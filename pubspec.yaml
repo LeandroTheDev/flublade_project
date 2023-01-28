@@ -57,6 +57,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/authentication_image.png
+    - assets/items/sword_of_the_primordial_fire.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
