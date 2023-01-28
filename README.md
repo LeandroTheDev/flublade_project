@@ -1,16 +1,9 @@
-# flublade_project
+# Flublade Project
 
-A new Flutter project.
+This is a MMORPG turn based game, it uses the MYSQL database to work, the idea is to make any game that can be all changed in the servers database, the applications will be a template to database and push the informations from database and work with the informations and show everthing in the screen.
 
-## Getting Started
+# Packages using in this project
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- provider: ^6.0.5
+- mysql1: ^0.20.0
+- shared_preferences: ^2.0.17

@@ -1,4 +1,7 @@
+import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AuthenticationPage extends StatefulWidget {
   const AuthenticationPage({super.key});
@@ -12,7 +15,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final options = Provider.of<Options>(context);
     final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -44,9 +49,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                 letterSpacing: 4, fontWeight: FontWeight.w900),
                           ),
                           const SizedBox(height: 20),
-                          //E-mail Text
-                          const Text('E-mail'),
-                          //E-mail Input
+                          //Username Text
+                          Text(Language.Translate('authentication_username',
+                                  options.language) ??
+                              'Username'),
+                          //Username Input
                           Stack(
                             children: [
                               //Background Box Color and Decoration
@@ -72,7 +79,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                               ),
                             ],
                           ),
-                          const Text('Password'),
+                          const SizedBox(height: 10),
+                          //Password Text
+                          Text(Language.Translate('authentication_password',
+                                  options.language) ??
+                              'Password'),
                           //Password Input
                           Stack(
                             children: [
@@ -100,31 +111,111 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                             ],
                           ),
                           const SizedBox(height: 15),
-                          //Remember CheckBox
-                          Row(
-                            children: [
-                              //Check Box
-                              Checkbox(
-                                value: rememberMe,
-                                onChanged: (checked) => setState(() {
-                                  rememberMe = !rememberMe;
-                                }),
-                              ),
-                              //Remember Text
-                              const Text(
-                                'Remember',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
+                          //Remember CheckBox and Language
+                          SizedBox(
+                            width: 310,
+                            child: Row(
+                              children: [
+                                //Check Box
+                                Checkbox(
+                                  value: rememberMe,
+                                  onChanged: (checked) => setState(() {
+                                    rememberMe = !rememberMe;
+                                  }),
+                                ),
+                                //Remember Text
+                                Text(
+                                  Language.Translate('authentication_remember',
+                                          options.language) ??
+                                      'Remember',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const Spacer(),
+                                //Language Button
+                                ElevatedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: Text(Language.Translate(
+                                                      'authentication_language',
+                                                      options.language) ??
+                                                  'Language'),
+                                              content: Column(
+                                                children: [
+                                                  //en_US
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        vertical: 8.0),
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        options.changeLanguage(
+                                                            'en_US');
+                                                        Navigator.pop(context);
+                                                        Navigator.pushReplacement(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (BuildContext
+                                                                        context) =>
+                                                                    super
+                                                                        .widget));
+                                                      },
+                                                      child: const Text(
+                                                        'English',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  //pt_BR
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        vertical: 8.0),
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
+                                                        options.changeLanguage(
+                                                            'pt_BR');
+                                                        Navigator.pop(context);
+                                                        Navigator.pushReplacement(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (BuildContext
+                                                                        context) =>
+                                                                    super
+                                                                        .widget));
+                                                      },
+                                                      child: const Text(
+                                                        'Português',
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    },
+                                    child: Text(Language.Translate(
+                                            'authentication_language',
+                                            options.language) ??
+                                        'Language'))
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 15),
-                          Row(
-                            children: [
-                              const SizedBox(width: 110),
-                              ElevatedButton(
-                                  onPressed: () {}, child: const Text('Login')),
-                              const SizedBox(width: 110),
-                            ],
+                          //Login Button
+                          Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 100),
+                            width: 310,
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: Text(Language.Translate(
+                                      'authentication_login',
+                                      options.language) ??
+                                  'Login'),
+                            ),
                           )
                         ],
                       ),

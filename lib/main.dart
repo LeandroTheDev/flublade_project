@@ -1,21 +1,31 @@
 // ignore_for_file: unused_local_variable
+import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/pages/authentication_page.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => Options(),
+        )
+      ],
+      child: const FluBlade(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FluBlade extends StatelessWidget {
+  const FluBlade({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(255, 53, 49, 49)
-      ),
+          scaffoldBackgroundColor: const Color.fromARGB(255, 53, 49, 49)),
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
       home: const FlubladeProject(),
@@ -40,7 +50,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
       (database) async {
         Navigator.pushReplacementNamed(context, '/authenticationpage');
       },
-    //Connection Error
+      //Connection Error
     ).catchError((error) {
       Navigator.of(context).pushReplacementNamed('/authenticationpage');
       showDialog(
