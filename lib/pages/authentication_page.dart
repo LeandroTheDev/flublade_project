@@ -1,5 +1,6 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -290,7 +291,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         context: context,
                                         builder: (context) {
                                           return SizedBox(
-                                            height: screenSize.height * 0.6,
+                                            height: screenSize.height * 0.8,
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.all(15.0),
@@ -299,8 +300,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     //Create Account Text
                                                     Center(
@@ -376,11 +376,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(5),
-                                                          alignment: Alignment
-                                                              .topLeft,
-                                                          width: screenSize
-                                                                  .width *
-                                                              0.95,
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          width:
+                                                              screenSize.width *
+                                                                  0.95,
                                                           height: 45,
                                                           child: TextFormField(
                                                               controller:
@@ -388,8 +388,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                         ),
                                                       ],
                                                     ),
-                                                    const SizedBox(
-                                                        height: 15),
+                                                    const SizedBox(height: 15),
                                                     //Password Text
                                                     FittedBox(
                                                       child: Text(
@@ -439,11 +438,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(5),
-                                                          alignment: Alignment
-                                                              .topLeft,
-                                                          width: screenSize
-                                                                  .width *
-                                                              0.95,
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          width:
+                                                              screenSize.width *
+                                                                  0.95,
                                                           height: 45,
                                                           child: TextFormField(
                                                               controller:
@@ -470,7 +469,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                                 child:
                                                                     ElevatedButton(
                                                                   onPressed:
-                                                                      () {
+                                                                      () async {
                                                                     //Error Treatment
                                                                     if (registerUsername
                                                                             .text
@@ -546,6 +545,83 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                                               ],
                                                                             );
                                                                           });
+                                                                    } else {
+                                                                      final result = await MySQL.createAccount(
+                                                                          name: registerUsername
+                                                                              .text,
+                                                                          password: registerPassword
+                                                                              .text,
+                                                                          language:
+                                                                              options.language);
+                                                                      if (result) {
+                                                                        showDialog(
+                                                                            barrierColor: const Color.fromARGB(
+                                                                                167,
+                                                                                0,
+                                                                                0,
+                                                                                0),
+                                                                            context:
+                                                                                context,
+                                                                            builder:
+                                                                                (context) {
+                                                                              return AlertDialog(
+                                                                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                                                                //Language Text
+                                                                                title: Text(
+                                                                                  Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
+                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
+                                                                                ),
+                                                                                content: Text(
+                                                                                  Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
+                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
+                                                                                ),
+                                                                                actions: [
+                                                                                  Center(
+                                                                                      child: ElevatedButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: const Text('Ok'),
+                                                                                  ))
+                                                                                ],
+                                                                              );
+                                                                            });
+                                                                      } else {
+                                                                        showDialog(
+                                                                            barrierColor: const Color.fromARGB(
+                                                                                167,
+                                                                                0,
+                                                                                0,
+                                                                                0),
+                                                                            context:
+                                                                                context,
+                                                                            builder:
+                                                                                (context) {
+                                                                              return AlertDialog(
+                                                                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                                                                //Language Text
+                                                                                title: Text(
+                                                                                  ':(',
+                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
+                                                                                ),
+                                                                                content: Text(
+                                                                                  Language.Translate('authentication_register_problem_connection', options.language) ?? 'Failed to connect to the Servers',
+                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
+                                                                                ),
+                                                                                actions: [
+                                                                                  Center(
+                                                                                      child: ElevatedButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: const Text('Ok'),
+                                                                                  ))
+                                                                                ],
+                                                                              );
+                                                                            });
+                                                                      }
                                                                     }
                                                                   },
                                                                   child: Text(

@@ -24,6 +24,9 @@ class Language {
     'authentication_register_create' : 'Create',
     'authentication_register_problem_username' : 'Username needs to have 3 or more Caracters',
     'authentication_register_problem_password' : 'Password needs to have 3 or more Caracters',
+    'authentication_register_problem_connection' : 'Failed to connect to the Servers',
+    'authentication_register_sucess' : 'Sucess',
+    'authentication_register_sucess_account' : 'Account Created',
   };
   static const pt_BR = {
     'authentication_username' : 'Usuário',
@@ -37,6 +40,9 @@ class Language {
     'authentication_register_password' : 'Sua Senha',
     'authentication_register_create' : 'Criar',
     'authentication_register_problem_username' : 'Usuário precisa ter 3 ou mais Caracteres',
-    'authentication_register_problem_password' : 'Usuário precisa ter 3 ou mais Caracteres',
+    'authentication_register_problem_password' : 'Senha precisa ter 3 ou mais Caracteres',
+    'authentication_register_problem_connection' : 'Falha ao connectar no Servidor',
+    'authentication_register_sucess' : 'Sucesso',
+    'authentication_register_sucess_account' : 'Conta Criada',
   };
 }
