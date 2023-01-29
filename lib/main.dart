@@ -25,7 +25,13 @@ class FluBlade extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(255, 53, 49, 49)),
+        primaryColor: Colors.white,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color.fromARGB(255, 92, 17, 17),
+          secondary: const Color.fromARGB(255, 0, 0, 0),
+        ),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 53, 49, 49),
+      ),
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
       home: const FlubladeProject(),
