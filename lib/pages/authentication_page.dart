@@ -12,7 +12,6 @@ class AuthenticationPage extends StatefulWidget {
 }
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
-  bool rememberMe = false;
 
   //Texts Controllers
   var username = TextEditingController();
@@ -24,6 +23,365 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
     final screenSize = MediaQuery.of(context).size;
+
+    //Error Dialog
+    errorDialog({
+      required String errorMsgTitle,
+      required String errorMsgContext,
+    }) {
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Language Text
+              title: Text(
+                ':(',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: Text(
+                Language.Translate(errorMsgTitle, options.language) ??
+                    errorMsgContext,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              actions: [
+                Center(
+                    child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Ok'),
+                ))
+              ],
+            );
+          });
+    }
+
+    //Register Modal
+    registerModal() {
+      //Modal Bottom
+      showModalBottomSheet<void>(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(50.0),
+            ),
+          ),
+          isScrollControlled: true,
+          context: context,
+          builder: (context) {
+            return SizedBox(
+              height: screenSize.height * 0.8,
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //Create Account Text
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('authentication_register_text',
+                                      options.language) ??
+                                  'Create Account',
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      //Username Text
+                      FittedBox(
+                        child: Text(
+                          Language.Translate('authentication_register_username',
+                                  options.language) ??
+                              'Your Username',
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 25),
+                        ),
+                      ),
+                      //Username Input
+                      Stack(
+                        children: [
+                          //Background Box Color and Decoration
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 209, 209, 209),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              width: screenSize.width * 0.95,
+                              height: 40,
+                            ),
+                          ),
+                          //Input
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            alignment: Alignment.topLeft,
+                            width: screenSize.width * 0.95,
+                            height: 45,
+                            child: TextFormField(controller: registerUsername),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      //Password Text
+                      FittedBox(
+                        child: Text(
+                          Language.Translate('authentication_register_password',
+                                  options.language) ??
+                              'Your Password',
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 25),
+                        ),
+                      ),
+                      //Password Input
+                      Stack(
+                        children: [
+                          //Background Box Color and Decoration
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 209, 209, 209),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              width: screenSize.width * 0.95,
+                              height: 40,
+                            ),
+                          ),
+                          //Input
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            alignment: Alignment.topLeft,
+                            width: screenSize.width * 0.95,
+                            height: 45,
+                            child: TextFormField(controller: registerPassword),
+                          ),
+                        ],
+                      ),
+                      //Create Button
+                      FittedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 50.0),
+                          child: SizedBox(
+                            width: screenSize.width,
+                            child: Row(
+                              children: [
+                                const Spacer(),
+                                SizedBox(
+                                  height: 100,
+                                  width: 250,
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      //Username Error
+                                      if (registerUsername.text.length < 3 ||
+                                          registerUsername.text.length > 20) {
+                                        errorDialog(
+                                            errorMsgTitle:
+                                                'authentication_register_problem_username',
+                                            errorMsgContext:
+                                                'Username needs to have 3 or more Caracters');
+                                        //Password Error
+                                      } else if (registerPassword.text.length <
+                                          3) {
+                                        errorDialog(
+                                            errorMsgTitle:
+                                                'authentication_register_problem_password',
+                                            errorMsgContext:
+                                                'Password needs to have 3 or more Caracters');
+                                        //Connect
+                                      } else {
+                                        MySQL.loadingWidget(
+                                            context: context,
+                                            language: options.language);
+                                        final result =
+                                            await MySQL.createAccount(
+                                                name: registerUsername.text,
+                                                password: registerPassword.text,
+                                                language: options.language);
+                                        if (result == 'sucess') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          showDialog(
+                                                  barrierColor:
+                                                      const Color.fromARGB(
+                                                          167, 0, 0, 0),
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape: const RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius.circular(
+                                                                      32.0))),
+                                                      backgroundColor: Theme.of(
+                                                              context)
+                                                          .scaffoldBackgroundColor,
+                                                      //Language Text
+                                                      title: Text(
+                                                        Language.Translate(
+                                                                'authentication_register_sucess',
+                                                                options
+                                                                    .language) ??
+                                                            'Failed to connect to the Servers',
+                                                        style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .primaryColor),
+                                                      ),
+                                                      content: Text(
+                                                        Language.Translate(
+                                                                'authentication_register_sucess_account',
+                                                                options
+                                                                    .language) ??
+                                                            'Failed to connect to the Servers',
+                                                        style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .primaryColor),
+                                                      ),
+                                                      actions: [
+                                                        Center(
+                                                            child:
+                                                                ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child:
+                                                              const Text('Ok'),
+                                                        ))
+                                                      ],
+                                                    );
+                                                  })
+                                              .then((result) {
+                                                    Navigator.popUntil(
+                                                        context,
+                                                        ModalRoute.withName(
+                                                            '/authenticationpage'));
+                                                  });
+                                        } else if (result == 'exists') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          errorDialog(
+                                              errorMsgTitle:
+                                                  'authentication_register_problem_existusername',
+                                              errorMsgContext:
+                                                  'Username already exist');
+                                        } else if (result == 'failed') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          errorDialog(
+                                              errorMsgTitle:
+                                                  'authentication_register_problem_connection',
+                                              errorMsgContext:
+                                                  'Failed to connect to the Servers');
+                                        }
+                                      }
+                                    },
+                                    child: Text(
+                                      Language.Translate(
+                                              'authentication_register_create',
+                                              options.language) ??
+                                          'Create',
+                                      style: const TextStyle(fontSize: 45),
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 240),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          });
+    }
+
+    //Change Language
+    changeLanguage() {
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Language Text
+              title: Text(
+                Language.Translate(
+                        'authentication_language', options.language) ??
+                    'Language',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: SizedBox(
+                width: screenSize.width * 0.5,
+                height: screenSize.height * 0.3,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      //en_US
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            options.changeLanguage('en_US');
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        super.widget));
+                          },
+                          child: const Text(
+                            'English',
+                          ),
+                        ),
+                      ),
+                      //pt_BR
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            options.changeLanguage('pt_BR');
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        super.widget));
+                          },
+                          child: const Text(
+                            'Português',
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          });
+    }
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -138,10 +496,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                   children: [
                                     //Check Box
                                     Checkbox(
-                                      value: rememberMe,
-                                      onChanged: (checked) => setState(() {
-                                        rememberMe = !rememberMe;
-                                      }),
+                                      fillColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.primary),
+                                      value: options.remember,
+                                      onChanged: (checked) => options.changeRemember(),
                                     ),
                                     //Remember Text
                                     Text(
@@ -156,101 +513,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                     //Language Button
                                     ElevatedButton(
                                         onPressed: () {
-                                          showDialog(
-                                              barrierColor:
-                                                  const Color.fromARGB(
-                                                      167, 0, 0, 0),
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius.circular(
-                                                                      32.0))),
-                                                  backgroundColor: Theme.of(
-                                                          context)
-                                                      .scaffoldBackgroundColor,
-                                                  //Language Text
-                                                  title: Text(
-                                                    Language.Translate(
-                                                            'authentication_language',
-                                                            options.language) ??
-                                                        'Language',
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .primaryColor),
-                                                  ),
-                                                  content: SizedBox(
-                                                    width:
-                                                        screenSize.width * 0.5,
-                                                    height:
-                                                        screenSize.height * 0.3,
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      child: Column(
-                                                        children: [
-                                                          //en_US
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        8.0),
-                                                            child:
-                                                                ElevatedButton(
-                                                              onPressed: () {
-                                                                options
-                                                                    .changeLanguage(
-                                                                        'en_US');
-                                                                Navigator.pop(
-                                                                    context);
-                                                                Navigator.pushReplacement(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                        builder:
-                                                                            (BuildContext context) =>
-                                                                                super.widget));
-                                                              },
-                                                              child: const Text(
-                                                                'English',
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          //pt_BR
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        8.0),
-                                                            child:
-                                                                ElevatedButton(
-                                                              onPressed: () {
-                                                                options
-                                                                    .changeLanguage(
-                                                                        'pt_BR');
-                                                                Navigator.pop(
-                                                                    context);
-                                                                Navigator.pushReplacement(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                        builder:
-                                                                            (BuildContext context) =>
-                                                                                super.widget));
-                                                              },
-                                                              child: const Text(
-                                                                'Português',
-                                                              ),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              });
+                                          changeLanguage();
                                         },
                                         child: Text(Language.Translate(
                                                 'authentication_language',
@@ -278,376 +541,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: TextButton(
                                   onPressed: () {
-                                    //Modal Bottom
-                                    showModalBottomSheet<void>(
-                                        backgroundColor: Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(50.0),
-                                          ),
-                                        ),
-                                        isScrollControlled: true,
-                                        context: context,
-                                        builder: (context) {
-                                          return SizedBox(
-                                            height: screenSize.height * 0.8,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(15.0),
-                                              child: SingleChildScrollView(
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    //Create Account Text
-                                                    Center(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: FittedBox(
-                                                          child: Text(
-                                                            Language.Translate(
-                                                                    'authentication_register_text',
-                                                                    options
-                                                                        .language) ??
-                                                                'Create Account',
-                                                            style: TextStyle(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .primaryColor,
-                                                                fontSize: 40,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    //Username Text
-                                                    FittedBox(
-                                                      child: Text(
-                                                        Language.Translate(
-                                                                'authentication_register_username',
-                                                                options
-                                                                    .language) ??
-                                                            'Your Username',
-                                                        style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .primaryColor,
-                                                            fontSize: 25),
-                                                      ),
-                                                    ),
-                                                    //Username Input
-                                                    Stack(
-                                                      children: [
-                                                        //Background Box Color and Decoration
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  top: 8.0),
-                                                          child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: const Color
-                                                                      .fromARGB(
-                                                                  255,
-                                                                  209,
-                                                                  209,
-                                                                  209),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8),
-                                                            ),
-                                                            width: screenSize
-                                                                    .width *
-                                                                0.95,
-                                                            height: 40,
-                                                          ),
-                                                        ),
-                                                        //Input
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          alignment:
-                                                              Alignment.topLeft,
-                                                          width:
-                                                              screenSize.width *
-                                                                  0.95,
-                                                          height: 45,
-                                                          child: TextFormField(
-                                                              controller:
-                                                                  registerUsername),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 15),
-                                                    //Password Text
-                                                    FittedBox(
-                                                      child: Text(
-                                                        Language.Translate(
-                                                                'authentication_register_password',
-                                                                options
-                                                                    .language) ??
-                                                            'Your Password',
-                                                        style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .primaryColor,
-                                                            fontSize: 25),
-                                                      ),
-                                                    ),
-                                                    //Password Input
-                                                    Stack(
-                                                      children: [
-                                                        //Background Box Color and Decoration
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  top: 8.0),
-                                                          child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: const Color
-                                                                      .fromARGB(
-                                                                  255,
-                                                                  209,
-                                                                  209,
-                                                                  209),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8),
-                                                            ),
-                                                            width: screenSize
-                                                                    .width *
-                                                                0.95,
-                                                            height: 40,
-                                                          ),
-                                                        ),
-                                                        //Input
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5),
-                                                          alignment:
-                                                              Alignment.topLeft,
-                                                          width:
-                                                              screenSize.width *
-                                                                  0.95,
-                                                          height: 45,
-                                                          child: TextFormField(
-                                                              controller:
-                                                                  registerPassword),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    //Create Button
-                                                    FittedBox(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                vertical: 50.0),
-                                                        child: SizedBox(
-                                                          width:
-                                                              screenSize.width,
-                                                          child: Row(
-                                                            children: [
-                                                              const Spacer(),
-                                                              SizedBox(
-                                                                height: 100,
-                                                                width: 250,
-                                                                child:
-                                                                    ElevatedButton(
-                                                                  onPressed:
-                                                                      () async {
-                                                                    //Error Treatment
-                                                                    if (registerUsername
-                                                                            .text
-                                                                            .length <
-                                                                        3) {
-                                                                      showDialog(
-                                                                          barrierColor: const Color.fromARGB(
-                                                                              167,
-                                                                              0,
-                                                                              0,
-                                                                              0),
-                                                                          context:
-                                                                              context,
-                                                                          builder:
-                                                                              (context) {
-                                                                            return AlertDialog(
-                                                                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                                                              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                                              //Language Text
-                                                                              title: Text(
-                                                                                ':(',
-                                                                                style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                              ),
-                                                                              content: Text(
-                                                                                Language.Translate('authentication_register_problem_username', options.language) ?? 'Username needs to have 3 or more Caracters',
-                                                                                style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                              ),
-                                                                              actions: [
-                                                                                Center(
-                                                                                    child: ElevatedButton(
-                                                                                  onPressed: () {
-                                                                                    Navigator.pop(context);
-                                                                                  },
-                                                                                  child: const Text('Ok'),
-                                                                                ))
-                                                                              ],
-                                                                            );
-                                                                          });
-                                                                    } else if (registerPassword
-                                                                            .text
-                                                                            .length <
-                                                                        3) {
-                                                                      showDialog(
-                                                                          barrierColor: const Color.fromARGB(
-                                                                              167,
-                                                                              0,
-                                                                              0,
-                                                                              0),
-                                                                          context:
-                                                                              context,
-                                                                          builder:
-                                                                              (context) {
-                                                                            return AlertDialog(
-                                                                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                                                              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                                              //Language Text
-                                                                              title: Text(
-                                                                                ':(',
-                                                                                style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                              ),
-                                                                              content: Text(
-                                                                                Language.Translate('authentication_register_problem_password', options.language) ?? 'Password needs to have 3 or more Caracters',
-                                                                                style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                              ),
-                                                                              actions: [
-                                                                                Center(
-                                                                                    child: ElevatedButton(
-                                                                                  onPressed: () {
-                                                                                    Navigator.pop(context);
-                                                                                  },
-                                                                                  child: const Text('Ok'),
-                                                                                ))
-                                                                              ],
-                                                                            );
-                                                                          });
-                                                                    } else {
-                                                                      final result = await MySQL.createAccount(
-                                                                          name: registerUsername
-                                                                              .text,
-                                                                          password: registerPassword
-                                                                              .text,
-                                                                          language:
-                                                                              options.language);
-                                                                      if (result) {
-                                                                        showDialog(
-                                                                            barrierColor: const Color.fromARGB(
-                                                                                167,
-                                                                                0,
-                                                                                0,
-                                                                                0),
-                                                                            context:
-                                                                                context,
-                                                                            builder:
-                                                                                (context) {
-                                                                              return AlertDialog(
-                                                                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                                                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                                                //Language Text
-                                                                                title: Text(
-                                                                                  Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
-                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                                ),
-                                                                                content: Text(
-                                                                                  Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
-                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                                ),
-                                                                                actions: [
-                                                                                  Center(
-                                                                                      child: ElevatedButton(
-                                                                                    onPressed: () {
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: const Text('Ok'),
-                                                                                  ))
-                                                                                ],
-                                                                              );
-                                                                            });
-                                                                      } else {
-                                                                        showDialog(
-                                                                            barrierColor: const Color.fromARGB(
-                                                                                167,
-                                                                                0,
-                                                                                0,
-                                                                                0),
-                                                                            context:
-                                                                                context,
-                                                                            builder:
-                                                                                (context) {
-                                                                              return AlertDialog(
-                                                                                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                                                                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                                                //Language Text
-                                                                                title: Text(
-                                                                                  ':(',
-                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                                ),
-                                                                                content: Text(
-                                                                                  Language.Translate('authentication_register_problem_connection', options.language) ?? 'Failed to connect to the Servers',
-                                                                                  style: TextStyle(color: Theme.of(context).primaryColor),
-                                                                                ),
-                                                                                actions: [
-                                                                                  Center(
-                                                                                      child: ElevatedButton(
-                                                                                    onPressed: () {
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: const Text('Ok'),
-                                                                                  ))
-                                                                                ],
-                                                                              );
-                                                                            });
-                                                                      }
-                                                                    }
-                                                                  },
-                                                                  child: Text(
-                                                                    Language.Translate(
-                                                                            'authentication_register_create',
-                                                                            options.language) ??
-                                                                        'Create',
-                                                                    style: const TextStyle(
-                                                                        fontSize:
-                                                                            45),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              const Spacer(),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 240),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        });
+                                    registerModal();
                                   },
                                   child: Text(Language.Translate(
                                           'authentication_register',
