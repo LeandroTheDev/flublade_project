@@ -44,3 +44,22 @@ class Options with ChangeNotifier {
     _id = value;
   }
 }
+
+class Settings with ChangeNotifier {
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  void changeIsLoading({value}){
+    if(value == null){
+      _isLoading = !_isLoading;
+      notifyListeners();
+    } else if(value){
+      _isLoading = true;
+      notifyListeners();
+    } else {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+}

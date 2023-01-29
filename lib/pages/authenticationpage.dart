@@ -12,7 +12,6 @@ class AuthenticationPage extends StatefulWidget {
 }
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
-
   //Texts Controllers
   var username = TextEditingController();
   var password = TextEditingController();
@@ -22,6 +21,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
+    final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
 
     //Error Dialog
@@ -216,63 +216,56 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                           // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           showDialog(
-                                                  barrierColor:
-                                                      const Color.fromARGB(
-                                                          167, 0, 0, 0),
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      shape: const RoundedRectangleBorder(
+                                              barrierColor:
+                                                  const Color.fromARGB(
+                                                      167, 0, 0, 0),
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  shape:
+                                                      const RoundedRectangleBorder(
                                                           borderRadius:
                                                               BorderRadius.all(
                                                                   Radius.circular(
                                                                       32.0))),
-                                                      backgroundColor: Theme.of(
-                                                              context)
-                                                          .scaffoldBackgroundColor,
-                                                      //Language Text
-                                                      title: Text(
-                                                        Language.Translate(
-                                                                'authentication_register_sucess',
-                                                                options
-                                                                    .language) ??
-                                                            'Failed to connect to the Servers',
-                                                        style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .primaryColor),
-                                                      ),
-                                                      content: Text(
-                                                        Language.Translate(
-                                                                'authentication_register_sucess_account',
-                                                                options
-                                                                    .language) ??
-                                                            'Failed to connect to the Servers',
-                                                        style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .primaryColor),
-                                                      ),
-                                                      actions: [
-                                                        Center(
-                                                            child:
-                                                                ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child:
-                                                              const Text('Ok'),
-                                                        ))
-                                                      ],
-                                                    );
-                                                  })
-                                              .then((result) {
-                                                    Navigator.popUntil(
-                                                        context,
-                                                        ModalRoute.withName(
-                                                            '/authenticationpage'));
-                                                  });
+                                                  backgroundColor: Theme.of(
+                                                          context)
+                                                      .scaffoldBackgroundColor,
+                                                  //Language Text
+                                                  title: Text(
+                                                    Language.Translate(
+                                                            'authentication_register_sucess',
+                                                            options.language) ??
+                                                        'Failed to connect to the Servers',
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .primaryColor),
+                                                  ),
+                                                  content: Text(
+                                                    Language.Translate(
+                                                            'authentication_register_sucess_account',
+                                                            options.language) ??
+                                                        'Failed to connect to the Servers',
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .primaryColor),
+                                                  ),
+                                                  actions: [
+                                                    Center(
+                                                        child: ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Text('Ok'),
+                                                    ))
+                                                  ],
+                                                );
+                                              }).then((result) {
+                                            Navigator.popUntil(
+                                                context,
+                                                ModalRoute.withName(
+                                                    '/authenticationpage'));
+                                          });
                                         } else if (result == 'exists') {
                                           // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
@@ -496,9 +489,14 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                   children: [
                                     //Check Box
                                     Checkbox(
-                                      fillColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.primary),
+                                      fillColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
                                       value: options.remember,
-                                      onChanged: (checked) => options.changeRemember(),
+                                      onChanged: (checked) =>
+                                          options.changeRemember(),
                                     ),
                                     //Remember Text
                                     Text(
@@ -524,18 +522,74 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                               ),
                               const SizedBox(height: 15),
                               //Login Button
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 100),
-                                width: 310,
-                                child: ElevatedButton(
-                                  onPressed: () {},
-                                  child: Text(Language.Translate(
-                                          'authentication_login',
-                                          options.language) ??
-                                      'Login'),
-                                ),
-                              ),
+                              settings.isLoading
+                                  ? SizedBox(
+                                      width: 310,
+                                      child: Row(
+                                        children: const [
+                                          Spacer(),
+                                          CircularProgressIndicator(),
+                                          Spacer(),
+                                        ],
+                                      ))
+                                  : Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 100),
+                                      width: 310,
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          settings.changeIsLoading(value: true);
+                                          if (username.text.length < 3) {
+                                            settings.changeIsLoading(
+                                                value: false);
+                                            errorDialog(
+                                                errorMsgTitle:
+                                                    'authentication_login_notfound',
+                                                errorMsgContext:
+                                                    'Username or password is Invalid');
+                                          } else if (password.text.length < 3) {
+                                            settings.changeIsLoading(
+                                                value: false);
+                                            errorDialog(
+                                                errorMsgTitle:
+                                                    'authentication_login_notfound',
+                                                errorMsgContext:
+                                                    'Username or password is Invalid');
+                                          } else {
+                                            settings.changeIsLoading(
+                                                value: false);
+                                            final result = await MySQL.login(
+                                                username: username.text,
+                                                password: password.text);
+                                            if (result == 'notfound') {
+                                              errorDialog(
+                                                  errorMsgTitle:
+                                                      'authentication_login_notfound',
+                                                  errorMsgContext:
+                                                      'Username or password is Invalid');
+                                            } else if (result == 'failed') {
+                                              settings.changeIsLoading(
+                                                  value: false);
+                                              errorDialog(
+                                                  errorMsgTitle:
+                                                      'authentication_register_problem_connection',
+                                                  errorMsgContext:
+                                                      'Failed to connect to the Servers');
+                                            } else if (result == 'success') {
+                                              settings.changeIsLoading(
+                                                  value: false);
+                                              // ignore: use_build_context_synchronously
+                                              Navigator.pushReplacementNamed(
+                                                  context, '/mainmenu');
+                                            }
+                                          }
+                                        },
+                                        child: Text(Language.Translate(
+                                                'authentication_login',
+                                                options.language) ??
+                                            'Login'),
+                                      ),
+                                    ),
                               //Register
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),

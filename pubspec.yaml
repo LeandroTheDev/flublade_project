@@ -60,6 +60,7 @@ flutter:
   assets:
     - assets/authentication_image.png
     - assets/items/sword_of_the_primordial_fire.png
+    - assets/main_menu_background.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

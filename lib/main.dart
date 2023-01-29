@@ -1,16 +1,21 @@
 // ignore_for_file: unused_local_variable
 import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/pages/authentication_page.dart';
+import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/pages/main_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
+      //Providers Call
       providers: [
         ChangeNotifierProvider(
           create: (_) => Options(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Settings(),
         )
       ],
       child: const FluBlade(),
@@ -35,7 +40,10 @@ class FluBlade extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
       home: const FlubladeProject(),
-      routes: {'/authenticationpage': (context) => const AuthenticationPage()},
+      routes: {
+        '/authenticationpage': (context) => const AuthenticationPage(),
+        '/mainmenu': (context) => const MainMenu(),
+      },
     );
   }
 }

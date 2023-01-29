@@ -15,10 +15,11 @@ class MySQL {
   );
 
   //Account Creation
-  static Future<String> createAccount(
-      {required String name,
-      required String password,
-      required String language}) async {
+  static Future<String> createAccount({
+    required String name,
+    required String password,
+    required String language,
+  }) async {
     //Connection to the database
     final connection = await database;
     try {
@@ -28,7 +29,7 @@ class MySQL {
           [name, password, language]);
       return 'sucess';
     } catch (error) {
-      if(error.toString().contains('Duplicate entry')){
+      if (error.toString().contains('Duplicate entry')) {
         return 'exists';
       }
       return 'failed';
@@ -55,11 +56,43 @@ class MySQL {
             content: const Padding(
               padding: EdgeInsets.all(50.0),
               child: SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: CircularProgressIndicator()),
+                  width: 100, height: 100, child: CircularProgressIndicator()),
             ),
           );
         });
+  }
+
+  //Login
+  static login({required String username, required String password}) async {
+    //Connection
+    final connection = await database;
+    try {
+      int id = 1;
+      //Credentials Checking
+      while (true) {
+        print('object');
+        dynamic usernamedb = await connection
+            .query('select username from accounts where id = ?', [id]);
+        usernamedb =
+            usernamedb.toString().replaceFirst('(Fields: {username: ', '');
+        usernamedb = usernamedb.substring(0, usernamedb.length - 2);
+        if (username == usernamedb) {
+          dynamic passworddb = await connection
+              .query('select password from accounts where id = ?', [id]);
+          passworddb =
+              passworddb.toString().replaceFirst('(Fields: {password: ', '');
+          passworddb = passworddb.substring(0, passworddb.length - 2);
+          if (password == passworddb) {
+            return 'success';
+          }
+        } else if (usernamedb == ''){
+          return 'notfound';
+        } else {
+          id++;
+        }
+      }
+    } catch (error) {
+      return 'failed';
+    }
   }
 }
