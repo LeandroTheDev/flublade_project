@@ -70,7 +70,6 @@ class MySQL {
       int id = 1;
       //Credentials Checking
       while (true) {
-        print('object');
         dynamic usernamedb = await connection
             .query('select username from accounts where id = ?', [id]);
         usernamedb =

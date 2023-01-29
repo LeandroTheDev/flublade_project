@@ -12,6 +12,10 @@ class Language {
   }
 
   static const en_US = {
+    'response_yes' : 'Yes',
+    'response_no' : 'No',
+    'response_confirmation' : 'Are you sure?',
+
     'authentication_username' : 'Username',
     'authentication_password' : 'Password',
     'authentication_remember' : 'Remember',
@@ -30,8 +34,18 @@ class Language {
     'authentication_register_loading' : 'Loading...',
     'authentication_register_sucess' : 'Sucess',
     'authentication_register_sucess_account' : 'Account Created',
+
+    'mainmenu_play' : 'Play',
+    'mainmenu_characters' : 'Characters',
+    'mainmenu_options' : 'Options',
+    'mainmenu_logout' : 'Logout',
+    'mainmenu_confirmation' : 'Logout and return to Login Page',
   };
   static const pt_BR = {
+    'response_yes' : 'Sim',
+    'response_no' : 'Não',
+    'response_confirmation' : 'Tem certeza?',
+
     'authentication_username' : 'Usuário',
     'authentication_password' : 'Senha',
     'authentication_remember' : 'Lembrar',
@@ -50,5 +64,11 @@ class Language {
     'authentication_register_loading' : 'Carregando...',
     'authentication_register_sucess' : 'Sucesso',
     'authentication_register_sucess_account' : 'Conta Criada',
+
+    'mainmenu_play' : 'Jogar',
+    'mainmenu_characters' : 'Personagens',
+    'mainmenu_options' : 'Opções',
+    'mainmenu_logout' : 'Desconectar',
+    'mainmenu_confirmation' : 'Desconectar e voltar para Pagina de Entrada',
   };
 }
