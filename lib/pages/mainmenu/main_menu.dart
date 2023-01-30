@@ -126,7 +126,9 @@ class MainMenu extends StatelessWidget {
                         const SizedBox(height: 400),
                         //Characters Button
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/charactersmenu');
+                          },
                           child: FittedBox(
                             child: Text(
                               Language.Translate('mainmenu_characters',

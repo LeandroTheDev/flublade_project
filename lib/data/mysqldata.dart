@@ -1,6 +1,8 @@
+import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:provider/provider.dart';
 
 class MySQL {
   //Connection
@@ -63,7 +65,7 @@ class MySQL {
   }
 
   //Login
-  static login({required String username, required String password}) async {
+  static login({required String username, required String password, required context}) async {
     //Connection
     final connection = await database;
     try {
@@ -82,6 +84,14 @@ class MySQL {
               passworddb.toString().replaceFirst('(Fields: {password: ', '');
           passworddb = passworddb.substring(0, passworddb.length - 2);
           if (password == passworddb) {
+            final options = Provider.of<Options>(context, listen: false);
+            options.changeUsername(username);
+            options.changePassword(password);
+            options.changeId(id);
+            SaveDatas.setUsername(username);
+            SaveDatas.setPassword(password);
+            SaveDatas.setId(id);
+            SaveDatas.setRemember(options.remember);
             return 'success';
           }
         } else if (usernamedb == ''){
@@ -91,6 +101,7 @@ class MySQL {
         }
       }
     } catch (error) {
+      print(error);
       return 'failed';
     }
   }

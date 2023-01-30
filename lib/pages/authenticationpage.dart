@@ -338,6 +338,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             options.changeLanguage('en_US');
+                            SaveDatas.setLanguage('en_US');
                             Navigator.pop(context);
                             Navigator.pushReplacement(
                                 context,
@@ -356,6 +357,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                         child: ElevatedButton(
                           onPressed: () {
                             options.changeLanguage('pt_BR');
+                            SaveDatas.setLanguage('pt_BR');
                             Navigator.pop(context);
                             Navigator.pushReplacement(
                                 context,
@@ -559,8 +561,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             settings.changeIsLoading(
                                                 value: false);
                                             final result = await MySQL.login(
-                                                username: username.text,
-                                                password: password.text);
+                                              username: username.text,
+                                              password: password.text,
+                                              context: context,
+                                            );
                                             if (result == 'notfound') {
                                               errorDialog(
                                                   errorMsgTitle:
@@ -576,6 +580,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   errorMsgContext:
                                                       'Failed to connect to the Servers');
                                             } else if (result == 'success') {
+                                              if(options.remember){
+                                                SaveDatas.setUsername(options.username);
+                                                SaveDatas.setPassword(options.password);
+                                                SaveDatas.setRemember(options.remember);
+                                              }
                                               settings.changeIsLoading(
                                                   value: false);
                                               // ignore: use_build_context_synchronously

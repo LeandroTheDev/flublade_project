@@ -45,6 +45,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                         child: ElevatedButton(
                           onPressed: () {
                             options.changeLanguage('en_US');
+                            SaveDatas.setLanguage('en_US');
                             Navigator.pop(context);
                             Navigator.pushReplacement(
                                 context,
@@ -63,6 +64,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                         child: ElevatedButton(
                           onPressed: () {
                             options.changeLanguage('pt_BR');
+                            SaveDatas.setLanguage('en_US');
                             Navigator.pop(context);
                             Navigator.pushReplacement(
                                 context,
@@ -102,6 +104,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
           ),
           Column(
             children: [
+              //Change Language
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 100),
                 child: Center(
@@ -120,6 +123,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            //Icon and Text
                             Row(
                               children: [
                                 Icon(Icons.language,

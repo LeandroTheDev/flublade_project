@@ -1,5 +1,6 @@
 // ignore_for_file: unused_local_variable
 import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
@@ -7,7 +8,13 @@ import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'pages/mainmenu/characters_menu.dart';
+
+void main() async {
+  //SaveDatas Loading
+  WidgetsFlutterBinding.ensureInitialized();
+  await SaveDatas.init();
+
   runApp(
     MultiProvider(
       //Providers Call
@@ -45,6 +52,7 @@ class FluBlade extends StatelessWidget {
         '/authenticationpage': (context) => const AuthenticationPage(),
         '/mainmenu': (context) => const MainMenu(),
         '/optionsmenu': (context) => const OptionsMenu(),
+        '/charactersmenu': (context) => const CharactersMenu(),
       },
     );
   }
@@ -61,10 +69,42 @@ class _FlubladeProjectState extends State<FlubladeProject> {
   @override
   void initState() {
     super.initState();
+    final options = Provider.of<Options>(context, listen: false);
+    //Load Datas
+    options.changeUsername(SaveDatas.getUsername() ?? '');
+    options.changePassword(SaveDatas.getPassword() ?? '');
+    options.changeId(SaveDatas.getId() ?? 0);
+    options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
     //Connection
     Future database = MySQL.database.then(
       (database) async {
-        Navigator.pushReplacementNamed(context, '/authenticationpage');
+        //Check Remember Box
+        if (SaveDatas.getRemember() ?? false) {
+          final result = await MySQL.login(
+              username: options.username,
+              password: options.password,
+              context: context);
+          if (result == 'success') {
+            // ignore: use_build_context_synchronously
+            Navigator.pushReplacementNamed(context, '/mainmenu');
+          } else {
+            // ignore: use_build_context_synchronously
+            Navigator.of(context).pushReplacementNamed('/authenticationpage');
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text(':('),
+                    content: Text(Language.Translate(
+                            'authentication_register_problem_connection',
+                            options.language) ??
+                        'Failed to connect to the Servers'),
+                  );
+                });
+          }
+        } else {
+          Navigator.of(context).pushReplacementNamed('/authenticationpage');
+        }
       },
       //Connection Error
     ).catchError((error) {
@@ -72,9 +112,12 @@ class _FlubladeProjectState extends State<FlubladeProject> {
       showDialog(
           context: context,
           builder: (context) {
-            return const AlertDialog(
-              title: Text(':('),
-              content: Text('Sem conexão com o servidor'),
+            return AlertDialog(
+              title: const Text(':('),
+              content: Text(Language.Translate(
+                      'authentication_register_problem_connection',
+                      options.language) ??
+                  'Failed to connect to the Servers'),
             );
           });
     });
