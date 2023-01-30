@@ -60,116 +60,159 @@ class _CharacterCreationState extends State<CharacterCreation> {
             ),
           ),
           //Creation
-          Column(
-            children: [
-              SizedBox(height: screenSize.height * 0.07),
-              //Book Selection
-              FittedBox(
-                child: Stack(
-                  children: [
-                    //Book Image
-                    SizedBox(
-                      width: 2800,
-                      height: 2400,
-                      child: Image.asset(
-                        'assets/open_book.png',
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    //Class Text
-                    SizedBox(
-                      width: 950,
-                      height: 500,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 510.0, top: 400),
-                        child: FittedBox(
-                          child: Text(
-                            Language.Translate('characters_create_class',
-                                    options.language) ??
-                                'Class',
-                            maxLines: 1,
-                            style: const TextStyle(fontFamily: 'PressStart'),
-                          ),
-                        ),
-                      ),
-                    ),
-                    //Class Text
-                    SizedBox(
-                      width: 2180,
-                      height: 500,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 1810.0, top: 400),
-                        child: FittedBox(
-                          child: Text(
-                            Language.Translate('characters_create_info',
-                                    options.language) ??
-                                'Info',
-                            maxLines: 1,
-                            style: const TextStyle(fontFamily: 'PressStart'),
-                          ),
-                        ),
-                      ),
-                    ),
-                    //Class Image
-                    SizedBox(
-                      width: 1140,
-                      height: 1780,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 350.0, top: 670),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: screenSize.height * 0.07),
+                //Book Selection
+                FittedBox(
+                  child: Stack(
+                    children: [
+                      //Book Image
+                      SizedBox(
+                        width: 2800,
+                        height: 2800,
                         child: Image.asset(
-                          Gameplay.classes[selectedClass],
+                          'assets/open_book.png',
                           fit: BoxFit.fill,
                         ),
                       ),
-                    ),
-                    //Next Button
-                    Padding(
-                      padding: const EdgeInsets.only(left: 1820.0, top: 1850),
-                      child: SizedBox(
-                          width: 400,
-                          height: 130,
-                          child: TextButton(
-                              onPressed: () {
-                                changeClass(true);
-                              },
-                              child: Center(
-                                child: FittedBox(
-                                  child: Text(
-                                    Language.Translate('response_next', options.language) ?? 'Next',
-                                    style: TextStyle(
-                                        fontSize: 80,
-                                        fontFamily: 'PressStart',
-                                        color: Theme.of(context).primaryColor),
-                                  ),
+                      //Class Text
+                      SizedBox(
+                        width: 950,
+                        height: 580,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 510.0, top: 500),
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('characters_create_class',
+                                      options.language) ??
+                                  'Class',
+                              maxLines: 1,
+                              style: const TextStyle(fontFamily: 'PressStart'),
+                            ),
+                          ),
+                        ),
+                      ),
+                      //Class Text
+                      SizedBox(
+                        width: 2180,
+                        height: 580,
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 1810.0, top: 500),
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('characters_create_info',
+                                      options.language) ??
+                                  'Info',
+                              maxLines: 1,
+                              style: const TextStyle(fontFamily: 'PressStart'),
+                            ),
+                          ),
+                        ),
+                      ),
+                      //Class Image
+                      SizedBox(
+                        width: 1140,
+                        height: 2110,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 350.0, top: 770),
+                          child: Image.asset(
+                            Gameplay.classes[selectedClass],
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                      //Class Info
+                      Padding(
+                        padding: const EdgeInsets.only(left: 1700.0, top: 750),
+                        child: SizedBox(
+                          width: 650,
+                          height: 1350,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Text(
+                                  Gameplay.returnClassInfo(
+                                      selectedClass, options.language),
+                                  style: const TextStyle(
+                                      fontFamily: 'Explora',
+                                      fontSize: 200,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 10),
                                 ),
-                              ))),
-                    ),
-                    //Back Button
-                    Padding(
-                      padding: const EdgeInsets.only(left: 590.0, top: 1850),
-                      child: SizedBox(
-                          width: 400,
-                          height: 130,
-                          child: TextButton(
-                              onPressed: () {
-                                changeClass(false);
-                              },
-                              child: Center(
-                                child: FittedBox(
-                                  child: Text(
-                                    Language.Translate('response_back', options.language) ?? 'Back',
-                                    style: TextStyle(
-                                        fontSize: 80,
-                                        fontFamily: 'PressStart',
-                                        color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              ))),
-                    ),
-                  ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                //Next & Back Button
+                SizedBox(
+                  width: screenSize.width,
+                  child: FittedBox(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        //Back Button
+                        TextButton(
+                          onPressed: () {
+                            changeClass(false);
+                          },
+                          child: Text(
+                            Language.Translate(
+                                    'response_back', options.language) ??
+                                'Back',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'PressStart',
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        ),
+                        SizedBox(width: 30),
+                        //Next Button
+                        TextButton(
+                          onPressed: () {
+                            changeClass(true);
+                          },
+                          child: Text(
+                            Language.Translate(
+                                    'response_next', options.language) ??
+                                'Next',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'PressStart',
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SizedBox(
+                        height: screenSize.height * 0.15,
+                        width: screenSize.width,
+                        child: ElevatedButton(
+                            onPressed: () {},
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FittedBox(
+                                child: Text(
+                                  Language.Translate('response_select', options.language) ?? 'Select',
+                                  style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
+                                ),
+                              ),
+                            ))),
+                  ),
+                )
+              ],
+            ),
           ),
         ],
       ),

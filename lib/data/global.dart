@@ -171,4 +171,22 @@ class Gameplay {
     10: 'assets/characters/weaponsmith.png',
     11: 'assets/characters/witch.png',
   };
+
+  static String returnClassInfo(int index, String language) {
+    Map classesInfo = {
+      0: 'characters_class_archer_info',
+      1: 'characters_class_assassin_info',
+      2: 'characters_class_bard_info',
+      3: 'characters_class_beastmaster_info',
+      4: 'characters_class_berserk_info',
+      5: 'characters_class_druid_info',
+      6: 'characters_class_mage_info',
+      7: 'characters_class_paladin_info',
+      8: 'characters_class_priest_info',
+      9: 'characters_class_trickmagician_info',
+      10: 'characters_class_weaponsmith_info',
+      11: 'characters_class_witch_info',
+    };
+    return Language.Translate(classesInfo[index], language) ?? 'Language Error';
+  }
 }

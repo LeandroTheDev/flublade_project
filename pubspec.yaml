@@ -114,6 +114,10 @@ flutter:
       fonts:
         - asset: assets/fonts/PressStart-Regular.ttf
           style: italic
+    - family: Explora
+      fonts:
+        - asset: assets/fonts/Explora-Regular.ttf
+          style: italic
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
