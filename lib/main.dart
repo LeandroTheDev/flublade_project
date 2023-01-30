@@ -25,7 +25,10 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => Settings(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Gameplay(),
+        ),
       ],
       child: const FluBlade(),
     ),
@@ -75,11 +78,13 @@ class _FlubladeProjectState extends State<FlubladeProject> {
   void initState() {
     super.initState();
     final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Load Datas
     options.changeUsername(SaveDatas.getUsername() ?? '');
     options.changePassword(SaveDatas.getPassword() ?? '');
     options.changeId(SaveDatas.getId() ?? 0);
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
+    gameplay.changeCharacters(SaveDatas.getCharacters() ?? '{}');
     Future.delayed(const Duration(seconds: 1), () => options.changeRemember(value: SaveDatas.getRemember() ?? false));
     //Connection
     Future database = MySQL.database.then(

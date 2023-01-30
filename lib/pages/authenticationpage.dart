@@ -21,44 +21,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
+    final optionsFalse = Provider.of<Options>(context, listen: false);
     final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
-
-    //Error Dialog
-    errorDialog({
-      required String errorMsgTitle,
-      required String errorMsgContext,
-    }) {
-      showDialog(
-          barrierColor: const Color.fromARGB(167, 0, 0, 0),
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Language Text
-              title: Text(
-                ':(',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              content: Text(
-                Language.Translate(errorMsgTitle, options.language) ??
-                    errorMsgContext,
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              actions: [
-                Center(
-                    child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Ok'),
-                ))
-              ],
-            );
-          });
-    }
 
     //Register Modal
     registerModal() {
@@ -189,19 +154,23 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                       //Username Error
                                       if (registerUsername.text.length < 3 ||
                                           registerUsername.text.length > 20) {
-                                        errorDialog(
+                                        GlobalFunctions.errorDialog(
                                             errorMsgTitle:
                                                 'authentication_register_problem_username',
                                             errorMsgContext:
-                                                'Username needs to have 3 or more Caracters');
+                                                'Username needs to have 3 or more Caracters',
+                                            context: context,
+                                            options: optionsFalse);
                                         //Password Error
                                       } else if (registerPassword.text.length <
                                           3) {
-                                        errorDialog(
+                                        GlobalFunctions.errorDialog(
                                             errorMsgTitle:
                                                 'authentication_register_problem_password',
                                             errorMsgContext:
-                                                'Password needs to have 3 or more Caracters');
+                                                'Password needs to have 3 or more Caracters',
+                                            context: context,
+                                            options: optionsFalse);
                                         //Connect
                                       } else {
                                         MySQL.loadingWidget(
@@ -269,19 +238,23 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         } else if (result == 'exists') {
                                           // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
-                                          errorDialog(
+                                          GlobalFunctions.errorDialog(
                                               errorMsgTitle:
                                                   'authentication_register_problem_existusername',
                                               errorMsgContext:
-                                                  'Username already exist');
+                                                  'Username already exist',
+                                              context: context,
+                                              options: optionsFalse);
                                         } else if (result == 'failed') {
                                           // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
-                                          errorDialog(
+                                          GlobalFunctions.errorDialog(
                                               errorMsgTitle:
                                                   'authentication_register_problem_connection',
                                               errorMsgContext:
-                                                  'Failed to connect to the Servers');
+                                                  'Failed to connect to the Servers',
+                                              context: context,
+                                              options: optionsFalse);
                                         }
                                       }
                                     },
@@ -444,7 +417,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                     //Language Button
                                     ElevatedButton(
                                         onPressed: () {
-                                          MySQL.changeLanguage(context, super.widget);
+                                          MySQL.changeLanguage(
+                                              context, super.widget);
                                         },
                                         child: Text(Language.Translate(
                                                 'authentication_language',
@@ -475,19 +449,23 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                           if (username.text.length < 3) {
                                             settings.changeIsLoading(
                                                 value: false);
-                                            errorDialog(
+                                            GlobalFunctions.errorDialog(
                                                 errorMsgTitle:
                                                     'authentication_login_notfound',
                                                 errorMsgContext:
-                                                    'Username or password is Invalid');
+                                                    'Username or password is Invalid',
+                                                context: context,
+                                                options: optionsFalse);
                                           } else if (password.text.length < 3) {
                                             settings.changeIsLoading(
                                                 value: false);
-                                            errorDialog(
+                                            GlobalFunctions.errorDialog(
                                                 errorMsgTitle:
                                                     'authentication_login_notfound',
                                                 errorMsgContext:
-                                                    'Username or password is Invalid');
+                                                    'Username or password is Invalid',
+                                                context: context,
+                                                options: optionsFalse);
                                           } else {
                                             settings.changeIsLoading(
                                                 value: false);
@@ -497,24 +475,31 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               context: context,
                                             );
                                             if (result == 'notfound') {
-                                              errorDialog(
+                                              GlobalFunctions.errorDialog(
                                                   errorMsgTitle:
                                                       'authentication_login_notfound',
                                                   errorMsgContext:
-                                                      'Username or password is Invalid');
+                                                      'Username or password is Invalid',
+                                                  context: context,
+                                                  options: optionsFalse);
                                             } else if (result == 'failed') {
                                               settings.changeIsLoading(
                                                   value: false);
-                                              errorDialog(
+                                              GlobalFunctions.errorDialog(
                                                   errorMsgTitle:
                                                       'authentication_register_problem_connection',
                                                   errorMsgContext:
-                                                      'Failed to connect to the Servers');
+                                                      'Failed to connect to the Servers',
+                                                  context: context,
+                                                  options: optionsFalse);
                                             } else if (result == 'success') {
-                                              if(options.remember){
-                                                SaveDatas.setUsername(options.username);
-                                                SaveDatas.setPassword(options.password);
-                                                SaveDatas.setRemember(options.remember);
+                                              if (options.remember) {
+                                                SaveDatas.setUsername(
+                                                    options.username);
+                                                SaveDatas.setPassword(
+                                                    options.password);
+                                                SaveDatas.setRemember(
+                                                    options.remember);
                                               }
                                               settings.changeIsLoading(
                                                   value: false);

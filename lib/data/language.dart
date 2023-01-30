@@ -18,6 +18,7 @@ class Language {
     'response_next': 'Next',
     'response_back': 'Back',
     'response_select': 'Select',
+    'response_create': 'Create',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -52,6 +53,8 @@ class Language {
     'characters_create': 'Create Character',
     'characters_create_class': 'Class',
     'characters_create_info': 'Info',
+    'characters_create_name': 'Character Name',
+    'characters_create_error': 'Ops, there\'s was a problem creating your character try again later',
     'characters_class_archer_info':
         'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
     'characters_class_assassin_info':
@@ -85,6 +88,7 @@ class Language {
     'response_next': 'Proximo',
     'response_back': 'Voltar',
     'response_select': 'Selecionar',
+    'response_create': 'Criar',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -119,6 +123,8 @@ class Language {
     'characters_create': 'Criar Personagem',
     'characters_create_class': 'Classe',
     'characters_create_info': 'Info ',
+    'characters_create_name': 'Nome do Personagem',
+    'characters_create_error': 'Ops, tivemos um problema ao criar seu personagem tente novamente mais tarde',
     'characters_class_archer_info':
         'Arqueiro\nVeloz e ágil, boa pontaria, menos chance de errar, frágil, maior chance de esquiva, pequena facilidade em roubos.',
     'characters_class_assassin_info':

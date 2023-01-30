@@ -1,5 +1,6 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,9 +13,13 @@ class CharacterCreation extends StatefulWidget {
 
 class _CharacterCreationState extends State<CharacterCreation> {
   int selectedClass = 0;
+  TextEditingController createName = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final options = Provider.of<Options>(context);
+
     //Change Class Button
     void changeClass(bool value) {
       if (value) {
@@ -40,8 +45,103 @@ class _CharacterCreationState extends State<CharacterCreation> {
       }
     }
 
-    final screenSize = MediaQuery.of(context).size;
-    final options = Provider.of<Options>(context);
+    //Select Username Dialog
+    void usernameSelect() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return FittedBox(
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              title: Text(
+                Language.Translate(
+                        'characters_create_name', options.language) ??
+                    'Character Name',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: Stack(
+                children: [
+                  //Background Box Color and Decoration
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 209, 209, 209),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      width: 250,
+                      height: 40,
+                    ),
+                  ),
+                  //Input
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    alignment: Alignment.topLeft,
+                    width: 250,
+                    height: 47,
+                    child: TextFormField(controller: createName),
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  children: [
+                    const Spacer(),
+                    //Create Button
+                    ElevatedButton(
+                      onPressed: () async {
+                        //Loading Widget
+                        MySQL.loadingWidget(
+                              context: context, language: options.language);
+                        //Uploading to database
+                        bool result = await MySQL.createCharacter(
+                            context: context,
+                            characterUsername: createName.text,
+                            characterClass: Gameplay.classes[selectedClass]);
+                        if (result) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.popUntil(
+                              context, ModalRoute.withName('/charactersmenu'));
+                        } else {
+                          GlobalFunctions.errorDialog(
+                            errorMsgTitle: 'characters_create_error',
+                            errorMsgContext:
+                                'Ops, there\'s was a problem creating your character try again later',
+                            context: context,
+                            options: options,
+                            popUntil: '/charactercreation',
+                          );
+                        }
+                      },
+                      child: Text(
+                        Language.Translate(
+                                'response_create', options.language) ??
+                            'Language',
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                    const Spacer(),
+                    //Back Button
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        Language.Translate('response_back', options.language) ??
+                            'Language',
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -94,7 +194,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                           ),
                         ),
                       ),
-                      //Class Text
+                      //Info Text
                       SizedBox(
                         width: 2180,
                         height: 580,
@@ -172,7 +272,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                                 color: Theme.of(context).primaryColor),
                           ),
                         ),
-                        SizedBox(width: 30),
+                        const SizedBox(width: 30),
                         //Next Button
                         TextButton(
                           onPressed: () {
@@ -192,6 +292,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                     ),
                   ),
                 ),
+                //Select Button
                 FittedBox(
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
@@ -199,13 +300,18 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         height: screenSize.height * 0.15,
                         width: screenSize.width,
                         child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              usernameSelect();
+                            },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: FittedBox(
                                 child: Text(
-                                  Language.Translate('response_select', options.language) ?? 'Select',
-                                  style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
+                                  Language.Translate('response_select',
+                                          options.language) ??
+                                      'Select',
+                                  style: const TextStyle(
+                                      fontSize: 500, fontFamily: 'PressStart'),
                                 ),
                               ),
                             ))),

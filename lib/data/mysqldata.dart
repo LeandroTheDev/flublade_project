@@ -45,20 +45,26 @@ class MySQL {
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
         builder: (context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            //Language Text
-            title: Text(
-              Language.Translate('authentication_register_loading', language) ??
-                  'Loading',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
-            content: const Padding(
-              padding: EdgeInsets.all(50.0),
-              child: SizedBox(
-                  width: 100, height: 100, child: CircularProgressIndicator()),
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Language Text
+              title: Text(
+                Language.Translate(
+                        'authentication_register_loading', language) ??
+                    'Loading',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: const Padding(
+                padding: EdgeInsets.all(50.0),
+                child: SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: CircularProgressIndicator()),
+              ),
             ),
           );
         });
@@ -118,8 +124,8 @@ class MySQL {
       options.changeLanguage(language);
       SaveDatas.setLanguage(language);
       database.then((connection) async {
-        await connection.query(
-            'update accounts set language=? where id=?', [language, options.id]);
+        await connection.query('update accounts set language=? where id=?',
+            [language, options.id]);
       });
 
       //Pop the Dialog
@@ -178,5 +184,28 @@ class MySQL {
             ),
           );
         });
+  }
+
+  //Create Character
+  static Future<bool> createCharacter({
+    required context,
+    required characterUsername,
+    required characterClass,
+  }) async {
+    //Save in Provider
+    String characters = Provider.of<Gameplay>(context, listen: false)
+        .addCharacter(
+            characterUsername: characterUsername,
+            characterClass: characterClass);
+    //Save in Database
+    try {
+      final connection = await database;
+      //Insert new account to the database
+      await connection.query('update accounts set characters=? where id=?',
+          [characters, Provider.of<Options>(context, listen: false).id]);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }

@@ -3,9 +3,14 @@ import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CharactersMenu extends StatelessWidget {
+class CharactersMenu extends StatefulWidget {
   const CharactersMenu({super.key});
 
+  @override
+  State<CharactersMenu> createState() => _CharactersMenuState();
+}
+
+class _CharactersMenuState extends State<CharactersMenu> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -36,7 +41,7 @@ class CharactersMenu extends StatelessWidget {
                   padding: const EdgeInsets.all(500.0),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/charactercreation');
+                      Navigator.of(context).pushNamed("/charactercreation").then((value) => setState(() {}));
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(200.0),

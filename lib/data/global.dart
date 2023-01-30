@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -76,6 +77,7 @@ class SaveDatas {
   static const _keyId = 0;
   static const _keyRemember = false;
   //Storage Options
+  static const _keyCharacters = '{}';
   static const _keyLanguage = 'en_US';
 
   //Load Datas
@@ -93,6 +95,8 @@ class SaveDatas {
       await _preferences.setBool(_keyRemember.toString(), remember);
   static Future setLanguage(String language) async =>
       await _preferences.setString(_keyLanguage, language);
+  static Future setCharacters(String characters) async =>
+      await _preferences.setString(_keyCharacters, characters);
 
   //Get Datas
   static String? getUsername() => _preferences.getString(_keyUsername);
@@ -100,6 +104,7 @@ class SaveDatas {
   static int? getId() => _preferences.getInt(_keyId.toString());
   static bool? getRemember() => _preferences.getBool(_keyRemember.toString());
   static String? getLanguage() => _preferences.getString(_keyLanguage);
+  static String? getCharacters() => _preferences.getString(_keyCharacters);
 }
 
 class GlobalFunctions {
@@ -154,9 +159,56 @@ class GlobalFunctions {
           );
         });
   }
+
+  //Error Dialog
+  static errorDialog({
+    required String errorMsgTitle,
+    required String errorMsgContext,
+    required BuildContext context,
+    required options,
+    String? popUntil,
+  }) {
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Language Text
+              title: Text(
+                ':(',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: Text(
+                Language.Translate(errorMsgTitle, options.language) ??
+                    errorMsgContext,
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              actions: [
+                Center(
+                    child: ElevatedButton(
+                  onPressed: () {
+                    if(popUntil != null){
+                      Navigator.popUntil(
+                                context, ModalRoute.withName(popUntil));
+                    } else {
+                    Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Ok'),
+                ))
+              ],
+            ),
+          );
+        });
+  }
 }
 
-class Gameplay {
+class Gameplay with ChangeNotifier {
   static Map classes = {
     0: 'assets/characters/archer.png',
     1: 'assets/characters/assassin.png',
@@ -188,5 +240,29 @@ class Gameplay {
       11: 'characters_class_witch_info',
     };
     return Language.Translate(classesInfo[index], language) ?? 'Language Error';
+  }
+
+  String _characters = '{}';
+
+  String get characters => _characters;
+
+  void changeCharacters(value){
+    _characters = value;
+  }
+
+  String addCharacter(
+      {required String characterUsername, required String characterClass}) {
+    Map characterFormat = jsonDecode(_characters);
+    characterFormat['character${characterFormat.length}'] = {
+      'name': characterUsername,
+      'class': characterClass.replaceFirst('assets/characters/', '').substring(
+          0, characterClass.replaceFirst('assets/characters/', '').length - 4),
+      'level': 1,
+      'skillpoint': 0,
+      'gold': 1,
+    };
+    _characters = jsonEncode(characterFormat);
+    SaveDatas.setCharacters(_characters);
+    return _characters;
   }
 }
