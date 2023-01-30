@@ -40,6 +40,8 @@ class Language {
     'mainmenu_options' : 'Options',
     'mainmenu_logout' : 'Logout',
     'mainmenu_confirmation' : 'Logout and return to Login Page',
+
+    'options_language' : 'Change Language',
   };
   static const pt_BR = {
     'response_yes' : 'Sim',
@@ -69,6 +71,8 @@ class Language {
     'mainmenu_characters' : 'Personagens',
     'mainmenu_options' : 'Opções',
     'mainmenu_logout' : 'Desconectar',
-    'mainmenu_confirmation' : 'Desconectar e voltar para Pagina de Entrada',
+    'mainmenu_confirmation' : 'Desconectar e voltar para Pagina de Entrada?',
+
+    'options_language' : 'Trocar Linguagem',
   };
 }

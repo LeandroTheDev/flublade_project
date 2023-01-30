@@ -2,7 +2,8 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/data/mysqldata.dart';
-import 'package:flublade_project/pages/main_menu.dart';
+import 'package:flublade_project/pages/mainmenu/main_menu.dart';
+import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,7 +34,7 @@ class FluBlade extends StatelessWidget {
         primaryColor: Colors.white,
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: const Color.fromARGB(255, 92, 17, 17),
-          secondary: const Color.fromARGB(255, 0, 0, 0),
+          secondary: const Color.fromARGB(255, 58, 55, 55),
         ),
         scaffoldBackgroundColor: const Color.fromARGB(255, 53, 49, 49),
       ),
@@ -43,6 +44,7 @@ class FluBlade extends StatelessWidget {
       routes: {
         '/authenticationpage': (context) => const AuthenticationPage(),
         '/mainmenu': (context) => const MainMenu(),
+        '/optionsmenu': (context) => const OptionsMenu(),
       },
     );
   }

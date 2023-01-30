@@ -24,7 +24,6 @@ class MainMenu extends StatelessWidget {
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Language Text
               title: Text(
                 Language.Translate(errorMsgTitle, options.language) ??
                     'Are you sure?',
@@ -143,7 +142,9 @@ class MainMenu extends StatelessWidget {
                         const SizedBox(height: 400),
                         //Options
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/optionsmenu');
+                          },
                           child: FittedBox(
                             child: Text(
                               Language.Translate(
