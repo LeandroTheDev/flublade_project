@@ -13,10 +13,10 @@ class AuthenticationPage extends StatefulWidget {
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
   //Texts Controllers
-  var username = TextEditingController();
-  var password = TextEditingController();
-  var registerUsername = TextEditingController();
-  var registerPassword = TextEditingController();
+  TextEditingController username = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController registerUsername = TextEditingController();
+  TextEditingController registerPassword = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

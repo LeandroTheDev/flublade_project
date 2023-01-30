@@ -1,4 +1,5 @@
 import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +26,32 @@ class CharactersMenu extends StatelessWidget {
               'assets/main_menu_background.png',
               fit: BoxFit.cover,
             ),
+          ),
+          // Characters
+          Column(
+            children: [
+              SizedBox(height: screenSize.height * 0.1),
+              FittedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(500.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/charactercreation');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(200.0),
+                      child: Text(
+                        Language.Translate(
+                                'characters_create', options.language) ??
+                            'characters_create',
+                        style: const TextStyle(
+                            fontSize: 500, fontFamily: 'PressStart'),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
         ],
       ),

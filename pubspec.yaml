@@ -58,9 +58,35 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+    # Menu
     - assets/authentication_image.png
-    - assets/items/sword_of_the_primordial_fire.png
     - assets/main_menu_background.png
+    - assets/open_book.png
+    - assets/tavern.png
+    # Item
+    - assets/items/sword_of_the_primordial_fire.png
+    # Classes
+    - assets/characters/archer.png
+    - assets/characters/assassin.png
+    - assets/characters/bard.png
+    - assets/characters/beastmaster.png
+    - assets/characters/berserk.png
+    - assets/characters/druid.png
+    - assets/characters/mage.png
+    - assets/characters/paladin.png
+    - assets/characters/priest.png
+    - assets/characters/trickmagician.png
+    - assets/characters/weaponsmith.png
+    - assets/characters/witch.png
+    # Monster
+      #drauy_monsters
+    - assets/monsters/drauy_monsters/big_spider.png
+    - assets/monsters/drauy_monsters/small_spider.png
+    # locations
+      #drauy_location
+    - assets/locations/drauy_dungeon/bedroom.png
+    - assets/locations/drauy_dungeon/central.png
+    - assets/locations/drauy_dungeon/room1.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

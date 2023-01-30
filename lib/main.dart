@@ -1,4 +1,5 @@
 // ignore_for_file: unused_local_variable
+import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -34,6 +35,7 @@ void main() async {
 class FluBlade extends StatelessWidget {
   const FluBlade({super.key});
 
+  //Program Call
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -53,6 +55,7 @@ class FluBlade extends StatelessWidget {
         '/mainmenu': (context) => const MainMenu(),
         '/optionsmenu': (context) => const OptionsMenu(),
         '/charactersmenu': (context) => const CharactersMenu(),
+        '/charactercreation':(context) => const CharacterCreation(),
       },
     );
   }

@@ -15,6 +15,8 @@ class Language {
     'response_yes' : 'Yes',
     'response_no' : 'No',
     'response_confirmation' : 'Are you sure?',
+    'response_next' : 'Next',
+    'response_back' : 'Back',
 
     'authentication_username' : 'Username',
     'authentication_password' : 'Password',
@@ -42,11 +44,17 @@ class Language {
     'mainmenu_confirmation' : 'Logout and return to Login Page',
 
     'options_language' : 'Change Language',
+
+    'characters_create' : 'Create Character',
+    'characters_create_class' : 'Class',
+    'characters_create_info' : 'Info',
   };
   static const pt_BR = {
     'response_yes' : 'Sim',
     'response_no' : 'Não',
     'response_confirmation' : 'Tem certeza?',
+    'response_next' : 'Proximo',
+    'response_back' : 'Voltar',
 
     'authentication_username' : 'Usuário',
     'authentication_password' : 'Senha',
@@ -74,5 +82,9 @@ class Language {
     'mainmenu_confirmation' : 'Desconectar e voltar para Pagina de Entrada?',
 
     'options_language' : 'Trocar Linguagem',
+
+    'characters_create' : 'Criar Personagem',
+    'characters_create_class' : 'Classe',
+    'characters_create_info' : 'Info ',
   };
 }
