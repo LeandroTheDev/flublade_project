@@ -309,75 +309,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
           });
     }
 
-    //Change Language
-    changeLanguage() {
-      showDialog(
-          barrierColor: const Color.fromARGB(167, 0, 0, 0),
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Language Text
-              title: Text(
-                Language.Translate(
-                        'authentication_language', options.language) ??
-                    'Language',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              content: SizedBox(
-                width: screenSize.width * 0.5,
-                height: screenSize.height * 0.3,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      //en_US
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            options.changeLanguage('en_US');
-                            SaveDatas.setLanguage('en_US');
-                            Navigator.pop(context);
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        super.widget));
-                          },
-                          child: const Text(
-                            'English',
-                          ),
-                        ),
-                      ),
-                      //pt_BR
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            options.changeLanguage('pt_BR');
-                            SaveDatas.setLanguage('pt_BR');
-                            Navigator.pop(context);
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) =>
-                                        super.widget));
-                          },
-                          child: const Text(
-                            'Português',
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          });
-    }
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -513,7 +444,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                     //Language Button
                                     ElevatedButton(
                                         onPressed: () {
-                                          changeLanguage();
+                                          MySQL.changeLanguage(context, super.widget);
                                         },
                                         child: Text(Language.Translate(
                                                 'authentication_language',

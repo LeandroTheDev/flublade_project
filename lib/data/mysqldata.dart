@@ -65,7 +65,10 @@ class MySQL {
   }
 
   //Login
-  static login({required String username, required String password, required context}) async {
+  static login(
+      {required String username,
+      required String password,
+      required context}) async {
     //Connection
     final connection = await database;
     try {
@@ -94,15 +97,86 @@ class MySQL {
             SaveDatas.setRemember(options.remember);
             return 'success';
           }
-        } else if (usernamedb == ''){
+        } else if (usernamedb == '') {
           return 'notfound';
         } else {
           id++;
         }
       }
     } catch (error) {
-      print(error);
       return 'failed';
     }
+  }
+
+  //Change Language
+  static void changeLanguage(context, widget) {
+    final screenSize = MediaQuery.of(context).size;
+    final options = Provider.of<Options>(context, listen: false);
+    //Upload to MySQL
+    uploadData(String language) {
+      //Update Datas
+      options.changeLanguage(language);
+      SaveDatas.setLanguage(language);
+      database.then((connection) async {
+        await connection.query(
+            'update accounts set language=? where id=?', [language, options.id]);
+      });
+
+      //Pop the Dialog
+      Navigator.pop(context);
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (BuildContext context) => widget));
+    }
+
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            //Language Text
+            title: Text(
+              Language.Translate('authentication_language', options.language) ??
+                  'Language',
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            content: SizedBox(
+              width: screenSize.width * 0.5,
+              height: screenSize.height * 0.3,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    //en_US
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          uploadData('en_US');
+                        },
+                        child: const Text(
+                          'English',
+                        ),
+                      ),
+                    ),
+                    //pt_BR
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          uploadData('pt_BR');
+                        },
+                        child: const Text(
+                          'Português',
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 }

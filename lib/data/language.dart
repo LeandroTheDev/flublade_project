@@ -59,7 +59,7 @@ class Language {
     'authentication_register_username' : 'Seu Usuário',
     'authentication_register_password' : 'Sua Senha',
     'authentication_register_create' : 'Criar',
-    'authentication_register_problem_username' : 'Usuário precisa ter 3 Caracters e menos que 20 Caracteres',
+    'authentication_register_problem_username' : 'Usuário precisa ter 3 Caracteres e menos que 20 Caracteres',
     'authentication_register_problem_existusername' : 'Usuário já existe',
     'authentication_register_problem_password' : 'Senha precisa ter 3 ou mais Caracteres',
     'authentication_register_problem_connection' : 'Falha ao connectar no Servidor',

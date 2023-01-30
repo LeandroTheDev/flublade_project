@@ -1,6 +1,6 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
+import 'package:flublade_project/data/language.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Options with ChangeNotifier {
@@ -67,12 +67,6 @@ class Settings with ChangeNotifier {
   }
 }
 
-class Profile with ChangeNotifier {
-  Map _characters = {};
-
-  Map get characters => _characters;
-}
-
 class SaveDatas {
   static late SharedPreferences _preferences;
 
@@ -100,4 +94,59 @@ class SaveDatas {
   static int? getId() => _preferences.getInt(_keyId.toString());
   static bool? getRemember() => _preferences.getBool(_keyRemember.toString());
   static String? getLanguage() => _preferences.getString(_keyLanguage);
+}
+
+class GlobalFunctions {
+  //Confirmation Dialog
+    static void confirmationDialog({
+      required String errorMsgTitle,
+      required String errorMsgContext,
+      required BuildContext context,
+    }) {
+      final options = Provider.of<Options>(context, listen: false);
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              title: Text(
+                Language.Translate(errorMsgTitle, options.language) ??
+                    'Are you sure?',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: Text(
+                Language.Translate(errorMsgContext, options.language) ??
+                    'MsgContext',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    options.changeUsername('');
+                    options.changePassword('');
+                    options.changeRemember(value: false);
+                    options.changeId(0);
+                    Navigator.pushReplacementNamed(
+                        context, '/authenticationpage');
+                  },
+                  child: Text(
+                    Language.Translate('response_yes', options.language) ??
+                        'Yes',
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    Language.Translate('response_no', options.language) ?? 'No',
+                  ),
+                ),
+              ],
+            );
+          });
+    }
 }

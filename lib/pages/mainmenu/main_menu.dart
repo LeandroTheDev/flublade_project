@@ -3,64 +3,18 @@ import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MainMenu extends StatelessWidget {
+class MainMenu extends StatefulWidget {
   const MainMenu({super.key});
 
+  @override
+  State<MainMenu> createState() => _MainMenuState();
+}
+
+class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
     final screenSize = MediaQuery.of(context).size;
-
-    //Confirmation Dialog
-    confirmationDialog({
-      required String errorMsgTitle,
-      required String errorMsgContext,
-    }) {
-      showDialog(
-          barrierColor: const Color.fromARGB(167, 0, 0, 0),
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              title: Text(
-                Language.Translate(errorMsgTitle, options.language) ??
-                    'Are you sure?',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              content: Text(
-                Language.Translate(errorMsgContext, options.language) ??
-                    'MsgContext',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    options.changeUsername('');
-                    options.changePassword('');
-                    options.changeRemember(value: false);
-                    options.changeId(0);
-                    Navigator.pushReplacementNamed(
-                        context, '/authenticationpage');
-                  },
-                  child: Text(
-                    Language.Translate('response_yes', options.language) ??
-                        'Yes',
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    Language.Translate('response_no', options.language) ?? 'No',
-                  ),
-                ),
-              ],
-            );
-          });
-    }
 
     return Scaffold(
       body: Stack(
@@ -145,7 +99,7 @@ class MainMenu extends StatelessWidget {
                         //Options
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/optionsmenu');
+                            Navigator.of(context).pushNamed("/optionsmenu").then((value) => setState(() {}));
                           },
                           child: FittedBox(
                             child: Text(
@@ -163,9 +117,11 @@ class MainMenu extends StatelessWidget {
                         //Logout
                         TextButton(
                           onPressed: () async {
-                            confirmationDialog(
+                            GlobalFunctions.confirmationDialog(
                                 errorMsgTitle: 'response_confirmation',
-                                errorMsgContext: 'mainmenu_confirmation');
+                                errorMsgContext: 'mainmenu_confirmation',
+                                context: context,
+                                );
                           },
                           child: FittedBox(
                             child: Text(

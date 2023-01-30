@@ -66,6 +66,8 @@ class FlubladeProject extends StatefulWidget {
 }
 
 class _FlubladeProjectState extends State<FlubladeProject> {
+
+  //Load Datas & Auto Login
   @override
   void initState() {
     super.initState();
@@ -75,11 +77,13 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     options.changePassword(SaveDatas.getPassword() ?? '');
     options.changeId(SaveDatas.getId() ?? 0);
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
+    Future.delayed(const Duration(seconds: 1), () => options.changeRemember(value: SaveDatas.getRemember() ?? false));
     //Connection
     Future database = MySQL.database.then(
       (database) async {
+        await Future.delayed(const Duration(seconds: 1));
         //Check Remember Box
-        if (SaveDatas.getRemember() ?? false) {
+        if (options.remember) {
           final result = await MySQL.login(
               username: options.username,
               password: options.password,
@@ -103,12 +107,14 @@ class _FlubladeProjectState extends State<FlubladeProject> {
                 });
           }
         } else {
+          // ignore: use_build_context_synchronously
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
         }
       },
       //Connection Error
     ).catchError((error) {
       Navigator.of(context).pushReplacementNamed('/authenticationpage');
+      //Connection Error
       showDialog(
           context: context,
           builder: (context) {
