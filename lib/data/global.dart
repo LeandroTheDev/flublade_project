@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
+
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -251,6 +253,7 @@ class Gameplay with ChangeNotifier {
     _characters = value;
   }
 
+  //Add new Character
   Future<String> addCharacter({
     required String characterUsername,
     required String characterClass,
@@ -281,6 +284,7 @@ class Gameplay with ChangeNotifier {
           'level': 1,
           'skillpoint': 0,
           'gold': 0,
+          'location': 'prologue',
         };
         charactersdb = jsonEncode(charactersdb);
         //Upload to Database
@@ -299,6 +303,7 @@ class Gameplay with ChangeNotifier {
       'level': 1,
       'skillpoint': 0,
       'gold': 0,
+      'location': 'prologue',
     };
     //Saving Datas
     _characters = jsonEncode(characterFormat);

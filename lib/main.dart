@@ -4,12 +4,12 @@ import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flublade_project/pages/mainmenu/options_menu.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'pages/mainmenu/characters_menu.dart';
 
 void main() async {
   //SaveDatas Loading
@@ -58,7 +58,7 @@ class FluBlade extends StatelessWidget {
         '/mainmenu': (context) => const MainMenu(),
         '/optionsmenu': (context) => const OptionsMenu(),
         '/charactersmenu': (context) => const CharactersMenu(),
-        '/charactercreation':(context) => const CharacterCreation(),
+        '/charactercreation': (context) => const CharacterCreation(),
       },
     );
   }
@@ -72,7 +72,6 @@ class FlubladeProject extends StatefulWidget {
 }
 
 class _FlubladeProjectState extends State<FlubladeProject> {
-
   //Load Datas & Auto Login
   @override
   void initState() {
@@ -85,34 +84,34 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     options.changeId(SaveDatas.getId() ?? 0);
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
     gameplay.changeCharacters(SaveDatas.getCharacters() ?? '{}');
-    Future.delayed(const Duration(seconds: 1), () => options.changeRemember(value: SaveDatas.getRemember() ?? false));
+    Future.delayed(const Duration(seconds: 1),
+        () => options.changeRemember(value: SaveDatas.getRemember() ?? false));
     //Connection
     Future database = MySQL.database.then(
       (database) async {
         await Future.delayed(const Duration(seconds: 1));
         //Check Remember Box
         if (options.remember) {
+          //Login Check
           final result = await MySQL.login(
               username: options.username,
               password: options.password,
               context: context);
           if (result == 'success') {
+            //Push Characters
+            String characters = await MySQL.pushCharacters(options: options);
+            gameplay.changeCharacters(characters);
+            SaveDatas.setCharacters(characters);
             // ignore: use_build_context_synchronously
             Navigator.pushReplacementNamed(context, '/mainmenu');
           } else {
             // ignore: use_build_context_synchronously
             Navigator.of(context).pushReplacementNamed('/authenticationpage');
-            showDialog(
+            GlobalFunctions.errorDialog(
+                errorMsgTitle: 'authentication_register_problem_connection',
+                errorMsgContext: 'Failed to connect to the Servers',
                 context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text(':('),
-                    content: Text(Language.Translate(
-                            'authentication_register_problem_connection',
-                            options.language) ??
-                        'Failed to connect to the Servers'),
-                  );
-                });
+                options: options);
           }
         } else {
           // ignore: use_build_context_synchronously

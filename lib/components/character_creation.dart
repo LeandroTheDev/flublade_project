@@ -1,6 +1,7 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -55,12 +56,14 @@ class _CharacterCreationState extends State<CharacterCreation> {
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Title
               title: Text(
                 Language.Translate(
                         'characters_create_name', options.language) ??
                     'Character Name',
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
+              //Text and Input
               content: Stack(
                 children: [
                   //Background Box Color and Decoration
@@ -85,6 +88,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                   ),
                 ],
               ),
+              //Butons
               actions: [
                 Row(
                   children: [
@@ -92,27 +96,38 @@ class _CharacterCreationState extends State<CharacterCreation> {
                     //Create Button
                     ElevatedButton(
                       onPressed: () async {
-                        //Loading Widget
-                        MySQL.loadingWidget(
-                              context: context, language: options.language);
-                        //Uploading to database
-                        bool result = await MySQL.createCharacter(
-                            context: context,
-                            characterUsername: createName.text,
-                            characterClass: Gameplay.classes[selectedClass]);
-                        if (result) {
-                          // ignore: use_build_context_synchronously
-                          Navigator.popUntil(
-                              context, ModalRoute.withName('/charactersmenu'));
-                        } else {
+                        if (createName.text.length > 10) {
                           GlobalFunctions.errorDialog(
-                            errorMsgTitle: 'characters_create_error',
-                            errorMsgContext:
-                                'Ops, there\'s was a problem creating your character try again later',
-                            context: context,
-                            options: options,
-                            popUntil: '/charactercreation',
-                          );
+                              errorMsgTitle:
+                                  'characters_create_error_namelimit',
+                              errorMsgContext:
+                                  'Character name cannot be longer than 10 characters',
+                              context: context,
+                              options:
+                                  Provider.of<Options>(context, listen: false));
+                        } else {
+                          //Loading Widget
+                          MySQL.loadingWidget(
+                              context: context, language: options.language);
+                          //Uploading to database
+                          bool result = await MySQL.createCharacter(
+                              context: context,
+                              characterUsername: createName.text,
+                              characterClass: Gameplay.classes[selectedClass]);
+                          if (result) {
+                            // ignore: use_build_context_synchronously
+                            Navigator.popUntil(context,
+                                ModalRoute.withName('/charactersmenu'));
+                          } else {
+                            GlobalFunctions.errorDialog(
+                              errorMsgTitle: 'characters_create_error',
+                              errorMsgContext:
+                                  'Ops, there\'s was a problem creating your character try again later',
+                              context: context,
+                              options: options,
+                              popUntil: '/charactercreation',
+                            );
+                          }
                         }
                       },
                       child: Text(

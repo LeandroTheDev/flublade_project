@@ -19,6 +19,8 @@ class Language {
     'response_back': 'Back',
     'response_select': 'Select',
     'response_create': 'Create',
+    'response_remove': 'Remove',
+    'response_ok': 'Ok',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -52,9 +54,15 @@ class Language {
     //Characters
     'characters_create': 'Create Character',
     'characters_create_class': 'Class',
+    'characters_create_level': 'Level',
+    'characters_create_gold': 'Gold',
+    'characters_create_location': 'Location',
     'characters_create_info': 'Info',
     'characters_create_name': 'Character Name',
-    'characters_create_error': 'Ops, there\'s was a problem creating your character try again later',
+    'characters_create_error':
+        'Ops, there\'s was a problem creating your character try again later',
+    'characters_create_error_namelimit':
+        'Character name cannot be longer than 10 characters',
     'characters_class_archer_info':
         'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
     'characters_class_assassin_info':
@@ -79,6 +87,21 @@ class Language {
         'Weaponsmith\nForged weapons are 10% more effective, great at making friends, robust, can create wards, chance to forge with enchantment.',
     'characters_class_witch_info':
         'Witch\nDamage with dark spells 10% more effective, 10% of damage dealt is converted to life, extremely fragile, can charm enemies, excellent at making friends, takes 10% more damage from light spells.',
+    'characters_class_archer': 'Archer',
+    'characters_class_assassin': 'Assassin',
+    'characters_class_bard': 'Bard',
+    'characters_class_beastmaster': 'Beastmaster',
+    'characters_class_berserk': 'Berserk',
+    'characters_class_druid': 'Druid',
+    'characters_class_mage': 'Mage',
+    'characters_class_paladin': 'Paladin',
+    'characters_class_priest': 'Priest',
+    'characters_class_trickmagician': 'Trickmagician',
+    'characters_class_weaponsmith': 'Weaponsmith',
+    'characters_class_witch': 'Witch',
+    'characters_remove': 'Type "DELETE" to remove the character',
+    //Locations
+    'locations_prologue': 'Prologue',
   };
   static const pt_BR = {
     //Response
@@ -89,6 +112,8 @@ class Language {
     'response_back': 'Voltar',
     'response_select': 'Selecionar',
     'response_create': 'Criar',
+    'response_remove': 'Remover',
+    'response_ok': 'Ok',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -122,9 +147,15 @@ class Language {
     //Characters
     'characters_create': 'Criar Personagem',
     'characters_create_class': 'Classe',
+    'characters_create_level': 'Nível',
+    'characters_create_gold': 'Ouro',
+    'characters_create_location': 'Local',
     'characters_create_info': 'Info ',
     'characters_create_name': 'Nome do Personagem',
-    'characters_create_error': 'Ops, tivemos um problema ao criar seu personagem tente novamente mais tarde',
+    'characters_create_error':
+        'Ops, tivemos um problema ao criar seu personagem tente novamente mais tarde',
+    'characters_create_error_namelimit':
+        'Nome do personagem não pode ter mais de 10 caracteres',
     'characters_class_archer_info':
         'Arqueiro\nVeloz e ágil, boa pontaria, menos chance de errar, frágil, maior chance de esquiva, pequena facilidade em roubos.',
     'characters_class_assassin_info':
@@ -149,5 +180,20 @@ class Language {
         'Armeiro\nArmas forjadas são 10% mais eficazes, ótimo em fazer amizades, robusto, consegue criar sentinelas, chance de forjar com encantamento.',
     'characters_class_witch_info':
         'Bruxa\nDanos com magias escuras 10% mais eficazes, 10% do dano causado é convertido em vida, extremamente frágil, consegue encantar inimigos, excelente em fazer amizades, recebe 10% mais de dano em magias da luz.',
+    'characters_class_archer': 'Arqueiro',
+    'characters_class_assassin': 'Assassino',
+    'characters_class_bard': 'Bardo',
+    'characters_class_beastmaster': 'Domador de Fera',
+    'characters_class_berserk': 'Berserk',
+    'characters_class_druid': 'Druida',
+    'characters_class_mage': 'Mago',
+    'characters_class_paladin': 'Paladino',
+    'characters_class_priest': 'Sacerdote',
+    'characters_class_trickmagician': 'Mágico',
+    'characters_class_weaponsmith': 'Armeiro',
+    'characters_class_witch': 'Bruxa',
+    'characters_remove': 'Digite "DELETE" para remover o personagem',
+    //Locations
+    'locations_prologue': 'Prólogo',
   };
 }

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
@@ -210,5 +213,21 @@ class MySQL {
     } catch (error) {
       return false;
     }
+  }
+
+  //Push Characters
+  static Future<String> pushCharacters({required options}) async {
+    final connection = await database;
+    dynamic charactersdb = await connection
+            .query('select characters from accounts where id = ?', [options.id]);
+        charactersdb =
+            charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
+        charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+    return charactersdb;
+  }
+
+  //Remove Characters
+  static Future<bool> removeCharacters({required index, required options, required gameplay}) async {
+    return false;
   }
 }
