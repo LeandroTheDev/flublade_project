@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flublade_project/data/language.dart';
 import 'package:flutter/material.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -192,11 +193,11 @@ class GlobalFunctions {
                 Center(
                     child: ElevatedButton(
                   onPressed: () {
-                    if(popUntil != null){
+                    if (popUntil != null) {
                       Navigator.popUntil(
-                                context, ModalRoute.withName(popUntil));
+                          context, ModalRoute.withName(popUntil));
                     } else {
-                    Navigator.pop(context);
+                      Navigator.pop(context);
                     }
                   },
                   child: const Text('Ok'),
@@ -246,12 +247,50 @@ class Gameplay with ChangeNotifier {
 
   String get characters => _characters;
 
-  void changeCharacters(value){
+  void changeCharacters(value) {
     _characters = value;
   }
 
-  String addCharacter(
-      {required String characterUsername, required String characterClass}) {
+  Future<String> addCharacter({
+    required String characterUsername,
+    required String characterClass,
+    required MySqlConnection connection,
+    required options,
+    required gameplay,
+  }) async {
+    dynamic charactersdb = {};
+    //Connection
+    try {
+      charactersdb = await connection
+          .query('select characters from accounts where id = ?', [options.id]);
+      charactersdb =
+          charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
+      charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+      //Verify if Database and Provider is the Same
+      if (charactersdb != gameplay.characters) {
+        //Add new character
+        charactersdb = jsonDecode(charactersdb);
+        charactersdb['character${charactersdb.length}'] = {
+          'name': characterUsername,
+          'class': characterClass
+              .replaceFirst('assets/characters/', '')
+              .substring(
+                  0,
+                  characterClass.replaceFirst('assets/characters/', '').length -
+                      4),
+          'level': 1,
+          'skillpoint': 0,
+          'gold': 0,
+        };
+        charactersdb = jsonEncode(charactersdb);
+        //Upload to Database
+        await connection.query('update accounts set characters=? where id=?', [charactersdb, options.id]);
+        return charactersdb;
+      }
+    } catch (error) {
+      return 'Cannot Connect to The Servers';
+    }
+    //Add new character in Provider
     Map characterFormat = jsonDecode(_characters);
     characterFormat['character${characterFormat.length}'] = {
       'name': characterUsername,
@@ -259,10 +298,13 @@ class Gameplay with ChangeNotifier {
           0, characterClass.replaceFirst('assets/characters/', '').length - 4),
       'level': 1,
       'skillpoint': 0,
-      'gold': 1,
+      'gold': 0,
     };
+    //Saving Datas
     _characters = jsonEncode(characterFormat);
     SaveDatas.setCharacters(_characters);
+    //Upload to Database
+    await connection.query('update accounts set characters=? where id=?', [_characters, options.id]);
     return _characters;
   }
 }

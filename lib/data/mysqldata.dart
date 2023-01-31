@@ -192,17 +192,20 @@ class MySQL {
     required characterUsername,
     required characterClass,
   }) async {
-    //Save in Provider
-    String characters = Provider.of<Gameplay>(context, listen: false)
-        .addCharacter(
-            characterUsername: characterUsername,
-            characterClass: characterClass);
-    //Save in Database
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     try {
       final connection = await database;
-      //Insert new account to the database
-      await connection.query('update accounts set characters=? where id=?',
-          [characters, Provider.of<Options>(context, listen: false).id]);
+      String characters = await gameplay.addCharacter(
+        characterUsername: characterUsername,
+        characterClass: characterClass,
+        connection: connection,
+        options: options,
+        gameplay: gameplay,
+      );
+      if(characters == 'Cannot Connect to The Servers'){
+        return false;
+      }
       return true;
     } catch (error) {
       return false;
