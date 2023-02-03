@@ -21,6 +21,8 @@ class Language {
     'response_create': 'Create',
     'response_remove': 'Remove',
     'response_ok': 'Ok',
+    'response_incorrect': 'Incorrect',
+    'response_error': 'Ops, There was a problem with your processing, try again later',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -63,6 +65,7 @@ class Language {
         'Ops, there\'s was a problem creating your character try again later',
     'characters_create_error_namelimit':
         'Character name cannot be longer than 10 characters',
+    'characters_create_error_empty': 'You need to make a name to your character',
     'characters_class_archer_info':
         'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
     'characters_class_assassin_info':
@@ -114,6 +117,8 @@ class Language {
     'response_create': 'Criar',
     'response_remove': 'Remover',
     'response_ok': 'Ok',
+    'response_incorrect': 'Incorreto',
+    'response_error': 'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',

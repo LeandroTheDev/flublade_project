@@ -249,7 +249,7 @@ class Gameplay with ChangeNotifier {
 
   String get characters => _characters;
 
-  void changeCharacters(value) {
+  void changeCharacters(String value) {
     _characters = value;
   }
 

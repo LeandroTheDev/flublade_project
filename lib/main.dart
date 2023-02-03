@@ -52,6 +52,10 @@ class FluBlade extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
+      //Change This
+      //To
+      //Bypass login
+      //Default FlubladeProject()
       home: const FlubladeProject(),
       routes: {
         '/authenticationpage': (context) => const AuthenticationPage(),

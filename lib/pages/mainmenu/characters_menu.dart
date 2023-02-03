@@ -21,6 +21,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
     final options = Provider.of<Options>(context);
     final characters = jsonDecode(Provider.of<Gameplay>(context).characters);
 
+    //Remove Character
     removeCharacterDialog(int index) {
       TextEditingController input = TextEditingController();
       showDialog(
@@ -71,7 +72,9 @@ class _CharactersMenuState extends State<CharactersMenu> {
                           alignment: Alignment.topLeft,
                           width: 300,
                           height: 47,
-                          child: TextFormField(controller: input),
+                          child: TextFormField(
+                            controller: input,
+                          ),
                         ),
                       ],
                     )
@@ -83,17 +86,43 @@ class _CharactersMenuState extends State<CharactersMenu> {
                       const Spacer(),
                       ElevatedButton(
                         onPressed: () async {
-                          MySQL.loadingWidget(
-                              context: context, language: options.language);
-                          await MySQL.removeCharacters(
-                            index: index,
-                            options:
-                                Provider.of<Options>(context, listen: false),
-                            gameplay:
-                                Provider.of<Gameplay>(context, listen: false),
-                          );
-                          // ignore: use_build_context_synchronously
-                          Navigator.popUntil(context, ModalRoute.withName('/charactersmenu'));
+                          if (input.text != 'DELETE') {
+                            GlobalFunctions.errorDialog(
+                                errorMsgTitle: 'response_incorrect',
+                                errorMsgContext: 'Incorrect',
+                                context: context,
+                                options: options);
+                          } else {
+                            MySQL.loadingWidget(
+                                context: context, language: options.language);
+                            final result = await MySQL.removeCharacters(
+                              index: index,
+                              options:
+                                  Provider.of<Options>(context, listen: false),
+                              gameplay:
+                                  Provider.of<Gameplay>(context, listen: false),
+                            );
+                            if (result) {
+                              // ignore: use_build_context_synchronously
+                              Navigator.pop(context);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pop(context);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              super.widget));
+                            } else {
+                              GlobalFunctions.errorDialog(
+                                  errorMsgTitle: 'response_error',
+                                  errorMsgContext:
+                                      'Ops, There was a problem with your processing, try again later',
+                                  context: context,
+                                  options: options,
+                                  popUntil: '/charactersmenu');
+                            }
+                          }
                         },
                         child: Text(Language.Translate(
                                 'response_remove', options.language) ??
@@ -164,6 +193,8 @@ class _CharactersMenuState extends State<CharactersMenu> {
                 ),
                 //Character List
                 ListView.builder(
+                    //Disable Scroll List View
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: characters.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -205,17 +236,16 @@ class _CharactersMenuState extends State<CharactersMenu> {
                             //Character Infos
                             Padding(
                               padding:
-                                  const EdgeInsets.only(top: 400, left: 250),
-                              child: FittedBox(
-                                child: SizedBox(
-                                  height: 1290,
-                                  width: 1450,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      //Class
-                                      Text(
+                                  const EdgeInsets.only(top: 380, left: 230),
+                              child: SizedBox(
+                                height: 1600,
+                                width: 1450,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //Class
+                                    FittedBox(
+                                      child: Text(
                                         '${Language.Translate('characters_create_class', options.language) ?? 'Class'}:  ${Language.Translate('characters_class_${characters['character$index']['class']}', options.language) ?? 'Language Error'}',
                                         maxLines: 1,
                                         style: TextStyle(
@@ -226,44 +256,41 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                                 Theme.of(context).primaryColor,
                                             overflow: TextOverflow.ellipsis),
                                       ),
-                                      //Level
-                                      Text(
-                                        '${Language.Translate('characters_create_level', options.language) ?? 'Level'}:  ${characters['character$index']['level']}',
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                            fontFamily: 'Explora',
-                                            fontSize: 250,
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                      //Gold
-                                      Text(
-                                        '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${characters['character$index']['gold']}',
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                            fontFamily: 'Explora',
-                                            fontSize: 250,
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                      //Location
-                                      Text(
-                                        '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location']}', options.language) ?? 'Language Error'}',
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                            fontFamily: 'Explora',
-                                            fontSize: 250,
-                                            fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    //Level
+                                    Text(
+                                      '${Language.Translate('characters_create_level', options.language) ?? 'Level'}:  ${characters['character$index']['level']}',
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontFamily: 'Explora',
+                                          fontSize: 250,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).primaryColor,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                    //Gold
+                                    Text(
+                                      '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${characters['character$index']['gold']}',
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontFamily: 'Explora',
+                                          fontSize: 250,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).primaryColor,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                    //Location
+                                    Text(
+                                      '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location']}', options.language) ?? 'Language Error'}',
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          fontFamily: 'Explora',
+                                          fontSize: 250,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).primaryColor,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

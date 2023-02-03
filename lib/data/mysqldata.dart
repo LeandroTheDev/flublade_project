@@ -206,7 +206,7 @@ class MySQL {
         options: options,
         gameplay: gameplay,
       );
-      if(characters == 'Cannot Connect to The Servers'){
+      if (characters == 'Cannot Connect to The Servers') {
         return false;
       }
       return true;
@@ -216,18 +216,50 @@ class MySQL {
   }
 
   //Push Characters
-  static Future<String> pushCharacters({required options}) async {
+  static Future<dynamic> pushCharacters({required options}) async {
+    try {
+      final connection = await database;
+      dynamic charactersdb = await connection
+          .query('select characters from accounts where id = ?', [options.id]);
+      charactersdb =
+          charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
+      charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+      return charactersdb;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  //Update Characters
+  static updateCharacters(String characters, options) async {
     final connection = await database;
-    dynamic charactersdb = await connection
-            .query('select characters from accounts where id = ?', [options.id]);
-        charactersdb =
-            charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
-        charactersdb = charactersdb.substring(0, charactersdb.length - 2);
-    return charactersdb;
+    await connection.query('update accounts set characters=? where id=?',
+        [characters, options.id]);
   }
 
   //Remove Characters
-  static Future<bool> removeCharacters({required index, required options, required gameplay}) async {
-    return false;
+  static Future<bool> removeCharacters(
+      {required index, required options, required gameplay}) async {
+    dynamic charactersdb = await pushCharacters(options: options);
+    //Check Connection
+    if (charactersdb == false) {
+      return false;
+    }
+    charactersdb = jsonDecode(charactersdb);
+    charactersdb.remove('character$index');
+    int lenght = charactersdb.length;
+    for (int i = index; i <= lenght - 1; i++) {
+      charactersdb['character$i'] = charactersdb['character${i + 1}'];
+    }
+    charactersdb.remove('character$lenght');
+    charactersdb = jsonEncode(charactersdb);
+    try {
+      updateCharacters(charactersdb, options);
+    } catch (error) {
+      return false;
+    }
+    SaveDatas.setCharacters(charactersdb);
+    gameplay.changeCharacters(charactersdb);
+    return true;
   }
 }
