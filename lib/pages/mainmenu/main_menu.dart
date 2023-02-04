@@ -65,7 +65,9 @@ class _MainMenuState extends State<MainMenu> {
                         const SizedBox(height: 100),
                         //Play Button
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
+                          },
                           child: FittedBox(
                             child: Text(
                               Language.Translate(
@@ -100,7 +102,9 @@ class _MainMenuState extends State<MainMenu> {
                         //Options
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed("/optionsmenu").then((value) => setState(() {}));
+                            Navigator.of(context)
+                                .pushNamed("/optionsmenu")
+                                .then((value) => setState(() {}));
                           },
                           child: FittedBox(
                             child: Text(
@@ -119,10 +123,10 @@ class _MainMenuState extends State<MainMenu> {
                         TextButton(
                           onPressed: () async {
                             GlobalFunctions.confirmationDialog(
-                                errorMsgTitle: 'response_confirmation',
-                                errorMsgContext: 'mainmenu_confirmation',
-                                context: context,
-                                );
+                              errorMsgTitle: 'response_confirmation',
+                              errorMsgContext: 'mainmenu_confirmation',
+                              context: context,
+                            );
                           },
                           child: FittedBox(
                             child: Text(

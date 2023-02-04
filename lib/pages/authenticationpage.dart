@@ -468,14 +468,14 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                 context: context,
                                                 options: optionsFalse);
                                           } else {
-                                            settings.changeIsLoading(
-                                                value: false);
                                             final result = await MySQL.login(
                                               username: username.text,
                                               password: password.text,
                                               context: context,
                                             );
                                             if (result == 'notfound') {
+                                              settings.changeIsLoading(
+                                                value: false);
                                               GlobalFunctions.errorDialog(
                                                   errorMsgTitle:
                                                       'authentication_login_notfound',
@@ -501,6 +501,15 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                     options.password);
                                                 SaveDatas.setRemember(
                                                     options.remember);
+                                                //Push Characters
+                                                String characters =
+                                                    await MySQL.pushCharacters(
+                                                        options: options);
+                                                // ignore: use_build_context_synchronously
+                                                Provider.of<Gameplay>(context, listen: false).changeCharacters(
+                                                    characters);
+                                                SaveDatas.setCharacters(
+                                                    characters);
                                               }
                                               settings.changeIsLoading(
                                                   value: false);

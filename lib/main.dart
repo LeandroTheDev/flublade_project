@@ -1,12 +1,7 @@
 // ignore_for_file: unused_local_variable
-import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/data/mysqldata.dart';
-import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
-import 'package:flublade_project/pages/mainmenu/main_menu.dart';
-import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -57,13 +52,7 @@ class FluBlade extends StatelessWidget {
       //Bypass login
       //Default FlubladeProject()
       home: const FlubladeProject(),
-      routes: {
-        '/authenticationpage': (context) => const AuthenticationPage(),
-        '/mainmenu': (context) => const MainMenu(),
-        '/optionsmenu': (context) => const OptionsMenu(),
-        '/charactersmenu': (context) => const CharactersMenu(),
-        '/charactercreation': (context) => const CharacterCreation(),
-      },
+      routes: GlobalFunctions.routes,
     );
   }
 }

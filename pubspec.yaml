@@ -35,7 +35,8 @@ dependencies:
   provider: ^6.0.5
   mysql1: ^0.20.0
   shared_preferences: ^2.0.17
-
+  #Engine
+  bonfire: ^2.12.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,28 +67,16 @@ flutter:
     - assets/character.png
     # Item
     - assets/items/sword_of_the_primordial_fire.png
+    # Map
+    - assets/images/prologue/
     # Classes
-    - assets/characters/archer.png
-    - assets/characters/assassin.png
-    - assets/characters/bard.png
-    - assets/characters/beastmaster.png
-    - assets/characters/berserk.png
-    - assets/characters/druid.png
-    - assets/characters/mage.png
-    - assets/characters/paladin.png
-    - assets/characters/priest.png
-    - assets/characters/trickmagician.png
-    - assets/characters/weaponsmith.png
-    - assets/characters/witch.png
+    - assets/characters/
     # Monster
       #drauy_monsters
-    - assets/monsters/drauy_monsters/big_spider.png
-    - assets/monsters/drauy_monsters/small_spider.png
+    - assets/monsters/drauy_monsters/
     # locations
       #drauy_location
-    - assets/locations/drauy_dungeon/bedroom.png
-    - assets/locations/drauy_dungeon/central.png
-    - assets/locations/drauy_dungeon/room1.png
+    - assets/locations/drauy_dungeon/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

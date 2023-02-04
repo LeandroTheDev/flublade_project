@@ -1,6 +1,12 @@
 import 'dart:convert';
 
+import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/pages/authenticationpage.dart';
+import 'package:flublade_project/pages/gameplay/ingame.dart';
+import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
+import 'package:flublade_project/pages/mainmenu/main_menu.dart';
+import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mysql1/mysql1.dart';
@@ -111,6 +117,17 @@ class SaveDatas {
 }
 
 class GlobalFunctions {
+
+  // Routes
+  static final routes = {
+    '/authenticationpage': (context) => const AuthenticationPage(),
+    '/mainmenu': (context) => const MainMenu(),
+    '/optionsmenu': (context) => const OptionsMenu(),
+    '/charactersmenu': (context) => const CharactersMenu(),
+    '/charactercreation': (context) => const CharacterCreation(),
+    '/ingame': (context) => const InGame(),
+  };
+
   //Confirmation Dialog
   static void confirmationDialog({
     required String errorMsgTitle,
@@ -288,7 +305,8 @@ class Gameplay with ChangeNotifier {
         };
         charactersdb = jsonEncode(charactersdb);
         //Upload to Database
-        await connection.query('update accounts set characters=? where id=?', [charactersdb, options.id]);
+        await connection.query('update accounts set characters=? where id=?',
+            [charactersdb, options.id]);
         return charactersdb;
       }
     } catch (error) {
@@ -309,7 +327,8 @@ class Gameplay with ChangeNotifier {
     _characters = jsonEncode(characterFormat);
     SaveDatas.setCharacters(_characters);
     //Upload to Database
-    await connection.query('update accounts set characters=? where id=?', [_characters, options.id]);
+    await connection.query('update accounts set characters=? where id=?',
+        [_characters, options.id]);
     return _characters;
   }
 }
