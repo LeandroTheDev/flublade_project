@@ -69,8 +69,10 @@ flutter:
     - assets/items/sword_of_the_primordial_fire.png
     # Map
     - assets/images/prologue/
-    # Classes
+    # Classes & Characters
     - assets/characters/
+    - assets/images/player/
+    - assets/images/players/berserk/
     # Monster
       #drauy_monsters
     - assets/monsters/drauy_monsters/
