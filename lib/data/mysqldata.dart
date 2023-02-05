@@ -216,7 +216,8 @@ class MySQL {
   }
 
   //Push Characters
-  static Future<dynamic> pushCharacters({required options}) async {
+  static Future<dynamic> pushCharacters(
+      {required options, update = false}) async {
     try {
       final connection = await database;
       dynamic charactersdb = await connection
@@ -224,6 +225,9 @@ class MySQL {
       charactersdb =
           charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
       charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+      if (update) {
+        await updateCharacters(charactersdb, options);
+      }
       return charactersdb;
     } catch (error) {
       return false;

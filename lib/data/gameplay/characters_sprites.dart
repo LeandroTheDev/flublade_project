@@ -11,7 +11,7 @@ class ClassSpriteSheet {
         textureSize: Vector2(16, 16),
       ),
     ),
-    'bersekrun': SpriteAnimation.load(
+    'berserkrun': SpriteAnimation.load(
         "players/berserk/berserk_ingame_runright.png",
         SpriteAnimationData.sequenced(
           amount: 4,

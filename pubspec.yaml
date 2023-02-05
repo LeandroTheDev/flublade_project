@@ -71,7 +71,6 @@ flutter:
     - assets/images/prologue/
     # Classes & Characters
     - assets/characters/
-    - assets/images/player/
     - assets/images/players/berserk/
     # Monster
       #drauy_monsters

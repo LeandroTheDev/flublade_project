@@ -66,7 +66,7 @@ class _MainMenuState extends State<MainMenu> {
                         //Play Button
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
+                            Navigator.pushNamed(context, '/characterselection');
                           },
                           child: FittedBox(
                             child: Text(

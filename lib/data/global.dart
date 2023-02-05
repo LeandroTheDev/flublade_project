@@ -4,6 +4,7 @@ import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
+import 'package:flublade_project/pages/mainmenu/character_selection.dart';
 import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flublade_project/pages/mainmenu/options_menu.dart';
@@ -117,7 +118,6 @@ class SaveDatas {
 }
 
 class GlobalFunctions {
-
   // Routes
   static final routes = {
     '/authenticationpage': (context) => const AuthenticationPage(),
@@ -125,6 +125,7 @@ class GlobalFunctions {
     '/optionsmenu': (context) => const OptionsMenu(),
     '/charactersmenu': (context) => const CharactersMenu(),
     '/charactercreation': (context) => const CharacterCreation(),
+    '/characterselection': (context) => const CharacterSelection(),
     '/ingame': (context) => const InGame(),
   };
 
@@ -226,6 +227,30 @@ class GlobalFunctions {
           );
         });
   }
+
+  //Pause Dialog
+  static pauseDialog({required BuildContext context, required options}) {
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            //Language Text
+            title: Text(
+              'errorMsgTitle',
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            content: Text(
+              Language.Translate('errorMsgContext', options.language) ??
+                  'Language Error',
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+          );
+        });
+  }
 }
 
 class Gameplay with ChangeNotifier {
@@ -263,11 +288,22 @@ class Gameplay with ChangeNotifier {
   }
 
   String _characters = '{}';
+  int _selectedCharacter = 0;
 
   String get characters => _characters;
+  int get selectedCharacter => _selectedCharacter;
 
   void changeCharacters(String value) {
     _characters = value;
+  }
+
+  void changeSelectedCharacter(int value) {
+    _selectedCharacter = value;
+  }
+
+  //Return class
+  static String returnClass() {
+    return 'berserk';
   }
 
   //Add new Character
