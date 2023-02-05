@@ -266,4 +266,50 @@ class MySQL {
     gameplay.changeCharacters(charactersdb);
     return true;
   }
+
+  //Return Info
+  static dynamic returnInfo(context, {required String returned}) {
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final Map characters = jsonDecode(gameplay.characters);
+    //Return Class
+    if (returned == 'class') {
+      final String characterClass =
+          characters['character${gameplay.selectedCharacter}']['class'];
+      return characterClass;
+    }
+    //Return Player Location
+    if (returned == 'location') {
+      final Map characters = jsonDecode(gameplay.characters);
+      final String location =
+          characters['character${gameplay.selectedCharacter}']['location'];
+      return location;
+    }
+  }
+
+  //Return Level
+  static Future<List<List<double>>> returnLevel(context,
+      {required String level}) async {
+    final connection = await database;
+    List<List<double>> listLevel = [];
+    int a = 1;
+    while (true) {
+      //Receive from database
+      dynamic leveldb = await connection
+          .query('select list$a from world where name = ?', [level]);
+      leveldb = leveldb.toString().replaceFirst('(Fields: {list$a: ', '');
+      leveldb = leveldb.substring(0, leveldb.length - 2);
+      //Verify if is empty
+      if (leveldb == '[]') {
+        break;
+      }
+      List levelIndex = jsonDecode(leveldb);
+      listLevel.add([]);
+      //Push levelIndex and returns to client
+      for (int b = 0; b < levelIndex.length; b++) {
+        listLevel[a - 1].add(double.parse(levelIndex[b].toString()));
+      }
+      a++;
+    }
+    return listLevel;
+  }
 }

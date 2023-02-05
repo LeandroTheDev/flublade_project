@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:bonfire/bonfire.dart';
+import 'package:bonfire/geometry/shape.dart';
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -234,20 +236,58 @@ class GlobalFunctions {
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
         builder: (context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            //Language Text
-            title: Text(
-              'errorMsgTitle',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
-            content: Text(
-              Language.Translate('errorMsgContext', options.language) ??
-                  'Language Error',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
+          return FittedBox(
+            child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                //Language Text
+                title: Text(
+                  Language.Translate('pausemenu_pause', options.language) ??
+                      'Pause',
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
+                content: Column(
+                  children: [
+                    //Continue
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(Language.Translate(
+                                'pausemenu_continue', options.language) ??
+                            'Continue'),
+                      ),
+                    ),
+                    //Options
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/optionsmenu');
+                        },
+                        child: Text(Language.Translate(
+                                'pausemenu_options', options.language) ??
+                            'Options'),
+                      ),
+                    ),
+                    //Disconnect
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/mainmenu', (Route route) => false);
+                        },
+                        child: Text(Language.Translate(
+                                'pausemenu_disconnect', options.language) ??
+                            'Disconnect'),
+                      ),
+                    ),
+                  ],
+                )),
           );
         });
   }
@@ -299,11 +339,6 @@ class Gameplay with ChangeNotifier {
 
   void changeSelectedCharacter(int value) {
     _selectedCharacter = value;
-  }
-
-  //Return class
-  static String returnClass() {
-    return 'berserk';
   }
 
   //Add new Character
@@ -366,5 +401,73 @@ class Gameplay with ChangeNotifier {
     await connection.query('update accounts set characters=? where id=?',
         [_characters, options.id]);
     return _characters;
+  }
+
+  //Load Tiles
+  static TileModel loadTiles(prop) {
+    late TileModelSprite sprite;
+    //Grass
+    if (prop.value == 0) {
+      sprite = TileModelSprite(
+        path: 'tilesets/overworld/grass.png',
+      );
+      return TileModel(
+        collisions: [],
+        x: prop.position.x,
+        y: prop.position.y,
+        sprite: sprite,
+        height: 32,
+        width: 32,
+      );
+    }
+    //Stone_down
+    if (prop.value == 1) {
+      sprite = TileModelSprite(
+        path: 'tilesets/overworld/stone_down.png',
+      );
+      return TileModel(
+        collisions: [
+          CollisionArea.rectangle(
+            size: Vector2(32, 32),
+            align: Vector2(0, 0),
+          ),
+        ],
+        x: prop.position.x,
+        y: prop.position.y,
+        sprite: sprite,
+        height: 32,
+        width: 32,
+      );
+    }
+    if (prop.value == 2) {
+      sprite = TileModelSprite(
+        path: 'tilesets/overworld/stone.png',
+      );
+      return TileModel(
+        collisions: [
+          CollisionArea.rectangle(
+            size: Vector2(32, 32),
+            align: Vector2(0, 0),
+          ),
+        ],
+        x: prop.position.x,
+        y: prop.position.y,
+        sprite: sprite,
+        height: 32,
+        width: 32,
+      );
+    }
+    //Null
+    sprite = TileModelSprite(
+      path: 'tilesets/overworld/grass.png',
+    );
+    return TileModel(
+      collisions: [],
+      x: prop.position.x,
+      y: prop.position.y,
+      sprite: sprite,
+      height: 32,
+      width: 32,
+    );
   }
 }

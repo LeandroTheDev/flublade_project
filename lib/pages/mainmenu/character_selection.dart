@@ -21,22 +21,22 @@ class CharacterSelection extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              //Background Image
-              SizedBox(
-                width: screenSize.width,
-                height: screenSize.height,
-                child: Image.asset(
-                  'assets/main_menu_background.png',
-                  fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                //Background Image
+                SizedBox(
+                  width: screenSize.width,
+                  height: screenSize.height,
+                  child: Image.asset(
+                    'assets/main_menu_background.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              // Characters
-              SingleChildScrollView(
-                child: Column(
+                // Characters
+                Column(
                   children: [
                     SizedBox(height: screenSize.height * 0.1),
                     //Character List
@@ -219,10 +219,10 @@ class CharacterSelection extends StatelessWidget {
                         })
                   ],
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

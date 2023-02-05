@@ -105,6 +105,11 @@ class Language {
     'characters_remove': 'Type "DELETE" to remove the character',
     //Locations
     'locations_prologue': 'Prologue',
+    //PauseMenu
+    'pausemenu_pause': 'Pause',
+    'pausemenu_continue': 'Continue',
+    'pausemenu_options': 'Options',
+    'pausemenu_disconnect': 'Disconnect',
   };
   static const pt_BR = {
     //Response
@@ -200,5 +205,10 @@ class Language {
     'characters_remove': 'Digite "DELETE" para remover o personagem',
     //Locations
     'locations_prologue': 'Prólogo',
+    //PauseMenu
+    'pausemenu_pause': 'Pausado',
+    'pausemenu_continue': 'Continuar',
+    'pausemenu_options': 'Opções',
+    'pausemenu_disconnect': 'Disconectar',
   };
 }
