@@ -1,11 +1,10 @@
 import 'dart:convert';
 
-import 'package:bonfire/bonfire.dart';
-import 'package:bonfire/geometry/shape.dart';
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
+import 'package:flublade_project/pages/gameplay/inventory.dart';
 import 'package:flublade_project/pages/mainmenu/character_selection.dart';
 import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bonfire/bonfire.dart';
 
 class Options with ChangeNotifier {
   String _language = 'en_US';
@@ -129,6 +129,7 @@ class GlobalFunctions {
     '/charactercreation': (context) => const CharacterCreation(),
     '/characterselection': (context) => const CharacterSelection(),
     '/ingame': (context) => const InGame(),
+    '/inventory': (context) => const GameplayInventory(),
   };
 
   //Confirmation Dialog
@@ -327,6 +328,7 @@ class Gameplay with ChangeNotifier {
     return Language.Translate(classesInfo[index], language) ?? 'Language Error';
   }
 
+  //System Provider
   String _characters = '{}';
   int _selectedCharacter = 0;
 
@@ -339,6 +341,40 @@ class Gameplay with ChangeNotifier {
 
   void changeSelectedCharacter(int value) {
     _selectedCharacter = value;
+  }
+
+  //Ingame Provider
+  bool _isTalkable = false;
+  String _selectedTalk = '';
+  
+  bool get isTalkable => _isTalkable;
+  String get selectedTalk => _selectedTalk;
+
+  void changeIsTalkable(value, text) {
+    _selectedTalk = text;
+    _isTalkable = value;
+    notifyListeners();
+  }
+
+  //Show Text Talk Dialog
+  static void showTalkText(context, text) {
+    final screenSize = MediaQuery.of(context).size;
+    showModalBottomSheet<void>(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(50.0),
+            ),
+          ),
+          isScrollControlled: true,
+          context: context,
+          builder: (context) {
+            return SizedBox(
+              width: screenSize.width,
+              height: screenSize.height * 0.30,
+            );
+          }
+    );
   }
 
   //Add new Character

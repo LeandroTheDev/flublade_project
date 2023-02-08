@@ -67,10 +67,12 @@ flutter:
     - assets/character.png
     # Item
     - assets/items/sword_of_the_primordial_fire.png
-    # Map
-    - assets/images/prologue/
+    # NPC
+    - assets/images/npc/
     # Tilesets
     - assets/images/tilesets/overworld/
+    # Interface
+    - assets/images/interface/
     # Classes & Characters
     - assets/characters/
     - assets/images/players/archer/

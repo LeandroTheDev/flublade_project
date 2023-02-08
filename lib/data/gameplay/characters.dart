@@ -1,7 +1,6 @@
-import 'package:flublade_project/data/gameplay/characters_sprites.dart';
+import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:bonfire/bonfire.dart';
-import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
 
 class PlayerClient extends SimplePlayer with ObjectCollision {
@@ -24,4 +23,42 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
       ),
     );
   }
+}
+
+class ClassSpriteSheet {
+  static final Map characterClass = {
+    //Berserk
+    'berserkidle': SpriteAnimation.load(
+      "players/berserk/berserk_ingame_idleright.png",
+      SpriteAnimationData.sequenced(
+        amount: 1,
+        stepTime: 0.1,
+        textureSize: Vector2(16, 16),
+      ),
+    ),
+    'berserkrun': SpriteAnimation.load(
+      "players/berserk/berserk_ingame_runright.png",
+      SpriteAnimationData.sequenced(
+        amount: 4,
+        stepTime: 0.1,
+        textureSize: Vector2(16, 16),
+      ),
+    ),
+    'archeridle': SpriteAnimation.load(
+      "players/archer/archer_ingame_idleright.png",
+      SpriteAnimationData.sequenced(
+        amount: 1,
+        stepTime: 0.1,
+        textureSize: Vector2(16, 16),
+      ),
+    ),
+    'archerrun': SpriteAnimation.load(
+      "players/archer/archer_ingame_runright.png",
+      SpriteAnimationData.sequenced(
+        amount: 4,
+        stepTime: 0.1,
+        textureSize: Vector2(16, 16),
+      ),
+    ),
+  };
 }
