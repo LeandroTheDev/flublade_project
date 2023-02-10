@@ -64,15 +64,15 @@ class _IngameInterfaceState extends State<IngameInterface> {
               ),
               const Spacer(),
               gameplay.isTalkable
-              //Talk Button
+                  //Talk Button
                   ? SizedBox(
-                    width: screenSize.width,
-                    child: Row(
-                      children: [
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 25),
-                          child: TextButton(
+                      width: screenSize.width,
+                      child: Row(
+                        children: [
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 25),
+                            child: TextButton(
                               onPressed: () {
                                 Gameplay.showTalkText(context, 'test');
                               },
@@ -81,16 +81,18 @@ class _IngameInterfaceState extends State<IngameInterface> {
                                 width: 100,
                                 height: 100,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.secondary,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
                                   borderRadius: BorderRadius.circular(100),
                                 ),
-                                child: const FittedBox(child: Icon(Icons.comment_outlined)),
+                                child: const FittedBox(
+                                    child: Icon(Icons.comment_outlined)),
                               ),
                             ),
-                        ),
-                      ],
-                    ),
-                  )
+                          ),
+                        ],
+                      ),
+                    )
                   : const SizedBox(),
             ],
           ),

@@ -4,9 +4,10 @@ import 'package:provider/provider.dart';
 
 class NPCWizard extends SimpleNpc with ObjectCollision {
   bool stopLoading = false;
-  NPCWizard(Vector2 position)
+  late final talk;
+  NPCWizard(Vector2 position, languageText)
       : super(
-          position: Vector2(100, 32),
+          position: position,
           size: Vector2(32, 32),
           animation: SimpleDirectionAnimation(
             idleRight: SpriteAnimation.load(
@@ -27,27 +28,31 @@ class NPCWizard extends SimpleNpc with ObjectCollision {
             ),
           ),
         ) {
+    talk = languageText;
     setupCollision(
       CollisionConfig(
-        collisions: [CollisionArea.circle(radius: 17, align: Vector2(-2.5,0))],
+        collisions: [CollisionArea.circle(radius: 17, align: Vector2(-2.5, 0))],
       ),
     );
   }
+
   @override
   void update(double dt) {
     seePlayer(
         observed: (player) {
           //Start seeing
-          if(!stopLoading){
-            Provider.of<Gameplay>(context, listen: false).changeIsTalkable(true, 'dialog_npc_wizard_prologue1');
+          if (!stopLoading) {
+            Provider.of<Gameplay>(context, listen: false)
+                .changeIsTalkable(true, talk);
           }
           stopLoading = true;
         },
         radiusVision: 50,
         notObserved: () {
           //Stop seeing
-          if(stopLoading){
-            Provider.of<Gameplay>(context, listen: false).changeIsTalkable(false, 'dialog_npc_wizard_prologue1');
+          if (stopLoading) {
+            Provider.of<Gameplay>(context, listen: false)
+                .changeIsTalkable(false, talk);
           }
           stopLoading = false;
         });

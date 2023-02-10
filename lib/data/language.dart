@@ -111,7 +111,9 @@ class Language {
     'pausemenu_options': 'Options',
     'pausemenu_disconnect': 'Disconnect',
     //Ingame Texts
-    'dialog_npc_wizard_prologue1': 'Hello there',
+    'dialog_npc_wizard_name': 'Wizard',
+    'dialog_npc_wizard_prologue1': 'Hello',
+    'dialog_npc_wizard_prologue2': 'Test',
   };
   static const pt_BR = {
     //Response
@@ -212,5 +214,9 @@ class Language {
     'pausemenu_continue': 'Continuar',
     'pausemenu_options': 'Opções',
     'pausemenu_disconnect': 'Desconectar',
+    //Ingame Texts
+    'dialog_npc_wizard_name': 'Mago',
+    'dialog_npc_wizard_prologue1': 'Olá',
+    'dialog_npc_wizard_prologue2': 'Test',
   };
 }

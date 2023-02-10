@@ -1,7 +1,6 @@
 import 'package:bonfire/bonfire.dart';
 import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/interface.dart';
-import 'package:flublade_project/data/gameplay/npc.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +12,8 @@ class InGame extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       //Level Load
-      future: MySQL.returnLevel(
-        context,
+      future: MySQLGameplay.returnLevel(
+        context: context,
         level: MySQL.returnInfo(context, returned: 'location'),
       ),
       builder: (context, future) {
@@ -29,7 +28,7 @@ class InGame extends StatelessWidget {
             map: MatrixMapGenerator.generate(
               axisInverted: true,
               //Load Tiles Position
-              matrix: future.data!,
+              matrix: future.data![0],
               //Load Tiles Images
               builder: (ItemMatrixProperties prop) => Gameplay.loadTiles(prop),
             ),
@@ -39,7 +38,7 @@ class InGame extends StatelessWidget {
               context,
             ),
             //Npcs
-            components: [NPCWizard(Vector2(100, 32))],
+            components: future.data![1],
             //Loots
             decorations: const [],
             //Enemies

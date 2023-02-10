@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/language.dart';
@@ -346,7 +347,7 @@ class Gameplay with ChangeNotifier {
   //Ingame Provider
   bool _isTalkable = false;
   String _selectedTalk = '';
-  
+
   bool get isTalkable => _isTalkable;
   String get selectedTalk => _selectedTalk;
 
@@ -357,24 +358,84 @@ class Gameplay with ChangeNotifier {
   }
 
   //Show Text Talk Dialog
-  static void showTalkText(context, text) {
+  static void showTalkText(context, npcname) {
     final screenSize = MediaQuery.of(context).size;
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     showModalBottomSheet<void>(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(50.0),
-            ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(50.0),
           ),
-          isScrollControlled: true,
-          context: context,
-          builder: (context) {
-            return SizedBox(
-              width: screenSize.width,
-              height: screenSize.height * 0.30,
-            );
-          }
-    );
+        ),
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return SizedBox(
+            width: screenSize.width,
+            height: screenSize.height * 0.30,
+            child: FittedBox(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                          child: Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(1.5),
+                            child: SizedBox(
+                              width: 30,
+                              height: 40,
+                              child: Image.asset(
+                                'assets/images/interface/profileimage.png',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                width: 17.5,
+                                height: 26,
+                                child:
+                                    Image.asset('assets/images/npc/wizard.png'),
+                              )),
+                        ],
+                      )),
+                      Stack(
+                        children: [
+                          SizedBox(
+                            width: 70,
+                            height: screenSize.height * 0.05,
+                            child: Image.asset(
+                                'assets/images/interface/boardtext.png', fit: BoxFit.fill,),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            width: 60,
+                            height: screenSize.height * 0.05,
+                            child: SingleChildScrollView(
+                              child: Text(
+                                Language.Translate(gameplay.selectedTalk,
+                                        options.language) ??
+                                    'Language Error',
+                                style: TextStyle(
+                                    fontSize: 5,
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   //Add new Character

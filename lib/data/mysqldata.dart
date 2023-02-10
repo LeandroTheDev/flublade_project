@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:flublade_project/data/gameplay/npc.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
+import 'package:bonfire/bonfire.dart';
 
 class MySQL {
   //Connection
@@ -285,13 +287,17 @@ class MySQL {
       return location;
     }
   }
+}
 
+class MySQLGameplay {
   //Return Level
-  static Future<List<List<double>>> returnLevel(context,
-      {required String level}) async {
-    final connection = await database;
+  static Future<List<dynamic>> returnLevel(
+      {required BuildContext context, required String level}) async {
+    final connection = await MySQL.database;
+    List results = [];
     List<List<double>> listLevel = [];
     int a = 1;
+    //Push Tiles
     while (true) {
       //Receive from database
       dynamic leveldb = await connection
@@ -310,6 +316,59 @@ class MySQL {
       }
       a++;
     }
-    return listLevel;
+    //Returning the Tiles
+    results.add(listLevel);
+    // ignore: use_build_context_synchronously
+    List<GameComponent> npc = await returnNPCs(context, level);
+    //Returning the NPCs
+    results.add(npc);
+    return results;
+  }
+
+  //Return NPCs
+  static Future<List<GameComponent>> returnNPCs(
+      BuildContext context, String level) async {
+    final connection = await MySQL.database;
+    dynamic npcdb =
+        await connection.query('select npc from world where name = ?', [level]);
+    npcdb = npcdb.toString().replaceFirst('(Fields: {npc: ', '');
+    npcdb = npcdb.substring(0, npcdb.length - 2);
+    List<GameComponent> npc = [];
+    //Add NPCs to the gameplay
+    if (npcdb != '{}') {
+      npcdb = jsonDecode(npcdb);
+      double positionx = double.parse(npcdb['npc0']['positionx']);
+      double positiony = double.parse(npcdb['npc0']['positiony']);
+      npc.add(parseNPC(
+          npcname: npcdb['npc0']['name'],
+          position: Vector2(positionx, positiony),
+          talk: npcdb['npc0']['talk']));
+      int i = 1;
+      while (true) {
+        if (npcdb['npc$i'] != null) {
+          positionx = double.parse(npcdb['npc$i']['positionx']);
+          positiony = double.parse(npcdb['npc$i']['positiony']);
+          npc.add(parseNPC(
+              npcname: npcdb['npc$i']['name'],
+              position: Vector2(positionx, positiony),
+              talk: npcdb['npc$i']['talk']));
+        }
+        i++;
+        break;
+      }
+    }
+    return npc;
+  }
+
+  //Parse NPCs
+  static SimpleNpc parseNPC(
+      {required String npcname,
+      required Vector2 position,
+      required String talk}) {
+    switch (npcname) {
+      case "wizard":
+        return NPCWizard(position, talk);
+    }
+    return NPCWizard(position, talk);
   }
 }
