@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
+import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
 import 'package:flublade_project/pages/gameplay/inventory.dart';
 import 'package:flublade_project/pages/mainmenu/character_selection.dart';
@@ -131,6 +131,7 @@ class GlobalFunctions {
     '/characterselection': (context) => const CharacterSelection(),
     '/ingame': (context) => const InGame(),
     '/inventory': (context) => const GameplayInventory(),
+    '/battlescene': (context) => const BattleScene(),
   };
 
   //Confirmation Dialog
@@ -347,6 +348,9 @@ class Gameplay with ChangeNotifier {
   //Ingame Provider
   bool _isTalkable = false;
   String _selectedTalk = '';
+  double _playerLife = 0;
+  double _playerMana = 0;
+  double _playerGold = 0;
 
   bool get isTalkable => _isTalkable;
   String get selectedTalk => _selectedTalk;
@@ -410,7 +414,9 @@ class Gameplay with ChangeNotifier {
                             width: 70,
                             height: screenSize.height * 0.05,
                             child: Image.asset(
-                                'assets/images/interface/boardtext.png', fit: BoxFit.fill,),
+                              'assets/images/interface/boardtext.png',
+                              fit: BoxFit.fill,
+                            ),
                           ),
                           Container(
                             padding: const EdgeInsets.all(8),
@@ -467,6 +473,8 @@ class Gameplay with ChangeNotifier {
                   characterClass.replaceFirst('assets/characters/', '').length -
                       4),
           'level': 1,
+          'life': 100,
+          'mana': 10,
           'skillpoint': 0,
           'gold': 0,
           'location': 'prologue',
@@ -487,6 +495,8 @@ class Gameplay with ChangeNotifier {
       'class': characterClass.replaceFirst('assets/characters/', '').substring(
           0, characterClass.replaceFirst('assets/characters/', '').length - 4),
       'level': 1,
+      'life': 100,
+      'mana': 10,
       'skillpoint': 0,
       'gold': 0,
       'location': 'prologue',

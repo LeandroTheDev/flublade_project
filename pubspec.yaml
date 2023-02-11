@@ -79,10 +79,13 @@ flutter:
     - assets/images/players/berserk/
     # Monster
       #drauy_monsters
-    - assets/monsters/drauy_monsters/
+    - assets/images/enemys/
+    - assets/images/enemys/infight/
     # locations
       #drauy_location
     - assets/locations/drauy_dungeon/
+      #prologue
+    - assets/locations/prologue/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

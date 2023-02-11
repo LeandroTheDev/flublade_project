@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 class NPCWizard extends SimpleNpc with ObjectCollision {
   bool stopLoading = false;
-  late final talk;
+  late String talk;
   NPCWizard(Vector2 position, languageText)
       : super(
           position: position,

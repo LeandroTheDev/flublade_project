@@ -44,6 +44,7 @@ class ClassSpriteSheet {
         textureSize: Vector2(16, 16),
       ),
     ),
+    //Archer
     'archeridle': SpriteAnimation.load(
       "players/archer/archer_ingame_idleright.png",
       SpriteAnimationData.sequenced(
