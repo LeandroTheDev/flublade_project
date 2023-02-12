@@ -43,7 +43,14 @@ class InGame extends StatelessWidget {
             //Loots
             decorations: const [],
             //Enemies
-            enemies: [EnemySmallSpider(Vector2(200, 200))],
+            enemies: [
+              EnemySmallSpider(
+                  position: Vector2(200, 200),
+                  life: 100,
+                  level: 1,
+                  armor: 1,
+                  mana: 0),
+            ],
             overlayBuilderMap: {
               'pause': (BuildContext context, BonfireGame game) {
                 return const IngameInterface();

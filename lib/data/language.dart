@@ -23,6 +23,7 @@ class Language {
     'response_ok': 'Ok',
     'response_incorrect': 'Incorrect',
     'response_error': 'Ops, There was a problem with your processing, try again later',
+    'response_loading': 'Loading Please Wait...',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -128,6 +129,7 @@ class Language {
     'response_ok': 'Ok',
     'response_incorrect': 'Incorreto',
     'response_error': 'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
+    'response_loading': 'Carregando Por Favor Espere...',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',

@@ -351,14 +351,59 @@ class Gameplay with ChangeNotifier {
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
+  double _playerArmor = 0;
+
+  double _enemyLife = 0;
+  double _enemyMana = 0;
+  double _enemyArmor = 0;
+  int _enemyLevel = 0;
 
   bool get isTalkable => _isTalkable;
   String get selectedTalk => _selectedTalk;
+  double get playerLife => _playerLife;
+  double get playerMana => _playerMana;
+  double get playerGold => _playerGold;
+  double get playerArmor => _playerArmor;
+
+  double get enemyLife => _enemyLife;
+  double get enemyMana => _enemyMana;
+  double get enemyArmor => _enemyArmor;
+  int get enemyLevel => _enemyLevel;
 
   void changeIsTalkable(value, text) {
     _selectedTalk = text;
     _isTalkable = value;
     notifyListeners();
+  }
+
+  void changeStats({required value, required String stats}) {
+    //Player Stats
+    if (stats == 'life') {
+      _playerLife = value;
+      return;
+    } else if (stats == 'mana') {
+      _playerMana = value;
+      return;
+    } else if (stats == 'gold') {
+      _playerGold = value;
+      return;
+    } else if (stats == 'armor') {
+      _playerArmor = value;
+      return;
+    }
+    //Enemy Stats
+    if (stats == 'elife') {
+      _enemyLife = value;
+      return;
+    } else if (stats == 'emana') {
+      _enemyMana = value;
+      return;
+    } else if (stats == 'earmor') {
+      _enemyArmor = value;
+      return;
+    } else if (stats == 'elevel') {
+      _enemyLevel = value;
+    }
   }
 
   //Show Text Talk Dialog

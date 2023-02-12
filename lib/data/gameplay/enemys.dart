@@ -3,8 +3,17 @@ import 'package:flutter/material.dart';
 
 class EnemySmallSpider extends SimpleEnemy {
   bool stopLoading = false;
-  EnemySmallSpider(Vector2 position)
-      : super(
+  late double enemyLife;
+  late double enemyMana;
+  late double enemyArmor;
+  late int enemyLevel;
+  EnemySmallSpider({
+    required Vector2 position,
+    required double life,
+    required double mana,
+    required double armor,
+    required int level,
+  }) : super(
           position: position,
           size: Vector2(32, 32),
           life: 100,
@@ -140,7 +149,12 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
           ),
-        );
+        ) {
+    enemyLife = life;
+    enemyMana = mana;
+    enemyArmor = armor;
+    enemyLevel = level;
+  }
 
   @override
   void update(double dt) {
