@@ -184,6 +184,9 @@ class CharacterSelection extends StatelessWidget {
                                                   .changeSelectedCharacter(
                                                       index);
                                               // ignore: use_build_context_synchronously
+                                              await MySQL.returnPlayerStats(
+                                                  context);
+                                              // ignore: use_build_context_synchronously
                                               Navigator.of(context)
                                                   .pushNamedAndRemoveUntil(
                                                       '/ingame',

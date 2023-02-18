@@ -22,7 +22,8 @@ class Language {
     'response_remove': 'Remove',
     'response_ok': 'Ok',
     'response_incorrect': 'Incorrect',
-    'response_error': 'Ops, There was a problem with your processing, try again later',
+    'response_error':
+        'Ops, There was a problem with your processing, try again later',
     'response_loading': 'Loading Please Wait...',
     //Authentication
     'authentication_username': 'Username',
@@ -66,7 +67,8 @@ class Language {
         'Ops, there\'s was a problem creating your character try again later',
     'characters_create_error_namelimit':
         'Character name cannot be longer than 10 characters',
-    'characters_create_error_empty': 'You need to make a name to your character',
+    'characters_create_error_empty':
+        'You need to make a name to your character',
     'characters_class_archer_info':
         'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
     'characters_class_assassin_info':
@@ -115,6 +117,11 @@ class Language {
     'dialog_npc_wizard_name': 'Wizard',
     'dialog_npc_wizard_prologue1': 'Hello',
     'dialog_npc_wizard_prologue2': 'Test',
+    //Battle Texts
+    'life': 'Life',
+    'mana': 'Mana',
+    'attack': 'Attack',
+    'defence': 'Defence',
   };
   static const pt_BR = {
     //Response
@@ -128,7 +135,8 @@ class Language {
     'response_remove': 'Remover',
     'response_ok': 'Ok',
     'response_incorrect': 'Incorreto',
-    'response_error': 'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
+    'response_error':
+        'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
     'response_loading': 'Carregando Por Favor Espere...',
     //Authentication
     'authentication_username': 'Usuário',
@@ -220,5 +228,10 @@ class Language {
     'dialog_npc_wizard_name': 'Mago',
     'dialog_npc_wizard_prologue1': 'Olá',
     'dialog_npc_wizard_prologue2': 'Test',
+    //Battle Texts
+    'life': 'Vida',
+    'mana': 'Mana',
+    'attack': 'Atacar',
+    'defence': 'Defender',
   };
 }

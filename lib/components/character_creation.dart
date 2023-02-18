@@ -125,9 +125,14 @@ class _CharacterCreationState extends State<CharacterCreation> {
                                 characterClass:
                                     Gameplay.classes[selectedClass]);
                             if (result) {
+                              //Pop until the character menu
+
                               // ignore: use_build_context_synchronously
-                              Navigator.popUntil(context,
-                                  ModalRoute.withName('/charactersmenu'));
+                              Navigator.pop(context);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pop(context);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pop(context);
                             } else {
                               GlobalFunctions.errorDialog(
                                 errorMsgTitle: 'characters_create_error',

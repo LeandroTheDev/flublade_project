@@ -1,6 +1,5 @@
 import 'package:bonfire/bonfire.dart';
 import 'package:flublade_project/data/gameplay/characters.dart';
-import 'package:flublade_project/data/gameplay/enemys.dart';
 import 'package:flublade_project/data/gameplay/interface.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -43,14 +42,7 @@ class InGame extends StatelessWidget {
             //Loots
             decorations: const [],
             //Enemies
-            enemies: [
-              EnemySmallSpider(
-                  position: Vector2(200, 200),
-                  life: 100,
-                  level: 1,
-                  armor: 1,
-                  mana: 0),
-            ],
+            enemies: future.data![2],
             overlayBuilderMap: {
               'pause': (BuildContext context, BonfireGame game) {
                 return const IngameInterface();

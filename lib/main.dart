@@ -1,4 +1,3 @@
-// ignore_for_file: unused_local_variable
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';

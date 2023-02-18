@@ -1,5 +1,7 @@
 import 'package:bonfire/bonfire.dart';
+import 'package:flublade_project/data/global.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class EnemySmallSpider extends SimpleEnemy {
   bool stopLoading = false;
@@ -159,11 +161,16 @@ class EnemySmallSpider extends SimpleEnemy {
   @override
   void update(double dt) {
     seeAndMoveToPlayer(
-        radiusVision: 100,
+        radiusVision:
+            Provider.of<Gameplay>(context, listen: false).enemysMove ? 100 : 0,
         margin: 0,
         closePlayer: (_) {
           //Start seeing
           if (!stopLoading) {
+            //Freeze Other Enemys
+            Provider.of<Gameplay>(context, listen: false)
+                .changeEnemyMove(false);
+            //Push to battle scene
             Navigator.pushNamed(gameRef.context, '/battlescene');
             stopLoading = true;
           }
@@ -179,7 +186,7 @@ class EnemySmallSpider extends SimpleEnemy {
 
   @override
   void die() {
-    /// Called when the enemy die
+    Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
     super.die();
   }
 }

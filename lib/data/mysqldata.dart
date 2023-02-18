@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flublade_project/data/gameplay/enemys.dart';
 import 'package:flublade_project/data/gameplay/npc.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
@@ -287,6 +288,41 @@ class MySQL {
       return location;
     }
   }
+
+  //Return Player Stats
+  static Future returnPlayerStats(context) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final connection = await MySQL.database;
+    //Receive from database
+    dynamic charactersdb = await connection
+        .query('select characters from accounts where id = ?', [options.id]);
+    charactersdb =
+        charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
+    charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+    charactersdb = jsonDecode(charactersdb);
+    //Pickup Selected Character
+    final selectedCharacter =
+        charactersdb['character${gameplay.selectedCharacter}'];
+    //Return Stats
+    gameplay.changeStats(
+        value: double.parse(selectedCharacter['life'].toString()),
+        stats: 'life');
+    gameplay.changeStats(
+        value: double.parse(selectedCharacter['mana'].toString()),
+        stats: 'mana');
+    gameplay.changeStats(
+        value: double.parse(selectedCharacter['armor'].toString()),
+        stats: 'armor');
+    gameplay.changeStats(
+        value: double.parse(selectedCharacter['gold'].toString()),
+        stats: 'gold');
+    gameplay.changeStats(
+        value: double.parse(selectedCharacter['xp'].toString()), stats: 'xp');
+    gameplay.changeStats(
+        value: int.parse(selectedCharacter['level'].toString()),
+        stats: 'level');
+  }
 }
 
 class MySQLGameplay {
@@ -318,10 +354,17 @@ class MySQLGameplay {
     }
     //Returning the Tiles
     results.add(listLevel);
+
+    //Returning the NPCs
     // ignore: use_build_context_synchronously
     List<GameComponent> npc = await returnNPCs(context, level);
-    //Returning the NPCs
     results.add(npc);
+
+    //Returning the Enemys
+    // ignore: use_build_context_synchronously
+    List<Enemy> enemy = await returnEnemys(context, level);
+    results.add(enemy);
+
     return results;
   }
 
@@ -360,6 +403,65 @@ class MySQLGameplay {
     return npc;
   }
 
+  //Return Enemys
+  static Future<List<Enemy>> returnEnemys(
+      BuildContext context, String level) async {
+    final connection = await MySQL.database;
+    dynamic enemysdb = await connection
+        .query('select enemy from world where name = ?', [level]);
+    enemysdb = enemysdb.toString().replaceFirst('(Fields: {enemy: ', '');
+    enemysdb = enemysdb.substring(0, enemysdb.length - 2);
+    List<Enemy> enemy = [];
+    //Add Enemys to the gameplay
+    if (enemysdb != '{}') {
+      double life;
+      double mana;
+      double armor;
+      int level;
+      double positionx;
+      double positiony;
+      //Transforming in MAP
+      enemysdb = jsonDecode(enemysdb);
+      life = double.parse(enemysdb['enemy0']['life'].toString());
+      mana = double.parse(enemysdb['enemy0']['mana'].toString());
+      armor = double.parse(enemysdb['enemy0']['armor'].toString());
+      level = int.parse(enemysdb['enemy0']['level'].toString());
+      positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
+      positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
+      //Adding the first enemy
+      enemy.add(parseEnemy(
+        enemyname: enemysdb['enemy0']['name'],
+        position: Vector2(positionx, positiony),
+        life: life,
+        mana: mana,
+        armor: armor,
+        level: level,
+      ));
+      int i = 1;
+      while (true) {
+        if (enemysdb['enemy$i'] != null) {
+          life = double.parse(enemysdb['enemy$i']['life'].toString());
+          mana = double.parse(enemysdb['enemy$i']['mana'].toString());
+          armor = double.parse(enemysdb['enemy$i']['armor'].toString());
+          level = int.parse(enemysdb['enemy$i']['level'].toString());
+          positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
+          positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
+          enemy.add(parseEnemy(
+            enemyname: enemysdb['enemy$i']['name'],
+            position: Vector2(positionx, positiony),
+            life: life,
+            mana: mana,
+            armor: armor,
+            level: level,
+          ));
+        }
+        i++;
+        break;
+      }
+    }
+    return enemy;
+  }
+
   //Parse NPCs
   static SimpleNpc parseNPC(
       {required String npcname,
@@ -370,5 +472,32 @@ class MySQLGameplay {
         return NPCWizard(position, talk);
     }
     return NPCWizard(position, talk);
+  }
+
+  //Parse NPCs
+  static Enemy parseEnemy({
+    required String enemyname,
+    required Vector2 position,
+    required double life,
+    required double mana,
+    required double armor,
+    required int level,
+  }) {
+    switch (enemyname) {
+      case "smallspider":
+        return EnemySmallSpider(
+            life: life,
+            mana: mana,
+            armor: armor,
+            level: level,
+            position: position);
+    }
+    return EnemySmallSpider(
+        life: 100, mana: 100, armor: 0, level: 0, position: position);
+  }
+
+  //Return Battle Enemy Stats
+  static Future<List<dynamic>> returnEnemyStats(context) async {
+    return [];
   }
 }

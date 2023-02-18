@@ -347,11 +347,14 @@ class Gameplay with ChangeNotifier {
 
   //Ingame Provider
   bool _isTalkable = false;
+  bool _enemysMove = true;
   String _selectedTalk = '';
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
   double _playerArmor = 0;
+  double _playerXP = 0;
+  int _playerLevel = 1;
 
   double _enemyLife = 0;
   double _enemyMana = 0;
@@ -359,23 +362,33 @@ class Gameplay with ChangeNotifier {
   int _enemyLevel = 0;
 
   bool get isTalkable => _isTalkable;
+  bool get enemysMove => _enemysMove;
   String get selectedTalk => _selectedTalk;
   double get playerLife => _playerLife;
   double get playerMana => _playerMana;
   double get playerGold => _playerGold;
   double get playerArmor => _playerArmor;
+  double get playerXP => _playerXP;
+  int get playerLevel => _playerLevel;
 
   double get enemyLife => _enemyLife;
   double get enemyMana => _enemyMana;
   double get enemyArmor => _enemyArmor;
   int get enemyLevel => _enemyLevel;
 
+  //Change the talk text
   void changeIsTalkable(value, text) {
     _selectedTalk = text;
     _isTalkable = value;
     notifyListeners();
   }
 
+  //Change if the enemys will move
+  void changeEnemyMove(value) {
+    _enemysMove = value;
+  }
+  
+  //Change Player Stats (LIFE, MANA, GOLD) or Enemy Stats
   void changeStats({required value, required String stats}) {
     //Player Stats
     if (stats == 'life') {
@@ -390,6 +403,12 @@ class Gameplay with ChangeNotifier {
     } else if (stats == 'armor') {
       _playerArmor = value;
       return;
+    } else if (stats == 'level') {
+      _playerLevel = value;
+      return;
+    } else if (stats == 'xp') {
+      _playerXP = value;
+      return;
     }
     //Enemy Stats
     if (stats == 'elife') {
@@ -403,6 +422,7 @@ class Gameplay with ChangeNotifier {
       return;
     } else if (stats == 'elevel') {
       _enemyLevel = value;
+      return;
     }
   }
 
@@ -517,11 +537,13 @@ class Gameplay with ChangeNotifier {
                   0,
                   characterClass.replaceFirst('assets/characters/', '').length -
                       4),
-          'level': 1,
           'life': 100,
           'mana': 10,
-          'skillpoint': 0,
+          'armor': 0,
           'gold': 0,
+          'level': 1,
+          'xp': 0,
+          'skillpoint': 0,
           'location': 'prologue',
         };
         charactersdb = jsonEncode(charactersdb);
@@ -539,11 +561,13 @@ class Gameplay with ChangeNotifier {
       'name': characterUsername,
       'class': characterClass.replaceFirst('assets/characters/', '').substring(
           0, characterClass.replaceFirst('assets/characters/', '').length - 4),
-      'level': 1,
       'life': 100,
       'mana': 10,
-      'skillpoint': 0,
+      'armor': 0,
       'gold': 0,
+      'level': 1,
+      'xp': 0,
+      'skillpoint': 0,
       'location': 'prologue',
     };
     //Saving Datas
