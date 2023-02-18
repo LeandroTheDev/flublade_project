@@ -118,10 +118,10 @@ class Language {
     'dialog_npc_wizard_prologue1': 'Hello',
     'dialog_npc_wizard_prologue2': 'Test',
     //Battle Texts
-    'life': 'Life',
-    'mana': 'Mana',
-    'attack': 'Attack',
-    'defence': 'Defence',
+    'battle_life': 'Life',
+    'battle_mana': 'Mana',
+    'battle_attack': 'Attack',
+    'battle_defence': 'Defence',
   };
   static const pt_BR = {
     //Response
@@ -229,9 +229,9 @@ class Language {
     'dialog_npc_wizard_prologue1': 'Olá',
     'dialog_npc_wizard_prologue2': 'Test',
     //Battle Texts
-    'life': 'Vida',
-    'mana': 'Mana',
-    'attack': 'Atacar',
-    'defence': 'Defender',
+    'battle_life': 'Vida',
+    'battle_mana': 'Mana',
+    'battle_attack': 'Atacar',
+    'battle_defence': 'Defender',
   };
 }

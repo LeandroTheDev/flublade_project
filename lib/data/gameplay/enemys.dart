@@ -170,9 +170,19 @@ class EnemySmallSpider extends SimpleEnemy {
             //Freeze Other Enemys
             Provider.of<Gameplay>(context, listen: false)
                 .changeEnemyMove(false);
+            //Add Enemy Stats
+            Provider.of<Gameplay>(context, listen: false)
+                .changeStats(value: enemyLife, stats: 'elife');
+            Provider.of<Gameplay>(context, listen: false)
+                .changeStats(value: enemyMana, stats: 'emana');
+            Provider.of<Gameplay>(context, listen: false)
+                .changeStats(value: enemyArmor, stats: 'earmor');
+            Provider.of<Gameplay>(context, listen: false)
+                .changeStats(value: enemyLevel, stats: 'elevel');
             //Push to battle scene
             Navigator.pushNamed(gameRef.context, '/battlescene');
             stopLoading = true;
+            die();
           }
         },
         notObserved: () {
@@ -186,7 +196,7 @@ class EnemySmallSpider extends SimpleEnemy {
 
   @override
   void die() {
-    Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
+    removeFromParent();
     super.die();
   }
 }

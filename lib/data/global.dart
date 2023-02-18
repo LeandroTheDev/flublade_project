@@ -355,11 +355,18 @@ class Gameplay with ChangeNotifier {
   double _playerArmor = 0;
   double _playerXP = 0;
   int _playerLevel = 1;
+  int _playerStrength = 0;
+  int _playerAgility = 0;
+  int _playerIntelligence = 0;
+  int _playerLuck = 0;
+  int _playerDamage = 0;
+  Map _playerInventory = {};
 
   double _enemyLife = 0;
   double _enemyMana = 0;
   double _enemyArmor = 0;
   int _enemyLevel = 0;
+  int _enemyDamage = 0;
 
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
@@ -370,11 +377,18 @@ class Gameplay with ChangeNotifier {
   double get playerArmor => _playerArmor;
   double get playerXP => _playerXP;
   int get playerLevel => _playerLevel;
+  int get playerStrength => _playerStrength;
+  int get playerAgility => _playerAgility;
+  int get playerIntelligence => _playerIntelligence;
+  int get playerLuck => _playerLuck;
+  int get playerDamage => _playerDamage;
+  Map get playerInventory => _playerInventory;
 
   double get enemyLife => _enemyLife;
   double get enemyMana => _enemyMana;
   double get enemyArmor => _enemyArmor;
   int get enemyLevel => _enemyLevel;
+  int get enemyDamage => _enemyDamage;
 
   //Change the talk text
   void changeIsTalkable(value, text) {
@@ -387,41 +401,79 @@ class Gameplay with ChangeNotifier {
   void changeEnemyMove(value) {
     _enemysMove = value;
   }
-  
+
   //Change Player Stats (LIFE, MANA, GOLD) or Enemy Stats
   void changeStats({required value, required String stats}) {
     //Player Stats
     if (stats == 'life') {
       _playerLife = value;
+      notifyListeners();
       return;
     } else if (stats == 'mana') {
       _playerMana = value;
+      notifyListeners();
       return;
     } else if (stats == 'gold') {
       _playerGold = value;
+      notifyListeners();
       return;
     } else if (stats == 'armor') {
       _playerArmor = value;
+      notifyListeners();
       return;
     } else if (stats == 'level') {
       _playerLevel = value;
+      notifyListeners();
       return;
     } else if (stats == 'xp') {
       _playerXP = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'strength') {
+      _playerStrength = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'agility') {
+      _playerAgility = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'intelligence') {
+      _playerIntelligence = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'luck') {
+      _playerLuck = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'damage') {
+      _playerDamage = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'inventory') {
+      _playerInventory = jsonDecode(value);
+      notifyListeners();
       return;
     }
     //Enemy Stats
     if (stats == 'elife') {
       _enemyLife = value;
+      notifyListeners();
       return;
     } else if (stats == 'emana') {
       _enemyMana = value;
+      notifyListeners();
       return;
     } else if (stats == 'earmor') {
       _enemyArmor = value;
+      notifyListeners();
       return;
     } else if (stats == 'elevel') {
       _enemyLevel = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'edamage') {
+      _enemyDamage = value;
+      notifyListeners();
       return;
     }
   }
@@ -544,6 +596,12 @@ class Gameplay with ChangeNotifier {
           'level': 1,
           'xp': 0,
           'skillpoint': 0,
+          'strength': 0,
+          'agility': 0,
+          'intelligence': 0,
+          'luck': 0,
+          'weapon': 'unarmed',
+          'inventory': '{}',
           'location': 'prologue',
         };
         charactersdb = jsonEncode(charactersdb);
@@ -568,6 +626,12 @@ class Gameplay with ChangeNotifier {
       'level': 1,
       'xp': 0,
       'skillpoint': 0,
+      'strength': 0,
+      'agility': 0,
+      'intelligence': 0,
+      'luck': 0,
+      'weapon': 'unarmed',
+      'inventory': '{}',
       'location': 'prologue',
     };
     //Saving Datas
@@ -645,5 +709,59 @@ class Gameplay with ChangeNotifier {
       height: 32,
       width: 32,
     );
+  }
+
+  //Class Calculations
+  static dynamic classTranslation({
+    options,
+    gameplay,
+    context,
+    required List values,
+    bool isCharacterCreation = false,
+    bool isIngamePlayerAttackCalculation = false,
+    bool isIngamePlayerDefenceCalculation = false,
+    bool isPlayerDamageCalculation = false,
+  }) {
+    //Character Creation Calculation
+    if (isCharacterCreation) {
+      if (values[0] == 'archer') {}
+    }
+    //Player Attack Calculation
+    if (isIngamePlayerAttackCalculation) {
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      final strengthDamage = (gameplay.playerStrength * 0.5).toStringAsFixed(0);
+      final weaponDamage = returnWeaponDamage(gameplay);
+      double totalDamage = double.parse(strengthDamage) + weaponDamage;
+      totalDamage = totalDamage - gameplay.enemyArmor;
+      final result = gameplay.enemyLife - totalDamage;
+      gameplay.changeStats(value: result, stats: 'elife');
+    }
+    //Player Damage Calculation
+    if (isPlayerDamageCalculation) {
+      final strengthDamage = (gameplay.playerStrength * 0.5).toStringAsFixed(0);
+      final weaponDamage = returnWeaponDamage(gameplay);
+      final totalDamage = int.parse(strengthDamage) + weaponDamage;
+      return totalDamage;
+    }
+  }
+
+  //Weapons Providers
+  String _playerWeapon = 'unarmed';
+
+  String get playerWeapon => _playerWeapon;
+
+  void changePlayerWeapon(value) {
+    _playerWeapon = value;
+  }
+
+  //Weapons Calculations
+  static int returnWeaponDamage(gameplay) {
+    switch (gameplay.playerWeapon) {
+      case 'unarmed':
+        return 1;
+      case 'woodsword':
+        return 2;
+    }
+    return 0;
   }
 }

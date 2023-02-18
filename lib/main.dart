@@ -79,6 +79,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     Future.delayed(const Duration(seconds: 1),
         () => options.changeRemember(value: SaveDatas.getRemember() ?? false));
     //Connection
+    // ignore: unused_local_variable
     Future database = MySQL.database.then(
       (database) async {
         await Future.delayed(const Duration(seconds: 1));

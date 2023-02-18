@@ -322,6 +322,20 @@ class MySQL {
     gameplay.changeStats(
         value: int.parse(selectedCharacter['level'].toString()),
         stats: 'level');
+    gameplay.changeStats(
+        value: int.parse(selectedCharacter['strength'].toString()),
+        stats: 'strength');
+    gameplay.changeStats(
+        value: int.parse(selectedCharacter['agility'].toString()),
+        stats: 'agility');
+    gameplay.changeStats(
+        value: int.parse(selectedCharacter['intelligence'].toString()),
+        stats: 'intelligence');
+    gameplay.changeStats(
+        value: int.parse(selectedCharacter['luck'].toString()), stats: 'luck');
+    gameplay.changeStats(
+        value: selectedCharacter['inventory'].toString(), stats: 'inventory');
+    gameplay.changePlayerWeapon(selectedCharacter['weapon'].toString());
   }
 }
 
@@ -494,10 +508,5 @@ class MySQLGameplay {
     }
     return EnemySmallSpider(
         life: 100, mana: 100, armor: 0, level: 0, position: position);
-  }
-
-  //Return Battle Enemy Stats
-  static Future<List<dynamic>> returnEnemyStats(context) async {
-    return [];
   }
 }
