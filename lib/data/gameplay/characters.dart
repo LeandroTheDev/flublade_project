@@ -1,10 +1,7 @@
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:bonfire/bonfire.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 class PlayerClient extends SimplePlayer with ObjectCollision {
   PlayerClient(
     Vector2 position,

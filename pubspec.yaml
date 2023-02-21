@@ -65,8 +65,8 @@ flutter:
     - assets/open_book.png
     - assets/tavern.png
     - assets/character.png
-    # Item
-    - assets/items/sword_of_the_primordial_fire.png
+    # Items
+    - assets/items/
     # NPC
     - assets/images/npc/
     # Tilesets

@@ -299,8 +299,7 @@ class _BattleSceneState extends State<BattleScene> {
                                   values: [],
                                   context: context);
                               if (gameplay.enemyLife <= 0) {
-                                Navigator.pop(context);
-                                Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
+                                GlobalFunctions.lootDialog(errorMsgTitle: 'battle_loot', errorMsgContext: '', context: context);
                               }
                             },
                             child: Text(Language.Translate(

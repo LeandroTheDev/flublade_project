@@ -122,6 +122,12 @@ class Language {
     'battle_mana': 'Mana',
     'battle_attack': 'Attack',
     'battle_defence': 'Defence',
+    'battle_loot': 'Loots',
+    'battle_loot_all': 'Take All',
+    'battle_loot_exit': 'Exit',
+    //Items Name
+    'items_gold': 'Gold',
+    'items_woodsword': 'Wooden Sword',
   };
   static const pt_BR = {
     //Response
@@ -233,5 +239,8 @@ class Language {
     'battle_mana': 'Mana',
     'battle_attack': 'Atacar',
     'battle_defence': 'Defender',
+    'battle_loot': 'Saque',
+    'battle_loot_all': 'Pegar Tudo',
+    'battle_loot_exit': 'Sair',
   };
 }

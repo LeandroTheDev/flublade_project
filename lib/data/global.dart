@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flublade_project/components/character_creation.dart';
+import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/pages/gameplay/battle_scene.dart';
@@ -182,6 +184,158 @@ class GlobalFunctions {
                 ),
               ),
             ],
+          );
+        });
+  }
+
+  //Loot Dialog
+  static void lootDialog({
+    required String errorMsgTitle,
+    required String errorMsgContext,
+    required BuildContext context,
+  }) {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final enemyLevel = gameplay.enemyLevel;
+    List lootCalculation() {
+      List loots = [];
+      int lootQuantity = 0;
+
+      //Gold Quantity Calculator
+      goldQuantity() {
+        if (enemyLevel >= 0 && enemyLevel <= 4) {
+          return 1 + Random().nextInt(6);
+        } else if (enemyLevel >= 5 && enemyLevel <= 10) {
+          return 3 + Random().nextInt(15);
+        } else if (enemyLevel >= 11 && enemyLevel <= 20) {
+          return 6 + Random().nextInt(25);
+        } else if (enemyLevel >= 21 && enemyLevel <= 30) {
+          return 12 + Random().nextInt(35);
+        } else if (enemyLevel >= 31 && enemyLevel <= 45) {
+          return 20 + Random().nextInt(50);
+        } else if (enemyLevel >= 46 && enemyLevel <= 60) {
+          return 30 + Random().nextInt(80);
+        } else if (enemyLevel > 60) {
+          return 50 + Random().nextInt(100);
+        }
+        return 0;
+      }
+
+      //Gold Add
+      loots.add({
+        'name': 'gold',
+        'quantity': goldQuantity(),
+      });
+
+      //Loot Quantity Calculator
+      if (Random().nextInt(8) >= 1) {
+        lootQuantity = lootQuantity + Random().nextInt(2);
+        //60% Chance to increase loot
+        if (Random().nextInt(8) > 3) {
+          lootQuantity = lootQuantity + Random().nextInt(3);
+          //40% Chance to increase loot
+          if (Random().nextInt(8) >= 5) {
+            lootQuantity = lootQuantity + Random().nextInt(4);
+          }
+          //20% Chance to increase loot
+          if (Random().nextInt(8) >= 7) {
+            lootQuantity = lootQuantity + Random().nextInt(5);
+            //10% Chance to increase loot
+            if (Random().nextInt(8) == 8) {
+              lootQuantity = lootQuantity + Random().nextInt(6);
+            }
+          }
+        }
+      }
+      //Loot Ramdomizer
+      lootRandom() {
+        return {
+          'name': 'woodsword',
+          'quantity': 1,
+        };
+      }
+
+      print(lootQuantity);
+      for (int i = 1; i <= lootQuantity; i++) {
+        loots.add(lootRandom());
+      }
+
+      return loots;
+    }
+
+    final loots = lootCalculation();
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return FittedBox(
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              title: Text(
+                Language.Translate(errorMsgTitle, options.language) ??
+                    'Language Error',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              //Loot Items
+              content: SizedBox(
+                width: 100,
+                height: 100,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                          ),
+                          shrinkWrap: true,
+                          itemCount: loots.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: LootView(
+                                loots: loots,
+                                index: index,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Navigator.pop(context);
+                    // Provider.of<Gameplay>(context, listen: false)
+                    //     .changeEnemyMove(true);
+                  },
+                  child: Text(
+                    Language.Translate('battle_loot_all', options.language) ??
+                        'Take All',
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    Provider.of<Gameplay>(context, listen: false)
+                        .changeEnemyMove(true);
+                  },
+                  child: Text(
+                    Language.Translate('battle_loot_exit', options.language) ??
+                        'Take All',
+                  ),
+                ),
+              ],
+            ),
           );
         });
   }
@@ -763,5 +917,53 @@ class Gameplay with ChangeNotifier {
         return 2;
     }
     return 0;
+  }
+}
+
+class LootView extends StatefulWidget {
+  const LootView({required this.loots, required this.index, super.key});
+  final List loots;
+  final int index;
+
+  @override
+  State<LootView> createState() => _LootViewState();
+}
+
+class _LootViewState extends State<LootView> {
+  bool isPickup = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      width: 100,
+      height: 150,
+      child: Column(
+        children: [
+          SizedBox(
+              width: 100,
+              height: 45,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  Items.list[widget.loots[widget.index]['name']]['image'],
+                  fit: BoxFit.fill,
+                ),
+              )),
+          FittedBox(
+            child: Text(
+              widget.loots[widget.index]['quantity'].toString(),
+              style: TextStyle(
+                  fontFamily: 'PressStart',
+                  fontSize: 10,
+                  color: Theme.of(context).primaryColor),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
