@@ -121,7 +121,7 @@ class MySQL {
   }
 
   //Change Language
-  static void changeLanguage(context, widget) {
+  static Future<void> changeLanguage(context, widget) async {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context, listen: false);
     //Upload to MySQL
@@ -190,6 +190,28 @@ class MySQL {
             ),
           );
         });
+  }
+
+  //Push and Upload Characters
+  static Future<void> pushUploadCharacters(
+      {required BuildContext context}) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final connection = await database;
+    //Pickup from database
+    dynamic charactersdb = await connection
+        .query('select characters from accounts where id = ?', [options.id]);
+    charactersdb =
+        charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
+    charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+    //Transform into MAP
+    charactersdb = jsonDecode(charactersdb);
+    //Add new items
+    charactersdb['character${gameplay.selectedCharacter}']['inventory'] = gameplay.playerInventory;
+    //Transform into String
+    charactersdb = jsonEncode(charactersdb);
+    //Upload to database
+    await updateCharacters(charactersdb, options);
   }
 
   //Create Character
@@ -334,7 +356,7 @@ class MySQL {
     gameplay.changeStats(
         value: int.parse(selectedCharacter['luck'].toString()), stats: 'luck');
     gameplay.changeStats(
-        value: selectedCharacter['inventory'].toString(), stats: 'inventory');
+        value: selectedCharacter['inventory'], stats: 'inventory');
     gameplay.changePlayerWeapon(selectedCharacter['weapon'].toString());
   }
 }

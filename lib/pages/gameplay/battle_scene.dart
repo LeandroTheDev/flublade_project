@@ -132,10 +132,10 @@ class _BattleSceneState extends State<BattleScene> {
                         Padding(
                           padding: const EdgeInsets.only(
                             top: 200,
-                            left: 2300,
+                            left: 2000,
                           ),
                           child: SizedBox(
-                            width: 500,
+                            width: 1100,
                             height: 600,
                             child: Center(
                               child: Stack(
@@ -299,7 +299,12 @@ class _BattleSceneState extends State<BattleScene> {
                                   values: [],
                                   context: context);
                               if (gameplay.enemyLife <= 0) {
-                                GlobalFunctions.lootDialog(errorMsgTitle: 'battle_loot', errorMsgContext: '', context: context);
+                                GlobalFunctions.lootDialog(
+                                  errorMsgTitle: 'battle_loot',
+                                  errorMsgContext: '',
+                                  context: context,
+                                  enemySpecialLoot: [],
+                                );
                               }
                             },
                             child: Text(Language.Translate(

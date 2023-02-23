@@ -125,9 +125,12 @@ class Language {
     'battle_loot': 'Loots',
     'battle_loot_all': 'Take All',
     'battle_loot_exit': 'Exit',
+    'battle_loot_selected': 'Selected',
     //Items Name
     'items_gold': 'Gold',
     'items_woodsword': 'Wooden Sword',
+    'items_thread': 'Thread',
+    'items_cloth': 'Cloth',
   };
   static const pt_BR = {
     //Response
