@@ -9,11 +9,9 @@ class LootWidget extends StatefulWidget {
   const LootWidget(
       {required this.loots,
       required this.index,
-      required this.color,
       super.key});
   final List loots;
   final int index;
-  final List<Color> color;
 
   @override
   State<LootWidget> createState() => _LootWidgetState();
@@ -29,7 +27,7 @@ class _LootWidgetState extends State<LootWidget> {
             onPressed: null,
             child: Container(
               decoration: BoxDecoration(
-                color: widget.color[widget.index],
+                color: Items.returnRarity(widget.loots[widget.index]['name']),
                 borderRadius: BorderRadius.circular(10),
               ),
               width: 100,
@@ -56,7 +54,7 @@ class _LootWidgetState extends State<LootWidget> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: widget.color[widget.index],
+                color: Items.returnRarity(widget.loots[widget.index]['name']),
                 borderRadius: BorderRadius.circular(10),
               ),
               width: 100,

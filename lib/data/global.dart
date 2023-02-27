@@ -201,7 +201,6 @@ class GlobalFunctions {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final enemyLevel = gameplay.enemyLevel;
-    List<Color> rarity = [];
     gameplay.resetPlayerInventorySelected();
     List lootCalculation() {
       List loots = [];
@@ -232,8 +231,6 @@ class GlobalFunctions {
         'name': 'gold',
         'quantity': goldQuantity() + enemySpecialGold,
       });
-      //Gold Color
-      rarity.add(Colors.grey);
 
       //Loot Quantity Calculator
       if (Random().nextInt(10) >= 1) {
@@ -263,14 +260,12 @@ class GlobalFunctions {
           //5% To Ultra Rare Items
           if (Random().nextInt(10) >= 7) {
             final int index = Random().nextInt(3) + 200;
-            rarity.add(Colors.purple);
             return {
               'name': Items.lootId[index],
               'quantity': 1,
             };
           }
           final int index = Random().nextInt(3) + 100;
-          rarity.add(Colors.green);
           return {
             'name': Items.lootId[index],
             'quantity': 1,
@@ -281,7 +276,6 @@ class GlobalFunctions {
         if (index == 0) {
           quantity = goldQuantity();
         }
-        rarity.add(Colors.grey);
         return {
           'name': Items.lootId[index],
           'quantity': quantity,
@@ -344,7 +338,6 @@ class GlobalFunctions {
                               return LootWidget(
                                 loots: loots,
                                 index: index,
-                                color: rarity,
                               );
                             },
                           ),
