@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flublade_project/components/character_creation.dart';
+import 'package:flublade_project/components/loot_widget.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -13,8 +14,8 @@ import 'package:flublade_project/pages/mainmenu/character_selection.dart';
 import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flublade_project/pages/mainmenu/options_menu.dart';
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -340,7 +341,7 @@ class GlobalFunctions {
                             shrinkWrap: true,
                             itemCount: loots.length,
                             itemBuilder: (context, index) {
-                              return LootView(
+                              return LootWidget(
                                 loots: loots,
                                 index: index,
                                 color: rarity,
@@ -359,6 +360,7 @@ class GlobalFunctions {
                       MySQL.loadingWidget(
                           context: context, language: options.language);
                       gameplay.addInventoryItem(loots);
+                      await MySQL.pushUploadCharacters(context: context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                       // ignore: use_build_context_synchronously
@@ -382,7 +384,7 @@ class GlobalFunctions {
                         MySQL.loadingWidget(
                             context: context, language: options.language);
                         //Update Local
-                        final result = gameplay
+                        gameplay
                             .addInventoryItem(gameplay.playerInventorySelected);
                         //Update Database
                         await MySQL.pushUploadCharacters(context: context);
@@ -631,6 +633,11 @@ class Gameplay with ChangeNotifier {
   //Reset Selected Inventory
   void resetPlayerInventorySelected() {
     _playerInventorySelected = [];
+  }
+
+  //Change Player Inventory
+  void changePlayerInventory(Map value) {
+    _playerInventory = value;
   }
 
   //Change Player Stats (LIFE, MANA, GOLD) or Enemy Stats
@@ -1040,90 +1047,5 @@ class Gameplay with ChangeNotifier {
         return 2;
     }
     return 0;
-  }
-}
-
-class LootView extends StatefulWidget {
-  const LootView(
-      {required this.loots,
-      required this.index,
-      required this.color,
-      super.key});
-  final List loots;
-  final int index;
-  final List<Color> color;
-
-  @override
-  State<LootView> createState() => _LootViewState();
-}
-
-class _LootViewState extends State<LootView> {
-  bool isPickup = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return isPickup
-        ? TextButton(
-            onPressed: null,
-            child: Container(
-              decoration: BoxDecoration(
-                color: widget.color[widget.index],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              width: 100,
-              height: 65,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FittedBox(
-                    child: Text(Language.Translate('battle_loot_selected',
-                            Provider.of<Options>(context).language) ??
-                        'Selected'),
-                  ),
-                ),
-              ),
-            ),
-          )
-        : TextButton(
-            onPressed: () {
-              Provider.of<Gameplay>(context, listen: false)
-                  .addPlayerInventorySelected(widget.loots[widget.index]);
-              setState(() {
-                isPickup = true;
-              });
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: widget.color[widget.index],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              width: 100,
-              height: 65,
-              child: Column(
-                children: [
-                  SizedBox(
-                      width: 100,
-                      height: 45,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.asset(
-                          Items.list[widget.loots[widget.index]['name']]
-                              ['image'],
-                          fit: BoxFit.fill,
-                        ),
-                      )),
-                  FittedBox(
-                    child: Text(
-                      widget.loots[widget.index]['quantity'].toString(),
-                      style: TextStyle(
-                          fontFamily: 'PressStart',
-                          fontSize: 10,
-                          color: Theme.of(context).primaryColor),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
   }
 }

@@ -192,6 +192,24 @@ class MySQL {
         });
   }
 
+  //Return Character Inventory
+  static Future<bool> returnPlayerInventory(BuildContext context) async {
+    final options = Provider.of<Options>(context);
+    final gameplay = Provider.of<Gameplay>(context);
+    final connection = await database;
+    //Pickup from database
+    dynamic charactersdb = await connection
+        .query('select characters from accounts where id = ?', [options.id]);
+    charactersdb =
+        charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
+    charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+    charactersdb = jsonDecode(charactersdb);
+    final inventory =
+        charactersdb['character${gameplay.selectedCharacter}']['inventory'];
+    gameplay.changePlayerInventory(inventory);
+    return true;
+  }
+
   //Push and Upload Characters
   static Future<void> pushUploadCharacters(
       {required BuildContext context}) async {
@@ -207,7 +225,8 @@ class MySQL {
     //Transform into MAP
     charactersdb = jsonDecode(charactersdb);
     //Add new items
-    charactersdb['character${gameplay.selectedCharacter}']['inventory'] = gameplay.playerInventory;
+    charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
+        gameplay.playerInventory;
     //Transform into String
     charactersdb = jsonEncode(charactersdb);
     //Upload to database

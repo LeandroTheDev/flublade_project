@@ -245,5 +245,11 @@ class Language {
     'battle_loot': 'Saque',
     'battle_loot_all': 'Pegar Tudo',
     'battle_loot_exit': 'Sair',
+    'battle_loot_selected': 'Selecionado',
+    //Items Name
+    'items_gold': 'Ouro',
+    'items_woodsword': 'Espada de Madeira',
+    'items_thread': 'Linha',
+    'items_cloth': 'Pano',
   };
 }
