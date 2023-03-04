@@ -122,7 +122,7 @@ class _MainMenuState extends State<MainMenu> {
                         //Logout
                         TextButton(
                           onPressed: () async {
-                            GlobalFunctions.confirmationDialog(
+                            GlobalFunctions.disconnectDialog(
                               errorMsgTitle: 'response_confirmation',
                               errorMsgContext: 'mainmenu_confirmation',
                               context: context,

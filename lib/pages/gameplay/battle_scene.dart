@@ -22,9 +22,7 @@ class _BattleSceneState extends State<BattleScene> {
           body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
-              height: screenSize.height * 0.07,
-            ),
+            SizedBox(height: screenSize.height * 0.07),
             //Top Side Screen
             Row(
               children: [

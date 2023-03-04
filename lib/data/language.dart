@@ -25,6 +25,9 @@ class Language {
     'response_error':
         'Ops, There was a problem with your processing, try again later',
     'response_loading': 'Loading Please Wait...',
+    'response_equip': 'Equip',
+    'response_damage': 'Damage',
+    'response_sellprice': 'Sell Price',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -128,9 +131,14 @@ class Language {
     'battle_loot_selected': 'Selected',
     //Items Name
     'items_gold': 'Gold',
+    'items_gold_desc':
+        'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
     'items_woodsword': 'Wooden Sword',
+    'items_woodsword_desc': 'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
     'items_thread': 'Thread',
+    'items_thread_desc': 'Made from twisted fibers of linen, cotton, silk, synthetics, etc., used in sewing, embroidery, lace, fabrication',
     'items_cloth': 'Cloth',
+    'items_cloth_desc': 'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
   };
   static const pt_BR = {
     //Response
@@ -147,6 +155,9 @@ class Language {
     'response_error':
         'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
     'response_loading': 'Carregando Por Favor Espere...',
+    'response_equip': 'Equipar',
+    'response_damage': 'Dano',
+    'response_sellprice': 'Preço de Venda',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -248,8 +259,13 @@ class Language {
     'battle_loot_selected': 'Selecionado',
     //Items Name
     'items_gold': 'Ouro',
+    'items_gold_desc':
+        'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
     'items_woodsword': 'Espada de Madeira',
+    'items_woodsword_desc': 'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
     'items_thread': 'Linha',
+    'items_thread_desc': 'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
     'items_cloth': 'Pano',
+    'items_cloth_desc': 'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.'
   };
 }

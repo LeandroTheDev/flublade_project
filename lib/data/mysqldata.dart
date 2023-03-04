@@ -14,7 +14,7 @@ class MySQL {
   //Connection
   static final database = MySqlConnection.connect(
     ConnectionSettings(
-      host: '192.168.1.25',
+      host: '192.168.0.13',
       port: 3306,
       user: 'flubladeGuest',
       password: 'i@Dhs4e5E%fGz&ngbY2m&AGRCVlskBUrrCnsYFUze&fhxehb#j',
@@ -206,6 +206,9 @@ class MySQL {
     charactersdb = jsonDecode(charactersdb);
     final inventory =
         charactersdb['character${gameplay.selectedCharacter}']['inventory'];
+    if (inventory == '{}') {
+      return false;
+    }
     gameplay.changePlayerInventory(inventory);
     return true;
   }
@@ -374,9 +377,10 @@ class MySQL {
         stats: 'intelligence');
     gameplay.changeStats(
         value: int.parse(selectedCharacter['luck'].toString()), stats: 'luck');
+    gameplay.changePlayerWeapon(selectedCharacter['weapon'].toString());
     gameplay.changeStats(
         value: selectedCharacter['inventory'], stats: 'inventory');
-    gameplay.changePlayerWeapon(selectedCharacter['weapon'].toString());
+    gameplay.changeStats(value: selectedCharacter['equips'], stats: 'equips');
   }
 }
 

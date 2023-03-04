@@ -138,8 +138,8 @@ class GlobalFunctions {
     '/battlescene': (context) => const BattleScene(),
   };
 
-  //Confirmation Dialog
-  static void confirmationDialog({
+  //Disconnect Dialog
+  static void disconnectDialog({
     required String errorMsgTitle,
     required String errorMsgContext,
     required BuildContext context,
@@ -581,6 +581,7 @@ class Gameplay with ChangeNotifier {
   int _playerDamage = 0;
   Map _playerInventory = {};
   List _playerInventorySelected = [];
+  List _playerEquips = [];
 
   double _enemyLife = 0;
   double _enemyMana = 0;
@@ -604,6 +605,7 @@ class Gameplay with ChangeNotifier {
   int get playerDamage => _playerDamage;
   Map get playerInventory => _playerInventory;
   List get playerInventorySelected => _playerInventorySelected;
+  List get playerEquips => _playerEquips;
 
   double get enemyLife => _enemyLife;
   double get enemyMana => _enemyMana;
@@ -688,6 +690,14 @@ class Gameplay with ChangeNotifier {
       }
       notifyListeners();
       return;
+    } else if (stats == 'equips') {
+      try {
+        _playerEquips = value;
+      } catch (_) {
+        _playerEquips = jsonDecode(value);
+      }
+      notifyListeners();
+      return;
     }
     //Enemy Stats
     if (stats == 'elife') {
@@ -718,6 +728,7 @@ class Gameplay with ChangeNotifier {
     _playerInventorySelected.add(value);
   }
 
+  //Add Items to invetory
   Map addInventoryItem(items) {
     bool jumpClear = false;
     for (int i = 0; i <= items.length - 1; i++) {
@@ -754,6 +765,9 @@ class Gameplay with ChangeNotifier {
     }
     return _playerInventory;
   }
+
+  //Equip Items
+  void changePlayerEquips(item, index) {}
 
   //Show Text Talk Dialog
   static void showTalkText(context, npcname) {
@@ -879,6 +893,7 @@ class Gameplay with ChangeNotifier {
           'luck': 0,
           'weapon': 'unarmed',
           'inventory': '{}',
+          'equips': [],
           'location': 'prologue',
         };
         charactersdb = jsonEncode(charactersdb);
@@ -909,6 +924,7 @@ class Gameplay with ChangeNotifier {
       'luck': 0,
       'weapon': 'unarmed',
       'inventory': '{}',
+      'equips': [],
       'location': 'prologue',
     };
     //Saving Datas
@@ -1006,11 +1022,17 @@ class Gameplay with ChangeNotifier {
     //Player Attack Calculation
     if (isIngamePlayerAttackCalculation) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
+      //Receive Strength Damage Calculation
       final strengthDamage = (gameplay.playerStrength * 0.5).toStringAsFixed(0);
+      //Receive Weapon Base Damage
       final weaponDamage = returnWeaponDamage(gameplay);
+      //Strength + Weapon Damage
       double totalDamage = double.parse(strengthDamage) + weaponDamage;
+      //If enemy has armor reduce damage
       totalDamage = totalDamage - gameplay.enemyArmor;
+      //Reducing enemy life
       final result = gameplay.enemyLife - totalDamage;
+      //Changing in Provider stats
       gameplay.changeStats(value: result, stats: 'elife');
     }
     //Player Damage Calculation
