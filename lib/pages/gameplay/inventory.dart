@@ -12,9 +12,38 @@ class GameplayInventory extends StatefulWidget {
   State<GameplayInventory> createState() => _GameplayInventoryState();
 }
 
-class _GameplayInventoryState extends State<GameplayInventory> {
+class _GameplayInventoryState extends State<GameplayInventory>
+    with SingleTickerProviderStateMixin {
   bool hideEquips = true;
+  //Animation Variables
+  AnimationController? _controller;
+  Animation<Size>? _heightController;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+        vsync: this,
+        duration: const Duration(
+          milliseconds: 300,
+        ));
+    _heightController = Tween(
+      begin: const Size(double.infinity, 700),
+      end: const Size(double.infinity, 0),
+    ).animate(
+      CurvedAnimation(parent: _controller!, curve: Curves.linear),
+    );
+    //Update Screen
+    _heightController?.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller?.dispose();
+  }
+
   void unequipItem() {}
+
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
@@ -32,6 +61,11 @@ class _GameplayInventoryState extends State<GameplayInventory> {
                       onPressed: () {
                         setState(() {
                           hideEquips = !hideEquips;
+                          if (!hideEquips) {
+                            _controller?.forward();
+                          } else {
+                            _controller?.reverse();
+                          }
                         });
                       },
                       child: SizedBox(
@@ -49,278 +83,267 @@ class _GameplayInventoryState extends State<GameplayInventory> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              //Spacer
-              hideEquips ? const SizedBox() : const SizedBox(height: 20),
-              //Equips
-              hideEquips
-                  ? const SizedBox()
-                  : SizedBox(
-                      height: 700,
-                      child: FittedBox(
-                        child: Column(
-                          children: [
-                            //Hat
-                            Row(
-                              children: [
-                                //Spacer
-                                const SizedBox(width: 20),
-                                //Null
-                                const SizedBox(width: 150),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Hat
-                                TextButton(
-                                  onPressed: () {},
-                                  child: Container(
-                                    padding: const EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                    height: 150,
-                                    width: 150,
-                                    child: Image.asset(
-                                        'assets/images/interface/equipHead.png'),
-                                  ),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Null
-                                const SizedBox(width: 150),
-                                //Spacer
-                                const SizedBox(width: 20),
-                              ],
+              AnimatedBuilder(
+                animation: _heightController!,
+                builder: (context, child) => //Equips
+                    Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: SizedBox(
+                      height: _heightController?.value.height ?? 0,
+                      child: child),
+                ),
+                child: FittedBox(
+                  child: Column(
+                    children: [
+                      //Hat
+                      Row(
+                        children: [
+                          //Spacer
+                          const SizedBox(width: 20),
+                          //Null
+                          const SizedBox(width: 150),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Hat
+                          TextButton(
+                            onPressed: () {},
+                            child: Container(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              height: 150,
+                              width: 150,
+                              child: Image.asset(
+                                  'assets/images/interface/equipHead.png'),
                             ),
-                            //Spacer
-                            const SizedBox(height: 35),
-                            //Shoulder & Necklace
-                            Row(
-                              children: [
-                                //Spacer
-                                const SizedBox(width: 20),
-                                //Shoulder
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipShoulder1.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Necklace
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipNecklace.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Shoulder
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipShoulder2.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 20),
-                              ],
-                            ),
-                            //Spacer
-                            const SizedBox(height: 35),
-                            //Hands & Chest
-                            Row(
-                              children: [
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Hands
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipHands1.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Chest
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipChest.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Null
-                                //Hands
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipHands2.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 20),
-                              ],
-                            ),
-                            //Spacer
-                            const SizedBox(height: 35),
-                            //Leggings & Belt
-                            Row(
-                              children: [
-                                //Spacer
-                                const SizedBox(width: 20),
-                                //Null
-                                const SizedBox(width: 150),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Legs
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipLegs.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Belt
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipBelt.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 20),
-                              ],
-                            ),
-                            const SizedBox(height: 35),
-                            //Shoes
-                            Row(
-                              children: [
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Null
-                                const SizedBox(width: 150),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Shoes
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equipShoes.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Null
-                                const SizedBox(width: 150),
-                                //Spacer
-                                const SizedBox(width: 20),
-                              ],
-                            ),
-                            //Weapons
-                            Row(
-                              children: [
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Weapon 1
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equip1.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Null
-                                const SizedBox(width: 150),
-                                //Spacer
-                                const SizedBox(width: 30),
-                                //Weapon 2
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  height: 150,
-                                  width: 150,
-                                  child: Image.asset(
-                                      'assets/images/interface/equip2.png'),
-                                ),
-                                //Spacer
-                                const SizedBox(width: 20),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Null
+                          const SizedBox(width: 150),
+                          //Spacer
+                          const SizedBox(width: 20),
+                        ],
                       ),
-                    ),
-              hideEquips ? const SizedBox() : const SizedBox(height: 50),
+                      //Spacer
+                      const SizedBox(height: 35),
+                      //Shoulder & Necklace
+                      Row(
+                        children: [
+                          //Spacer
+                          const SizedBox(width: 20),
+                          //Shoulder
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipShoulder1.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Necklace
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipNecklace.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Shoulder
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipShoulder2.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 20),
+                        ],
+                      ),
+                      //Spacer
+                      const SizedBox(height: 35),
+                      //Hands & Chest
+                      Row(
+                        children: [
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Hands
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipHands1.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Chest
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipChest.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Null
+                          //Hands
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipHands2.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 20),
+                        ],
+                      ),
+                      //Spacer
+                      const SizedBox(height: 35),
+                      //Leggings & Belt
+                      Row(
+                        children: [
+                          //Spacer
+                          const SizedBox(width: 20),
+                          //Null
+                          const SizedBox(width: 150),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Legs
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipLegs.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Belt
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipBelt.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 20),
+                        ],
+                      ),
+                      const SizedBox(height: 35),
+                      //Shoes
+                      Row(
+                        children: [
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Null
+                          const SizedBox(width: 150),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Shoes
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equipShoes.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Null
+                          const SizedBox(width: 150),
+                          //Spacer
+                          const SizedBox(width: 20),
+                        ],
+                      ),
+                      //Weapons
+                      Row(
+                        children: [
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Weapon 1
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equip1.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Null
+                          const SizedBox(width: 150),
+                          //Spacer
+                          const SizedBox(width: 30),
+                          //Weapon 2
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            height: 150,
+                            width: 150,
+                            child: Image.asset(
+                                'assets/images/interface/equip2.png'),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 20),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               //Items
               FutureBuilder(
                 future: MySQL.returnPlayerInventory(context),

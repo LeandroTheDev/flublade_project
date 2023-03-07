@@ -766,8 +766,72 @@ class Gameplay with ChangeNotifier {
     return _playerInventory;
   }
 
+  //Returns the equipment into the index
+  int translateEquipsIndex(equip) {
+    switch (equip) {
+      case '1weapon':
+        return 9;
+    }
+    return 0;
+  }
+
+  String translateItemRarity(itemName) {
+    if (Items.list[itemName]['rarity'].toString().length == 1) {
+      return '${itemName}0${Items.list[itemName]['rarity']}';
+    } else {
+      return '$itemName${Items.list[itemName]['rarity']}';
+    }
+  }
+
   //Equip Items
-  void changePlayerEquips(item, index) {}
+  void changePlayerEquips(item, index) {
+    switch (index) {
+      //Head
+      case 0:
+        _playerEquips[0] = item;
+        return;
+      //Shoulders1
+      case 1:
+        playerEquips[1] = item;
+        return;
+      //Shoulders2
+      case 2:
+        playerEquips[2] = item;
+        return;
+      //Necklace
+      case 3:
+        playerEquips[3] = item;
+        return;
+      //Hands1
+      case 4:
+        playerEquips[4] = item;
+        return;
+      //Hands2
+      case 5:
+        playerEquips[5] = item;
+        return;
+      //Chest
+      case 6:
+        playerEquips[6] = item;
+        return;
+      //Legs
+      case 7:
+        playerEquips[7] = item;
+        return;
+      //Boots
+      case 8:
+        playerEquips[8] = item;
+        return;
+      //Weapon1
+      case 9:
+        playerEquips[9] = item;
+        return;
+      //Weapon2
+      case 10:
+        playerEquips[10] = item;
+        return;
+    }
+  }
 
   //Show Text Talk Dialog
   static void showTalkText(context, npcname) {
@@ -893,7 +957,36 @@ class Gameplay with ChangeNotifier {
           'luck': 0,
           'weapon': 'unarmed',
           'inventory': '{}',
-          'equips': [],
+          'equips': [
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none',
+            'none'
+          ],
           'location': 'prologue',
         };
         charactersdb = jsonEncode(charactersdb);
@@ -924,7 +1017,36 @@ class Gameplay with ChangeNotifier {
       'luck': 0,
       'weapon': 'unarmed',
       'inventory': '{}',
-      'equips': [],
+      'equips': [
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none'
+      ],
       'location': 'prologue',
     };
     //Saving Datas

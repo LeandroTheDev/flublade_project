@@ -16,7 +16,7 @@ class ItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final itemColor = Items.returnRarity(itemName);
     final itemTier = Items.returnTier(itemName);
-    // final gameplay = Provider.of<Gameplay>(context);
+    final gameplay = Provider.of<Gameplay>(context);
     final options = Provider.of<Options>(context);
     final screenSize = MediaQuery.of(context).size;
 
@@ -192,7 +192,22 @@ class ItemWidget extends StatelessWidget {
                                     width: 200,
                                     height: 50,
                                     child: ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        MySQL.loadingWidget(
+                                            context: context,
+                                            language: options.language);
+                                        gameplay.changePlayerEquips(
+                                          itemName,
+                                          gameplay.translateEquipsIndex(
+                                              Items.list[itemName]['equip']),
+                                        );
+                                        await MySQL.pushUploadCharacters(
+                                            context: context);
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.pop(context);
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.pop(context);
+                                      },
                                       child: Text(
                                         Language.Translate('response_equip',
                                                 options.language) ??

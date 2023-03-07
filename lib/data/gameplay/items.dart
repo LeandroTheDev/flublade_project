@@ -184,6 +184,7 @@ class Items {
       'category': 'weapon',
       'damage': '60',
     },
+    //Armors
   };
 
   static Color returnRarity(itemName) {

@@ -230,6 +230,9 @@ class MySQL {
     //Add new items
     charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
         gameplay.playerInventory;
+    //Add new equips
+    charactersdb['character${gameplay.selectedCharacter}']['equips'] =
+        gameplay.playerEquips;
     //Transform into String
     charactersdb = jsonEncode(charactersdb);
     //Upload to database
