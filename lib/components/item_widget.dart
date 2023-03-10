@@ -151,9 +151,9 @@ class ItemWidget extends StatelessWidget {
                   child: Column(
                     children: [
                       //Desc & Stats
-                      SingleChildScrollView(
-                        child: SizedBox(
-                          height: 300,
+                      SizedBox(
+                        height: 300,
+                        child: SingleChildScrollView(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

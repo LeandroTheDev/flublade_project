@@ -28,6 +28,8 @@ class Language {
     'response_equip': 'Equip',
     'response_damage': 'Damage',
     'response_sellprice': 'Sell Price',
+    'response_unequipitem': 'Unequip Item',
+    'response_unequip': 'Unequip',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -158,6 +160,8 @@ class Language {
     'response_equip': 'Equipar',
     'response_damage': 'Dano',
     'response_sellprice': 'Preço de Venda',
+    'response_unequipitem': 'Desequipar Item',
+    'response_unequip': 'Desequipar',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',

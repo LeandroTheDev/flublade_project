@@ -475,7 +475,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             );
                                             if (result == 'notfound') {
                                               settings.changeIsLoading(
-                                                value: false);
+                                                  value: false);
                                               GlobalFunctions.errorDialog(
                                                   errorMsgTitle:
                                                       'authentication_login_notfound',
@@ -506,10 +506,22 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                     await MySQL.pushCharacters(
                                                         options: options);
                                                 // ignore: use_build_context_synchronously
-                                                Provider.of<Gameplay>(context, listen: false).changeCharacters(
-                                                    characters);
+                                                Provider.of<Gameplay>(context,
+                                                        listen: false)
+                                                    .changeCharacters(
+                                                        characters);
                                                 SaveDatas.setCharacters(
                                                     characters);
+                                              } else {
+                                                //Push Characters
+                                                String characters =
+                                                    await MySQL.pushCharacters(
+                                                        options: options);
+                                                // ignore: use_build_context_synchronously
+                                                Provider.of<Gameplay>(context,
+                                                        listen: false)
+                                                    .changeCharacters(
+                                                        characters);
                                               }
                                               settings.changeIsLoading(
                                                   value: false);

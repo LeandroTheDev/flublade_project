@@ -164,12 +164,15 @@ class GlobalFunctions {
               style: TextStyle(color: Theme.of(context).primaryColor),
             ),
             actions: [
+              //Yes
               ElevatedButton(
                 onPressed: () {
                   options.changeUsername('');
                   options.changePassword('');
                   options.changeRemember(value: false);
                   options.changeId(0);
+                  SaveDatas.setRemember(false);
+                  Provider.of<Gameplay>(context, listen: false).changeCharacters('{}');
                   Navigator.pushReplacementNamed(
                       context, '/authenticationpage');
                 },
@@ -177,6 +180,7 @@ class GlobalFunctions {
                   Language.Translate('response_yes', options.language) ?? 'Yes',
                 ),
               ),
+              //No
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -789,46 +793,57 @@ class Gameplay with ChangeNotifier {
       //Head
       case 0:
         _playerEquips[0] = item;
+        notifyListeners();
         return;
       //Shoulders1
       case 1:
         playerEquips[1] = item;
+        notifyListeners();
         return;
       //Shoulders2
       case 2:
         playerEquips[2] = item;
+        notifyListeners();
         return;
       //Necklace
       case 3:
         playerEquips[3] = item;
+        notifyListeners();
         return;
       //Hands1
       case 4:
         playerEquips[4] = item;
+        notifyListeners();
         return;
       //Hands2
       case 5:
         playerEquips[5] = item;
+        notifyListeners();
         return;
       //Chest
       case 6:
         playerEquips[6] = item;
+        notifyListeners();
         return;
       //Legs
       case 7:
         playerEquips[7] = item;
+        notifyListeners();
         return;
       //Boots
       case 8:
         playerEquips[8] = item;
+        notifyListeners();
         return;
       //Weapon1
       case 9:
         playerEquips[9] = item;
+        notifyListeners();
         return;
       //Weapon2
       case 10:
         playerEquips[10] = item;
+        notifyListeners();
         return;
     }
   }
