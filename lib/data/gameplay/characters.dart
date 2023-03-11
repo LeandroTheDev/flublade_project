@@ -62,3 +62,26 @@ class ClassSpriteSheet {
     ),
   };
 }
+
+
+
+class BaseCharacters {
+  static const baseAtributes = {
+    'archer': {
+      'life': 8,
+      'mana': 8,
+      'armor': 2,
+      'strength': 5,
+      'agility': 13,
+      'intelligence': 5,
+    },
+    'berserk': {
+      'life': 20,
+      'mana': 5,
+      'armor': 0,
+      'strength': 12,
+      'agility': 6,
+      'intelligence': 2,
+    }
+  };
+}

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
+import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -172,7 +173,8 @@ class GlobalFunctions {
                   options.changeRemember(value: false);
                   options.changeId(0);
                   SaveDatas.setRemember(false);
-                  Provider.of<Gameplay>(context, listen: false).changeCharacters('{}');
+                  Provider.of<Gameplay>(context, listen: false)
+                      .changeCharacters('{}');
                   Navigator.pushReplacementNamed(
                       context, '/authenticationpage');
                 },
@@ -213,19 +215,19 @@ class GlobalFunctions {
       //Gold Quantity Calculator
       goldQuantity() {
         if (enemyLevel >= 0 && enemyLevel <= 4) {
-          return 1 + Random().nextInt(6);
+          return 1 + Random().nextInt(3);
         } else if (enemyLevel >= 5 && enemyLevel <= 10) {
-          return 3 + Random().nextInt(15);
+          return 3 + Random().nextInt(8);
         } else if (enemyLevel >= 11 && enemyLevel <= 20) {
-          return 6 + Random().nextInt(25);
+          return 6 + Random().nextInt(15);
         } else if (enemyLevel >= 21 && enemyLevel <= 30) {
-          return 12 + Random().nextInt(35);
+          return 12 + Random().nextInt(20);
         } else if (enemyLevel >= 31 && enemyLevel <= 45) {
-          return 20 + Random().nextInt(50);
+          return 20 + Random().nextInt(30);
         } else if (enemyLevel >= 46 && enemyLevel <= 60) {
-          return 30 + Random().nextInt(80);
+          return 30 + Random().nextInt(40);
         } else if (enemyLevel > 60) {
-          return 50 + Random().nextInt(100);
+          return 50 + Random().nextInt(45);
         }
         return 0;
       }
@@ -582,7 +584,7 @@ class Gameplay with ChangeNotifier {
   int _playerAgility = 0;
   int _playerIntelligence = 0;
   int _playerLuck = 0;
-  int _playerDamage = 0;
+  double _playerDamage = 0;
   Map _playerInventory = {};
   List _playerInventorySelected = [];
   List _playerEquips = [];
@@ -606,7 +608,7 @@ class Gameplay with ChangeNotifier {
   int get playerAgility => _playerAgility;
   int get playerIntelligence => _playerIntelligence;
   int get playerLuck => _playerLuck;
-  int get playerDamage => _playerDamage;
+  double get playerDamage => _playerDamage;
   Map get playerInventory => _playerInventory;
   List get playerInventorySelected => _playerInventorySelected;
   List get playerEquips => _playerEquips;
@@ -616,6 +618,11 @@ class Gameplay with ChangeNotifier {
   double get enemyArmor => _enemyArmor;
   int get enemyLevel => _enemyLevel;
   int get enemyDamage => _enemyDamage;
+
+  //Change Player Base Damage
+  void changePlayerDamage(value) {
+    _playerDamage = value;
+  }
 
   //Change the talk text
   void changeIsTalkable(value, text) {
@@ -940,6 +947,10 @@ class Gameplay with ChangeNotifier {
     required gameplay,
   }) async {
     dynamic charactersdb = {};
+    final playerClass = characterClass
+        .replaceFirst('assets/characters/', '')
+        .substring(0,
+            characterClass.replaceFirst('assets/characters/', '').length - 4);
     //Connection
     try {
       charactersdb = await connection
@@ -953,24 +964,19 @@ class Gameplay with ChangeNotifier {
         charactersdb = jsonDecode(charactersdb);
         charactersdb['character${charactersdb.length}'] = {
           'name': characterUsername,
-          'class': characterClass
-              .replaceFirst('assets/characters/', '')
-              .substring(
-                  0,
-                  characterClass.replaceFirst('assets/characters/', '').length -
-                      4),
-          'life': 100,
-          'mana': 10,
-          'armor': 0,
+          'class': playerClass,
+          'life': BaseCharacters.baseAtributes[playerClass]!['life'],
+          'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
+          'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
           'gold': 0,
           'level': 1,
           'xp': 0,
           'skillpoint': 0,
-          'strength': 0,
-          'agility': 0,
-          'intelligence': 0,
+          'strength': BaseCharacters.baseAtributes[playerClass]!['strength'],
+          'agility': BaseCharacters.baseAtributes[playerClass]!['agility'],
+          'intelligence':
+              BaseCharacters.baseAtributes[playerClass]!['intelligence'],
           'luck': 0,
-          'weapon': 'unarmed',
           'inventory': '{}',
           'equips': [
             'none',
@@ -1017,20 +1023,19 @@ class Gameplay with ChangeNotifier {
     Map characterFormat = jsonDecode(_characters);
     characterFormat['character${characterFormat.length}'] = {
       'name': characterUsername,
-      'class': characterClass.replaceFirst('assets/characters/', '').substring(
-          0, characterClass.replaceFirst('assets/characters/', '').length - 4),
-      'life': 100,
-      'mana': 10,
-      'armor': 0,
+      'class': playerClass,
+      'life': BaseCharacters.baseAtributes[playerClass]!['life'],
+      'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
+      'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
       'gold': 0,
       'level': 1,
       'xp': 0,
       'skillpoint': 0,
-      'strength': 0,
-      'agility': 0,
-      'intelligence': 0,
+      'strength': BaseCharacters.baseAtributes[playerClass]!['strength'],
+      'agility': BaseCharacters.baseAtributes[playerClass]!['agility'],
+      'intelligence':
+          BaseCharacters.baseAtributes[playerClass]!['intelligence'],
       'luck': 0,
-      'weapon': 'unarmed',
       'inventory': '{}',
       'equips': [
         'none',
@@ -1143,61 +1148,128 @@ class Gameplay with ChangeNotifier {
 
   //Class Calculations
   static dynamic classTranslation({
-    options,
-    gameplay,
     context,
-    required List values,
-    bool isCharacterCreation = false,
-    bool isIngamePlayerAttackCalculation = false,
-    bool isIngamePlayerDefenceCalculation = false,
-    bool isPlayerDamageCalculation = false,
+    values,
+    bool playerDamageCalculationInEnemy = false,
+    bool playerDamageCalculationInStats = false,
+    bool playerMaxLifeCalculationInGeneral = false,
   }) {
-    //Character Creation Calculation
-    if (isCharacterCreation) {
-      if (values[0] == 'archer') {}
-    }
-    //Player Attack Calculation
-    if (isIngamePlayerAttackCalculation) {
+    //Player Damage Calculation to Enemy
+    if (playerDamageCalculationInEnemy) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
-      //Receive Strength Damage Calculation
-      final strengthDamage = (gameplay.playerStrength * 0.5).toStringAsFixed(0);
-      //Receive Weapon Base Damage
-      final weaponDamage = returnWeaponDamage(gameplay);
-      //Strength + Weapon Damage
-      double totalDamage = double.parse(strengthDamage) + weaponDamage;
-      //If enemy has armor reduce damage
-      totalDamage = totalDamage - gameplay.enemyArmor;
-      //Reducing enemy life
-      final result = gameplay.enemyLife - totalDamage;
-      //Changing in Provider stats
-      gameplay.changeStats(value: result, stats: 'elife');
+      final character = jsonDecode(gameplay.characters);
+      //Damage Calculator
+      double damageCalculator() {
+        //No weapons equipped
+        if (gameplay.playerEquips[9] == 'none' &&
+            gameplay.playerEquips[10] == 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return 1 * (gameplay.playerStrength * 0.1);
+          }
+          return 1;
+          //Only Left weapon equipped
+        } else if (gameplay.playerEquips[9] != 'none' &&
+            gameplay.playerEquips[10] == 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return Items.list[gameplay.playerEquips[9]]['damage'] *
+                (gameplay.playerStrength * 0.1);
+          }
+          return Items.list[gameplay.playerEquips[9]]['damage'];
+          //Only Right weapon equipped
+        } else if (gameplay.playerEquips[9] == 'none' &&
+            gameplay.playerEquips[10] != 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return Items.list[gameplay.playerEquips[10]]['damage'] *
+                (gameplay.playerStrength * 0.1);
+          }
+          return Items.list[gameplay.playerEquips[10]]['damage'];
+          //Left & Right weapon equipped
+        } else if (gameplay.playerEquips[9] != 'none' &&
+            gameplay.playerEquips[10] != 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return (Items.list[gameplay.playerEquips[9]]['damage'] +
+                    Items.list[gameplay.playerEquips[10]]['damage']) *
+                (gameplay.playerStrength * 0.1);
+          }
+          return (Items.list[gameplay.playerEquips[9]]['damage'] +
+              Items.list[gameplay.playerEquips[10]]['damage']);
+        }
+        return 0.0;
+      }
+
+      //Berserk Class
+      if (character['character${gameplay.selectedCharacter}']['class'] ==
+          'berserk') {
+        double damage = double.parse(damageCalculator().toStringAsFixed(1));
+        double elife = gameplay.enemyLife;
+        elife = elife - damage;
+        gameplay.changeStats(value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
+      }
+      //Archer Class
+      if (character['character${gameplay.selectedCharacter}']['class'] ==
+          'archer') {
+        double damage = double.parse(damageCalculator().toStringAsFixed(1));
+        double elife = gameplay.enemyLife;
+        elife = elife - damage;
+        gameplay.changeStats(value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
+      }
     }
-    //Player Damage Calculation
-    if (isPlayerDamageCalculation) {
-      final strengthDamage = (gameplay.playerStrength * 0.5).toStringAsFixed(0);
-      final weaponDamage = returnWeaponDamage(gameplay);
-      final totalDamage = int.parse(strengthDamage) + weaponDamage;
-      return totalDamage;
+    //Player Damage Calculation to Stats
+    if (playerDamageCalculationInStats) {
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      //Damage Calculator
+      double damageCalculator() {
+        //No weapons equipped
+        if (gameplay.playerEquips[9] == 'none' &&
+            gameplay.playerEquips[10] == 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return 1 * (gameplay.playerStrength * 0.1);
+          }
+          return 1;
+          //Only Left weapon equipped
+        } else if (gameplay.playerEquips[9] != 'none' &&
+            gameplay.playerEquips[10] == 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return Items.list[gameplay.playerEquips[9]]['damage'] *
+                (gameplay.playerStrength * 0.1);
+          }
+          return Items.list[gameplay.playerEquips[9]]['damage'];
+          //Only Right weapon equipped
+        } else if (gameplay.playerEquips[9] == 'none' &&
+            gameplay.playerEquips[10] != 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return Items.list[gameplay.playerEquips[10]]['damage'] *
+                (gameplay.playerStrength * 0.1);
+          }
+          return Items.list[gameplay.playerEquips[10]]['damage'];
+          //Left & Right weapon equipped
+        } else if (gameplay.playerEquips[9] != 'none' &&
+            gameplay.playerEquips[10] != 'none') {
+          if (gameplay.playerStrength >= 12) {
+            return (Items.list[gameplay.playerEquips[9]]['damage'] +
+                    Items.list[gameplay.playerEquips[10]]['damage']) *
+                (gameplay.playerStrength * 0.1);
+          }
+          return (Items.list[gameplay.playerEquips[9]]['damage'] +
+              Items.list[gameplay.playerEquips[10]]['damage']);
+        }
+        return 0.0;
+      }
+
+      return double.parse(damageCalculator().toStringAsFixed(1));
     }
-  }
-
-  //Weapons Providers
-  String _playerWeapon = 'unarmed';
-
-  String get playerWeapon => _playerWeapon;
-
-  void changePlayerWeapon(value) {
-    _playerWeapon = value;
-  }
-
-  //Weapons Calculations
-  static int returnWeaponDamage(gameplay) {
-    switch (gameplay.playerWeapon) {
-      case 'unarmed':
-        return 1;
-      case 'woodsword':
-        return 2;
+    //Player Max Life Calculation to General
+    if (playerMaxLifeCalculationInGeneral) {
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      final character = jsonDecode(gameplay.characters);
+      //Berserk Class
+      if (character['character${gameplay.selectedCharacter}']['class'] ==
+          'berserk') {
+        double maxLife = 20.0;
+        for (int i = 1; i > gameplay._playerStrength; i++) {
+          print(i);
+        }
+      }
     }
-    return 0;
   }
 }

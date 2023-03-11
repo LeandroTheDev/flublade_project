@@ -193,14 +193,19 @@ class ItemWidget extends StatelessWidget {
                                     height: 50,
                                     child: ElevatedButton(
                                       onPressed: () async {
+                                        //Loading Widget
                                         MySQL.loadingWidget(
                                             context: context,
                                             language: options.language);
+                                        //Adding in the equipment
                                         gameplay.changePlayerEquips(
                                           itemName,
                                           gameplay.translateEquipsIndex(
                                               Items.list[itemName]['equip']),
                                         );
+                                        //Change the damage
+                                        gameplay.changePlayerDamage(
+                                            Items.list[itemName]['damage']);
                                         await MySQL.pushUploadCharacters(
                                             context: context);
                                         // ignore: use_build_context_synchronously

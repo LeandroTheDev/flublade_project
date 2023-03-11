@@ -380,7 +380,6 @@ class MySQL {
         stats: 'intelligence');
     gameplay.changeStats(
         value: int.parse(selectedCharacter['luck'].toString()), stats: 'luck');
-    gameplay.changePlayerWeapon(selectedCharacter['weapon'].toString());
     gameplay.changeStats(
         value: selectedCharacter['inventory'], stats: 'inventory');
     gameplay.changeStats(value: selectedCharacter['equips'], stats: 'equips');

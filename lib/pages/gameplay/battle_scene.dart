@@ -293,8 +293,8 @@ class _BattleSceneState extends State<BattleScene> {
                           ElevatedButton(
                             onPressed: () {
                               Gameplay.classTranslation(
-                                  isIngamePlayerAttackCalculation: true,
-                                  values: [],
+                                  playerDamageCalculationInEnemy: true,
+                                  values: null,
                                   context: context);
                               if (gameplay.enemyLife <= 0) {
                                 GlobalFunctions.lootDialog(

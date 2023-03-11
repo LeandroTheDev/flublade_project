@@ -28,6 +28,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'misc',
+      'damage': null,
     },
     'thread': {
       'image': 'assets/items/thread.png',
@@ -39,6 +40,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'misc',
+      'damage': null,
     },
     'cloth': {
       'image': 'assets/items/cloth.png',
@@ -50,6 +52,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'misc',
+      'damage': null,
     },
     //Weapons
     'woodsword': {
@@ -62,7 +65,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '3',
+      'damage': 2.0,
     },
     'woodsword01': {
       'image': 'assets/items/wooden_sword.png',
@@ -74,7 +77,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '6',
+      'damage': 3.0,
     },
     'woodsword02': {
       'image': 'assets/items/wooden_sword.png',
@@ -86,7 +89,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '9',
+      'damage': 5.0,
     },
     'woodsword03': {
       'image': 'assets/items/wooden_sword.png',
@@ -98,7 +101,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '12',
+      'damage': 6.0,
     },
     'woodsword04': {
       'image': 'assets/items/wooden_sword.png',
@@ -110,7 +113,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '16',
+      'damage': 8.0,
     },
     'woodsword05': {
       'image': 'assets/items/wooden_sword.png',
@@ -122,7 +125,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '20',
+      'damage': 10.0,
     },
     'woodsword06': {
       'image': 'assets/items/wooden_sword.png',
@@ -134,7 +137,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '24',
+      'damage': 11.0,
     },
     'woodsword07': {
       'image': 'assets/items/wooden_sword.png',
@@ -146,7 +149,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '28',
+      'damage': 12.0,
     },
     'woodsword08': {
       'image': 'assets/items/wooden_sword.png',
@@ -158,7 +161,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '35',
+      'damage': 13.0,
     },
     'woodsword09': {
       'image': 'assets/items/wooden_sword.png',
@@ -170,7 +173,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '45',
+      'damage': 14.0,
     },
     'woodsword10': {
       'image': 'assets/items/wooden_sword.png',
@@ -182,7 +185,7 @@ class Items {
       'quest': false,
       'forge': false,
       'category': 'weapon',
-      'damage': '60',
+      'damage': 15.0,
     },
     //Armors
   };
