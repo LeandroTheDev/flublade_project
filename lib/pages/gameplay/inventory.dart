@@ -1,5 +1,4 @@
 import 'package:flublade_project/components/item_widget.dart';
-import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -19,133 +18,6 @@ class GameplayInventory extends StatefulWidget {
 class _GameplayInventoryState extends State<GameplayInventory>
     with SingleTickerProviderStateMixin {
   bool hideEquips = true;
-
-  //Show Unequip Items Dialog
-  void unequipItem(itemName, equipIndex) {
-    String itemTranslation;
-    if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {
-      itemTranslation = itemName.substring(0, itemName.length - 2);
-    } else {
-      itemTranslation = itemName;
-    }
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return FittedBox(
-            child: AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Unequip item Text
-              title: Text(
-                Language.Translate(
-                        'response_unequipitem',
-                        Provider.of<Options>(context, listen: false)
-                            .language) ??
-                    'Unequip item',
-                style: TextStyle(
-                    color: Theme.of(context).primaryColor, fontSize: 40),
-              ),
-              //Desc & Buttons
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //Unequip Text
-                  Text(
-                    '${Language.Translate('response_unequip', Provider.of<Options>(context, listen: false).language) ?? 'Unequip item'} ${Language.Translate('items_$itemTranslation', Provider.of<Options>(context, listen: false).language) ?? 'Item Name'} +${Items.returnTier(itemName)}',
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColor, fontSize: 30),
-                  ),
-                  //Damage Stats
-                  Items.list[itemName]['damage'] != null
-                      ? Text(
-                          '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Sell Price'}: ${Items.list[itemName]['damage']}',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 30),
-                        )
-                      : const SizedBox(),
-                  //Price Stats
-                  Items.list[itemName]['price'] != null
-                      ? Text(
-                          '${Language.Translate('response_sellprice', Provider.of<Options>(context, listen: false).language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 30),
-                        )
-                      : const SizedBox(),
-                  //Spacer
-                  const SizedBox(height: 40),
-                  //Buttons
-                  FittedBox(
-                    child: Row(
-                      children: [
-                        //Unequip
-                        SizedBox(
-                          width: 200,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              MySQL.loadingWidget(
-                                  context: context,
-                                  language: Provider.of<Options>(context,
-                                          listen: false)
-                                      .language);
-                              Provider.of<Gameplay>(context, listen: false)
-                                  .changePlayerEquips('none', equipIndex);
-                              await MySQL.pushUploadCharacters(
-                                  context: context);
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              Language.Translate(
-                                      'response_unequip',
-                                      Provider.of<Options>(context,
-                                              listen: false)
-                                          .language) ??
-                                  'Unequip',
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 30),
-                            ),
-                          ),
-                        ),
-                        //Spacer
-                        const SizedBox(width: 50),
-                        //Back
-                        SizedBox(
-                          width: 200,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              Language.Translate(
-                                      'response_back',
-                                      Provider.of<Options>(context,
-                                              listen: false)
-                                          .language) ??
-                                  'No',
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 30),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-  }
 
   //Show Player Stats Dialog
   void playerStats() {
@@ -225,6 +97,8 @@ class _GameplayInventoryState extends State<GameplayInventory>
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
+    final options = Provider.of<Options>(context);
+    final screenSize = MediaQuery.of(context).size;
 
     //Equiped Item Image
     String showItem({required int index, required String defaultImage}) {
@@ -234,47 +108,592 @@ class _GameplayInventoryState extends State<GameplayInventory>
       return defaultImage;
     }
 
+    //Show Unequip Items Dialog
+    void unequipItem(itemName, equipIndex) {
+      String itemTranslation;
+      if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {
+        itemTranslation = itemName.substring(0, itemName.length - 2);
+      } else {
+        itemTranslation = itemName;
+      }
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            return FittedBox(
+              child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                //Unequip item Text
+                title: Text(
+                  '${Language.Translate('response_unequip', Provider.of<Options>(context, listen: false).language) ?? 'Unequip item'} ${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} +${Items.returnTier(itemName)}',
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 40),
+                ),
+                //Desc & Buttons
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //Damage Stats
+                    Items.list[itemName]['damage'] != null
+                        ? Text(
+                            '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Sell Price'}: ${Items.list[itemName]['damage']}',
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 30),
+                          )
+                        : const SizedBox(),
+                    //Price Stats
+                    Items.list[itemName]['price'] != null
+                        ? Text(
+                            '${Language.Translate('response_sellprice', Provider.of<Options>(context, listen: false).language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 30),
+                          )
+                        : const SizedBox(),
+                    //Spacer
+                    const SizedBox(height: 40),
+                    //Buttons
+                    FittedBox(
+                      child: Row(
+                        children: [
+                          //Unequip
+                          SizedBox(
+                            width: 200,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                MySQL.loadingWidget(
+                                    context: context,
+                                    language: Provider.of<Options>(context,
+                                            listen: false)
+                                        .language);
+                                //Adding in the inventory
+                                Provider.of<Gameplay>(context, listen: false)
+                                    .addSpecificItemInventory(itemName);
+                                //Removing from equipments
+                                Provider.of<Gameplay>(context, listen: false)
+                                    .changePlayerEquips('none', equipIndex);
+                                await MySQL.pushUploadCharacters(
+                                    context: context);
+
+                                setState(() {
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                });
+                              },
+                              child: Text(
+                                Language.Translate(
+                                        'response_unequip',
+                                        Provider.of<Options>(context,
+                                                listen: false)
+                                            .language) ??
+                                    'Unequip',
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 30),
+                              ),
+                            ),
+                          ),
+                          //Spacer
+                          const SizedBox(width: 50),
+                          //Back
+                          SizedBox(
+                            width: 200,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                Language.Translate(
+                                        'response_back',
+                                        Provider.of<Options>(context,
+                                                listen: false)
+                                            .language) ??
+                                    'No',
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 30),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+    }
+
+    //Compare Item Info
+    void compareItemInfo(String itemName) {
+      showModalBottomSheet<void>(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(50.0),
+            ),
+          ),
+          isScrollControlled: true,
+          context: context,
+          builder: (context) {
+            return SizedBox(
+              height: screenSize.height * 0.7,
+              child: Column(
+                children: [
+                  //Comparation text
+                  SizedBox(
+                    height: screenSize.height * 0.1,
+                    child: FittedBox(
+                      child: Text(
+                        Language.Translate(
+                                'response_comparation',
+                                Provider.of<Options>(context, listen: false)
+                                    .language) ??
+                            'Compare',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 200),
+                      ),
+                    ),
+                  ),
+                  //Divider
+                  SizedBox(
+                    height: screenSize.height * 0.02,
+                    child: Divider(color: Theme.of(context).primaryColor),
+                  ),
+                  //Equipped Text
+                  Container(
+                    height: screenSize.height * 0.06,
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.centerLeft,
+                    child: FittedBox(
+                      child: Text(
+                        Language.Translate(
+                                'response_equipped',
+                                Provider.of<Options>(context, listen: false)
+                                    .language) ??
+                            'Equipped',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 200),
+                      ),
+                    ),
+                  ),
+                  //Damage Text
+                  Items.list[itemName]['damage'] != null
+                      ? Container(
+                          height: screenSize.height * 0.06,
+                          padding: const EdgeInsets.all(10),
+                          alignment: Alignment.centerLeft,
+                          child: FittedBox(
+                            child: Text(
+                              '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${Items.list[gameplay.playerEquips[Items.translateEquipsIndex(Items.list[itemName]['equip'])]]['damage']}',
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 200),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                  //Divider
+                  SizedBox(
+                    height: screenSize.height * 0.02,
+                    child: Divider(color: Theme.of(context).primaryColor),
+                  ),
+                  //Inventory Text
+                  Container(
+                    height: screenSize.height * 0.06,
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.centerLeft,
+                    child: FittedBox(
+                      child: Text(
+                        Language.Translate(
+                                'response_inventory',
+                                Provider.of<Options>(context, listen: false)
+                                    .language) ??
+                            'Equipped',
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 200),
+                      ),
+                    ),
+                  ),
+                  //Damage Text
+                  Items.list[itemName]['damage'] != null
+                      ? Container(
+                          height: screenSize.height * 0.06,
+                          padding: const EdgeInsets.all(10),
+                          alignment: Alignment.centerLeft,
+                          child: FittedBox(
+                            child: Text(
+                              '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${Items.list[itemName]['damage']}',
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 200),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
+              ),
+            );
+          });
+    }
+
+    //Show Item Infos
+    void showItemInfo(String itemName) async {
+      // final connection = await MySQL.database;
+      String itemTranslation;
+      //Translate
+      if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {
+        itemTranslation = itemName.substring(0, itemName.length - 2);
+      } else {
+        itemTranslation = itemName;
+      }
+      //Verify if tier is 0
+      String verifyTier(itemName) {
+        if (Items.returnTier(itemName) == '0') {
+          return '';
+        } else {
+          return '+${Items.returnTier(itemName)}';
+        }
+      }
+
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            //Gold Special
+            if (Items.list[itemName]['name'] == 'gold') {
+              return FittedBox(
+                child: AlertDialog(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  //Title
+                  title: Text(
+                    Language.Translate(
+                            'items_$itemTranslation', options.language) ??
+                        'Item Name',
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 40),
+                  ),
+                  //Desc & Buttons
+                  content: SizedBox(
+                    width: screenSize.width,
+                    height: 400,
+                    child: Column(
+                      children: [
+                        //Desc & Stats
+                        SizedBox(
+                          height: 300,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //Desc
+                                Text(
+                                  Language.Translate(
+                                          'items_${itemTranslation}_desc',
+                                          options.language) ??
+                                      'Item Description',
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 30),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        //Spacer
+                        const SizedBox(height: 30),
+                        //Buttons
+                        FittedBox(
+                          child: Row(
+                            children: [
+                              //Back
+                              SizedBox(
+                                width: 200,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    Language.Translate('response_back',
+                                            options.language) ??
+                                        'No',
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontSize: 30),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+            return FittedBox(
+              child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                //Title
+                title: Text(
+                  '${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${verifyTier(itemName)}',
+                  style: TextStyle(
+                      color: Theme.of(context).primaryColor, fontSize: 40),
+                ),
+                //Desc & Buttons
+                content: SizedBox(
+                  width: screenSize.width,
+                  height: Items.list[itemName]['equip'] != 'none' ? 450 : 400,
+                  child: Column(
+                    children: [
+                      //Desc & Stats
+                      SizedBox(
+                        height: 300,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //Desc
+                              Text(
+                                Language.Translate(
+                                        'items_${itemTranslation}_desc',
+                                        options.language) ??
+                                    'Item Description',
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 30),
+                              ),
+                              const SizedBox(height: 10),
+                              //Weapon Widget
+                              Items.list[itemName]['equip'] == '1weapon'
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${Language.Translate('response_damage', options.language) ?? 'Sell Price'}: ${Items.list[itemName]['damage']}',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              fontSize: 30),
+                                        ),
+                                        Text(
+                                          '${Language.Translate('response_sellprice', options.language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              fontSize: 30),
+                                        ),
+                                      ],
+                                    )
+                                  : const SizedBox(),
+                              //Misc Widget
+                              Items.list[itemName]['equip'] == 'none'
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${Language.Translate('response_sellprice', options.language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              fontSize: 30),
+                                        ),
+                                      ],
+                                    )
+                                  : const SizedBox(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      //Spacer
+                      const SizedBox(height: 20),
+                      //Buttons
+                      FittedBox(
+                        child: Row(
+                          children: [
+                            //Equip
+                            Items.list[itemName]['equip'] != 'none'
+                                ? SizedBox(
+                                    width: 200,
+                                    height: 50,
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        //Loading Widget
+                                        MySQL.loadingWidget(
+                                            context: context,
+                                            language: options.language);
+                                        //Removing from inventory
+                                        Provider.of<Gameplay>(context,
+                                                listen: false)
+                                            .removeSpecificItemInventory(
+                                                itemName);
+                                        //Adding in the equipment
+                                        gameplay.changePlayerEquips(
+                                          itemName,
+                                          Items.translateEquipsIndex(
+                                              Items.list[itemName]['equip']),
+                                        );
+                                        //Change the damage
+                                        gameplay.changePlayerDamage(
+                                            Items.list[itemName]['damage']);
+                                        await MySQL.pushUploadCharacters(
+                                            context: context);
+                                        setState(() {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                      child: Text(
+                                        Language.Translate('response_equip',
+                                                options.language) ??
+                                            'Language Error',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 30),
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            //Spacer
+                            Items.list[itemName]['equip'] != 'none'
+                                ? const SizedBox(width: 50)
+                                : const SizedBox(),
+                            //Back
+                            SizedBox(
+                              width: 200,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  Language.Translate(
+                                          'response_back', options.language) ??
+                                      'No',
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 30),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //Compare
+                      Items.list[itemName]['equip'] != 'none'
+                          ? gameplay.playerEquips[Items.translateEquipsIndex(
+                                      Items.list[itemName]['equip'])] !=
+                                  'none'
+                              //Enabled Button
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 30.0),
+                                  child: FittedBox(
+                                    child: SizedBox(
+                                      width: 200,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          compareItemInfo(itemName);
+                                        },
+                                        child: Text(
+                                          Language.Translate('response_compare',
+                                                  options.language) ??
+                                              'Compare',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              fontSize: 30),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              //Blocked Button
+                              : Padding(
+                                  padding: const EdgeInsets.only(top: 30.0),
+                                  child: FittedBox(
+                                    child: SizedBox(
+                                      width: 200,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        onPressed: null,
+                                        child: Text(
+                                          Language.Translate('response_compare',
+                                                  options.language) ??
+                                              'Compare',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                              fontSize: 30),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                          : const SizedBox(),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          });
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               //Show or Hide Equips
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          onPressed: () => playerStats(),
-                          child: SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: Image.asset(
-                                'assets/images/interface/equip_button.png'),
-                          ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => playerStats(),
+                        child: SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: Image.asset(
+                              'assets/images/interface/equip_button.png'),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              hideEquips = !hideEquips;
-                            });
-                          },
-                          child: SizedBox(
-                            height: 40,
-                            width: 40,
-                            child: hideEquips
-                                ? Image.asset(
-                                    'assets/images/interface/hide.png')
-                                : Image.asset(
-                                    'assets/images/interface/show.png'),
-                          ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            hideEquips = !hideEquips;
+                          });
+                        },
+                        child: SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: hideEquips
+                              ? Image.asset('assets/images/interface/hide.png')
+                              : Image.asset('assets/images/interface/show.png'),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -635,10 +1054,15 @@ class _GameplayInventoryState extends State<GameplayInventory>
                           itemCount: gameplay.playerInventory.length,
                           itemBuilder: (context, index) {
                             //Single Item
-                            return ItemWidget(
-                                itemName: inventory[index]['name'],
-                                itemQuantity:
-                                    inventory[index]['quantity'].toString());
+                            return TextButton(
+                              onPressed: () {
+                                showItemInfo(inventory[index]['name']);
+                              },
+                              child: ItemWidget(
+                                  itemName: inventory[index]['name'],
+                                  itemQuantity:
+                                      inventory[index]['quantity'].toString()),
+                            );
                           },
                         ),
                       );

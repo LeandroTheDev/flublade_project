@@ -7,6 +7,7 @@ import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/main.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
@@ -175,8 +176,10 @@ class GlobalFunctions {
                   SaveDatas.setRemember(false);
                   Provider.of<Gameplay>(context, listen: false)
                       .changeCharacters('{}');
-                  Navigator.pushReplacementNamed(
-                      context, '/authenticationpage');
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => const AuthenticationPage()),
+                      (Route<dynamic> route) => false);
                 },
                 child: Text(
                   Language.Translate('response_yes', options.language) ?? 'Yes',
@@ -240,20 +243,20 @@ class GlobalFunctions {
 
       //Loot Quantity Calculator
       if (Random().nextInt(10) >= 1) {
-        lootQuantity = lootQuantity + Random().nextInt(3);
+        lootQuantity = lootQuantity + Random().nextInt(2);
         //60% Chance to increase loot
         if (Random().nextInt(10) > 2) {
-          lootQuantity = lootQuantity + Random().nextInt(3);
+          lootQuantity = lootQuantity + Random().nextInt(2);
           //40% Chance to increase loot
           if (Random().nextInt(10) >= 5) {
-            lootQuantity = lootQuantity + Random().nextInt(4);
+            lootQuantity = lootQuantity + Random().nextInt(3);
           }
           //20% Chance to increase loot
           if (Random().nextInt(10) >= 6) {
-            lootQuantity = lootQuantity + Random().nextInt(5);
+            lootQuantity = lootQuantity + Random().nextInt(4);
             //10% Chance to increase loot
             if (Random().nextInt(10) >= 7) {
-              lootQuantity = lootQuantity + Random().nextInt(6);
+              lootQuantity = lootQuantity + Random().nextInt(5);
             }
           }
         }
@@ -265,19 +268,20 @@ class GlobalFunctions {
         if (Random().nextInt(10) >= 8) {
           //5% To Ultra Rare Items
           if (Random().nextInt(10) >= 7) {
-            final int index = Random().nextInt(3) + 200;
+            final int index = Random().nextInt(Items.lootId['ultraRareQuantity']) + 200;
             return {
               'name': Items.lootId[index],
               'quantity': 1,
             };
           }
-          final int index = Random().nextInt(3) + 100;
+          final int index = Random().nextInt(Items.lootId['rareQuantity']) + 100;
           return {
             'name': Items.lootId[index],
             'quantity': 1,
           };
         }
-        final int index = Random().nextInt(3);
+        //80% To Common Items
+        final int index = Random().nextInt(Items.lootId['commonQuantity']);
         int quantity = 1;
         if (index == 0) {
           quantity = goldQuantity();
@@ -619,6 +623,43 @@ class Gameplay with ChangeNotifier {
   int get enemyLevel => _enemyLevel;
   int get enemyDamage => _enemyDamage;
 
+  //Remove Specific Item in inventory
+  void removeSpecificItemInventory(itemName) {
+    //Base Function for removing item name from inventory
+    removingFunction(removedItem) {
+      //If already have quantity
+      if (playerInventory[removedItem]['quantity'] > 1) {
+        //Remove 1 quantity
+        playerInventory[removedItem]['quantity'] =
+            playerInventory[removedItem]['quantity'] - 1;
+      } else {
+        playerInventory.remove(removedItem);
+      }
+    }
+
+    final equip = Items.translateEquipsIndex(Items.list[itemName]['equip']);
+    if (_playerEquips[equip] != 'none') {
+      addSpecificItemInventory(_playerEquips[equip]);
+      removingFunction(itemName);
+    } else {
+      removingFunction(itemName);
+    }
+  }
+
+  //Add Specific Item in inventory
+  void addSpecificItemInventory(itemName) {
+    //If already have quantity
+    try {
+      if (playerInventory[itemName]['quantity'] > 1) {
+        //Remove 1 quantity
+        playerInventory[itemName]['quantity'] =
+            playerInventory[itemName]['quantity'] + 1;
+      }
+    } catch (error) {
+      playerInventory[itemName] = {'name': itemName, 'quantity': 1};
+    }
+  }
+
   //Change Player Base Damage
   void changePlayerDamage(value) {
     _playerDamage = value;
@@ -777,15 +818,6 @@ class Gameplay with ChangeNotifier {
     return _playerInventory;
   }
 
-  //Returns the equipment into the index
-  int translateEquipsIndex(equip) {
-    switch (equip) {
-      case '1weapon':
-        return 9;
-    }
-    return 0;
-  }
-
   String translateItemRarity(itemName) {
     if (Items.list[itemName]['rarity'].toString().length == 1) {
       return '${itemName}0${Items.list[itemName]['rarity']}';
@@ -800,57 +832,46 @@ class Gameplay with ChangeNotifier {
       //Head
       case 0:
         _playerEquips[0] = item;
-        notifyListeners();
         return;
       //Shoulders1
       case 1:
         playerEquips[1] = item;
-        notifyListeners();
         return;
       //Shoulders2
       case 2:
         playerEquips[2] = item;
-        notifyListeners();
         return;
       //Necklace
       case 3:
         playerEquips[3] = item;
-        notifyListeners();
         return;
       //Hands1
       case 4:
         playerEquips[4] = item;
-        notifyListeners();
         return;
       //Hands2
       case 5:
         playerEquips[5] = item;
-        notifyListeners();
         return;
       //Chest
       case 6:
         playerEquips[6] = item;
-        notifyListeners();
         return;
       //Legs
       case 7:
         playerEquips[7] = item;
-        notifyListeners();
         return;
       //Boots
       case 8:
         playerEquips[8] = item;
-        notifyListeners();
         return;
       //Weapon1
       case 9:
         playerEquips[9] = item;
-        notifyListeners();
         return;
       //Weapon2
       case 10:
         playerEquips[10] = item;
-        notifyListeners();
         return;
     }
   }
@@ -1203,7 +1224,8 @@ class Gameplay with ChangeNotifier {
         double damage = double.parse(damageCalculator().toStringAsFixed(1));
         double elife = gameplay.enemyLife;
         elife = elife - damage;
-        gameplay.changeStats(value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
+        gameplay.changeStats(
+            value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
       }
       //Archer Class
       if (character['character${gameplay.selectedCharacter}']['class'] ==
@@ -1211,7 +1233,8 @@ class Gameplay with ChangeNotifier {
         double damage = double.parse(damageCalculator().toStringAsFixed(1));
         double elife = gameplay.enemyLife;
         elife = elife - damage;
-        gameplay.changeStats(value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
+        gameplay.changeStats(
+            value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
       }
     }
     //Player Damage Calculation to Stats

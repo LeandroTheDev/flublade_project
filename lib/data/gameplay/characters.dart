@@ -60,6 +60,23 @@ class ClassSpriteSheet {
         textureSize: Vector2(16, 16),
       ),
     ),
+    //Assassin
+    'assassinidle': SpriteAnimation.load(
+      "players/assassin/assassin_ingame_idleright.png",
+      SpriteAnimationData.sequenced(
+        amount: 1,
+        stepTime: 0.1,
+        textureSize: Vector2(16, 16),
+      ),
+    ),
+    'assassinrun': SpriteAnimation.load(
+      "players/assassin/assassin_ingame_runright.png",
+      SpriteAnimationData.sequenced(
+        amount: 4,
+        stepTime: 0.1,
+        textureSize: Vector2(16, 16),
+      ),
+    ),
   };
 }
 
@@ -74,6 +91,14 @@ class BaseCharacters {
       'strength': 5,
       'agility': 13,
       'intelligence': 5,
+    },
+    'assassin': {
+      'life': 7,
+      'mana': 12,
+      'armor': 2,
+      'strength': 2,
+      'agility': 15,
+      'intelligence': 8,
     },
     'berserk': {
       'life': 20,

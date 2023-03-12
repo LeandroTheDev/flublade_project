@@ -227,7 +227,7 @@ class MySQL {
     charactersdb = charactersdb.substring(0, charactersdb.length - 2);
     //Transform into MAP
     charactersdb = jsonDecode(charactersdb);
-    //Add new items
+    //Add new or remove items
     charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
         gameplay.playerInventory;
     //Add new equips
@@ -261,6 +261,7 @@ class MySQL {
       }
       return true;
     } catch (error) {
+      print(error);
       return false;
     }
   }

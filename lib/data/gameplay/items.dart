@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 class Items {
   static const Map lootId = {
+    'commonQuantity': 3,
+    'rareQuantity': 3,
+    'ultraRareQuantity': 3,
     //Common
     0: 'gold',
     1: 'thread',
@@ -72,7 +75,7 @@ class Items {
       'price': 10,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 1,
+      'rarity': 0,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -84,7 +87,7 @@ class Items {
       'price': 15,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 1,
+      'rarity': 0,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -96,7 +99,7 @@ class Items {
       'price': 20,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 2,
+      'rarity': 1,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -108,7 +111,7 @@ class Items {
       'price': 25,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 2,
+      'rarity': 1,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -120,7 +123,7 @@ class Items {
       'price': 30,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 2,
+      'rarity': 1,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -132,7 +135,7 @@ class Items {
       'price': 35,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 3,
+      'rarity': 2,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -144,7 +147,7 @@ class Items {
       'price': 40,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 3,
+      'rarity': 2,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -156,7 +159,7 @@ class Items {
       'price': 50,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 3,
+      'rarity': 2,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -168,7 +171,7 @@ class Items {
       'price': 65,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 3,
+      'rarity': 2,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -180,7 +183,7 @@ class Items {
       'price': 100,
       'name': 'woodsword',
       'equip': '1weapon',
-      'rarity': 4,
+      'rarity': 3,
       'consumable': false,
       'quest': false,
       'forge': false,
@@ -190,6 +193,7 @@ class Items {
     //Armors
   };
 
+  //By the item name returns the rarity color
   static Color returnRarity(itemName) {
     final rarity = list[itemName]['rarity'];
     switch (rarity) {
@@ -207,37 +211,47 @@ class Items {
     return Colors.grey;
   }
 
+  //By the item name returns the Tier
   static String returnTier(String itemName) {
-    if(itemName.endsWith('01')) {
+    if (itemName.endsWith('01')) {
       return '1';
     }
-    if(itemName.endsWith('02')) {
+    if (itemName.endsWith('02')) {
       return '2';
     }
-    if(itemName.endsWith('03')) {
+    if (itemName.endsWith('03')) {
       return '3';
     }
-    if(itemName.endsWith('04')) {
+    if (itemName.endsWith('04')) {
       return '4';
     }
-    if(itemName.endsWith('05')) {
+    if (itemName.endsWith('05')) {
       return '5';
     }
-    if(itemName.endsWith('06')) {
+    if (itemName.endsWith('06')) {
       return '6';
     }
-    if(itemName.endsWith('07')) {
+    if (itemName.endsWith('07')) {
       return '7';
     }
-    if(itemName.endsWith('08')) {
+    if (itemName.endsWith('08')) {
       return '8';
     }
-    if(itemName.endsWith('09')) {
+    if (itemName.endsWith('09')) {
       return '9';
     }
-    if(itemName.endsWith('10')) {
+    if (itemName.endsWith('10')) {
       return '10';
     }
     return '0';
+  }
+
+  //By the item equip name returns the index to playerEquips
+  static int translateEquipsIndex(equip) {
+    switch (equip) {
+      case '1weapon':
+        return 9;
+    }
+    return 0;
   }
 }

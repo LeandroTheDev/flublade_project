@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names, camel_case_types, non_constant_identifier_names
 
 class Language {
+  //Translation
   static String? Translate(String value, String language) {
     if (language == 'en_US') {
       return en_US[value];
@@ -34,6 +35,10 @@ class Language {
     'response_agility': 'Agility',
     'response_intelligence': 'Intelligence',
     'response_armor': 'Armor',
+    'response_compare': 'Compare',
+    'response_comparation': 'Comparation',
+    'response_equipped': 'Equipped',
+    'response_inventory': 'Inventory',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -140,12 +145,24 @@ class Language {
     'items_gold_desc':
         'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
     'items_woodsword': 'Wooden Sword',
-    'items_woodsword_desc': 'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
+    'items_woodsword_desc':
+        'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
     'items_thread': 'Thread',
-    'items_thread_desc': 'Made from twisted fibers of linen, cotton, silk, synthetics, etc., used in sewing, embroidery, lace, fabrication',
+    'items_thread_desc':
+        'Made from twisted fibers of linen, cotton, silk, synthetics, etc., used in sewing, embroidery, lace, fabrication',
     'items_cloth': 'Cloth',
-    'items_cloth_desc': 'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
+    'items_cloth_desc':
+        'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
   };
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
   static const pt_BR = {
     //Response
     'response_yes': 'Sim',
@@ -170,6 +187,10 @@ class Language {
     'response_agility': 'Agilidade',
     'response_intelligence': 'Inteligência',
     'response_armor': 'Armadura',
+    'response_compare': 'Comparar',
+    'response_comparation': 'Comparação',
+    'response_equipped': 'Equipado',
+    'response_inventory': 'Inventário',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -274,10 +295,13 @@ class Language {
     'items_gold_desc':
         'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
     'items_woodsword': 'Espada de Madeira',
-    'items_woodsword_desc': 'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
+    'items_woodsword_desc':
+        'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
     'items_thread': 'Linha',
-    'items_thread_desc': 'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
+    'items_thread_desc':
+        'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
     'items_cloth': 'Pano',
-    'items_cloth_desc': 'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.'
+    'items_cloth_desc':
+        'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.'
   };
 }

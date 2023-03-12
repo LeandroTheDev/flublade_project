@@ -185,6 +185,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         if (result == 'sucess') {
                                           // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
+                                          //Show Result Dialog
                                           showDialog(
                                               barrierColor:
                                                   const Color.fromARGB(
@@ -201,7 +202,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   backgroundColor: Theme.of(
                                                           context)
                                                       .scaffoldBackgroundColor,
-                                                  //Language Text
+                                                  //Sucess Text
                                                   title: Text(
                                                     Language.Translate(
                                                             'authentication_register_sucess',
@@ -224,6 +225,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                     Center(
                                                         child: ElevatedButton(
                                                       onPressed: () {
+                                                        registerUsername =
+                                                            TextEditingController();
+                                                        registerPassword =
+                                                            TextEditingController();
                                                         Navigator.pop(context);
                                                       },
                                                       child: const Text('Ok'),
@@ -231,10 +236,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   ],
                                                 );
                                               }).then((result) {
-                                            Navigator.popUntil(
-                                                context,
-                                                ModalRoute.withName(
-                                                    '/authenticationpage'));
+                                            registerUsername =
+                                                TextEditingController();
+                                            registerPassword =
+                                                TextEditingController();
+                                            Navigator.pop(context);
                                           });
                                         } else if (result == 'exists') {
                                           // ignore: use_build_context_synchronously
