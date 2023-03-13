@@ -7,7 +7,6 @@ import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
-import 'package:flublade_project/main.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
@@ -268,13 +267,15 @@ class GlobalFunctions {
         if (Random().nextInt(10) >= 8) {
           //5% To Ultra Rare Items
           if (Random().nextInt(10) >= 7) {
-            final int index = Random().nextInt(Items.lootId['ultraRareQuantity']) + 200;
+            final int index =
+                Random().nextInt(Items.lootId['ultraRareQuantity']) + 200;
             return {
               'name': Items.lootId[index],
               'quantity': 1,
             };
           }
-          final int index = Random().nextInt(Items.lootId['rareQuantity']) + 100;
+          final int index =
+              Random().nextInt(Items.lootId['rareQuantity']) + 100;
           return {
             'name': Items.lootId[index],
             'quantity': 1,
@@ -578,6 +579,7 @@ class Gameplay with ChangeNotifier {
   bool _isTalkable = false;
   bool _enemysMove = true;
   String _selectedTalk = '';
+  List<String> _battleLog = [];
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
@@ -593,15 +595,17 @@ class Gameplay with ChangeNotifier {
   List _playerInventorySelected = [];
   List _playerEquips = [];
 
+  String _enemyName = '';
   double _enemyLife = 0;
   double _enemyMana = 0;
   double _enemyArmor = 0;
   int _enemyLevel = 0;
-  int _enemyDamage = 0;
+  double _enemyDamage = 0;
 
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
   String get selectedTalk => _selectedTalk;
+  List<String> get battleLog => _battleLog;
   double get playerLife => _playerLife;
   double get playerMana => _playerMana;
   double get playerGold => _playerGold;
@@ -617,11 +621,17 @@ class Gameplay with ChangeNotifier {
   List get playerInventorySelected => _playerInventorySelected;
   List get playerEquips => _playerEquips;
 
+  String get enemyName => _enemyName;
   double get enemyLife => _enemyLife;
   double get enemyMana => _enemyMana;
   double get enemyArmor => _enemyArmor;
   int get enemyLevel => _enemyLevel;
-  int get enemyDamage => _enemyDamage;
+  double get enemyDamage => _enemyDamage;
+
+  //Change enemy name
+  void changeEnemyName(value) {
+    _enemyName = value;
+  }
 
   //Remove Specific Item in inventory
   void removeSpecificItemInventory(itemName) {
@@ -675,6 +685,11 @@ class Gameplay with ChangeNotifier {
   //Change if the enemys will move
   void changeEnemyMove(value) {
     _enemysMove = value;
+  }
+
+  //Add a line to battle log
+  void addBattleLog(value) {
+    _battleLog.add(value);
   }
 
   //Reset Selected Inventory
@@ -1165,134 +1180,5 @@ class Gameplay with ChangeNotifier {
       height: 32,
       width: 32,
     );
-  }
-
-  //Class Calculations
-  static dynamic classTranslation({
-    context,
-    values,
-    bool playerDamageCalculationInEnemy = false,
-    bool playerDamageCalculationInStats = false,
-    bool playerMaxLifeCalculationInGeneral = false,
-  }) {
-    //Player Damage Calculation to Enemy
-    if (playerDamageCalculationInEnemy) {
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
-      final character = jsonDecode(gameplay.characters);
-      //Damage Calculator
-      double damageCalculator() {
-        //No weapons equipped
-        if (gameplay.playerEquips[9] == 'none' &&
-            gameplay.playerEquips[10] == 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return 1 * (gameplay.playerStrength * 0.1);
-          }
-          return 1;
-          //Only Left weapon equipped
-        } else if (gameplay.playerEquips[9] != 'none' &&
-            gameplay.playerEquips[10] == 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return Items.list[gameplay.playerEquips[9]]['damage'] *
-                (gameplay.playerStrength * 0.1);
-          }
-          return Items.list[gameplay.playerEquips[9]]['damage'];
-          //Only Right weapon equipped
-        } else if (gameplay.playerEquips[9] == 'none' &&
-            gameplay.playerEquips[10] != 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return Items.list[gameplay.playerEquips[10]]['damage'] *
-                (gameplay.playerStrength * 0.1);
-          }
-          return Items.list[gameplay.playerEquips[10]]['damage'];
-          //Left & Right weapon equipped
-        } else if (gameplay.playerEquips[9] != 'none' &&
-            gameplay.playerEquips[10] != 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return (Items.list[gameplay.playerEquips[9]]['damage'] +
-                    Items.list[gameplay.playerEquips[10]]['damage']) *
-                (gameplay.playerStrength * 0.1);
-          }
-          return (Items.list[gameplay.playerEquips[9]]['damage'] +
-              Items.list[gameplay.playerEquips[10]]['damage']);
-        }
-        return 0.0;
-      }
-
-      //Berserk Class
-      if (character['character${gameplay.selectedCharacter}']['class'] ==
-          'berserk') {
-        double damage = double.parse(damageCalculator().toStringAsFixed(1));
-        double elife = gameplay.enemyLife;
-        elife = elife - damage;
-        gameplay.changeStats(
-            value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
-      }
-      //Archer Class
-      if (character['character${gameplay.selectedCharacter}']['class'] ==
-          'archer') {
-        double damage = double.parse(damageCalculator().toStringAsFixed(1));
-        double elife = gameplay.enemyLife;
-        elife = elife - damage;
-        gameplay.changeStats(
-            value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
-      }
-    }
-    //Player Damage Calculation to Stats
-    if (playerDamageCalculationInStats) {
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
-      //Damage Calculator
-      double damageCalculator() {
-        //No weapons equipped
-        if (gameplay.playerEquips[9] == 'none' &&
-            gameplay.playerEquips[10] == 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return 1 * (gameplay.playerStrength * 0.1);
-          }
-          return 1;
-          //Only Left weapon equipped
-        } else if (gameplay.playerEquips[9] != 'none' &&
-            gameplay.playerEquips[10] == 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return Items.list[gameplay.playerEquips[9]]['damage'] *
-                (gameplay.playerStrength * 0.1);
-          }
-          return Items.list[gameplay.playerEquips[9]]['damage'];
-          //Only Right weapon equipped
-        } else if (gameplay.playerEquips[9] == 'none' &&
-            gameplay.playerEquips[10] != 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return Items.list[gameplay.playerEquips[10]]['damage'] *
-                (gameplay.playerStrength * 0.1);
-          }
-          return Items.list[gameplay.playerEquips[10]]['damage'];
-          //Left & Right weapon equipped
-        } else if (gameplay.playerEquips[9] != 'none' &&
-            gameplay.playerEquips[10] != 'none') {
-          if (gameplay.playerStrength >= 12) {
-            return (Items.list[gameplay.playerEquips[9]]['damage'] +
-                    Items.list[gameplay.playerEquips[10]]['damage']) *
-                (gameplay.playerStrength * 0.1);
-          }
-          return (Items.list[gameplay.playerEquips[9]]['damage'] +
-              Items.list[gameplay.playerEquips[10]]['damage']);
-        }
-        return 0.0;
-      }
-
-      return double.parse(damageCalculator().toStringAsFixed(1));
-    }
-    //Player Max Life Calculation to General
-    if (playerMaxLifeCalculationInGeneral) {
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
-      final character = jsonDecode(gameplay.characters);
-      //Berserk Class
-      if (character['character${gameplay.selectedCharacter}']['class'] ==
-          'berserk') {
-        double maxLife = 20.0;
-        for (int i = 1; i > gameplay._playerStrength; i++) {
-          print(i);
-        }
-      }
-    }
   }
 }

@@ -1,5 +1,7 @@
+import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +13,9 @@ class BattleScene extends StatefulWidget {
 }
 
 class _BattleSceneState extends State<BattleScene> {
+  bool isFighting = false;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context, listen: false);
@@ -274,7 +279,7 @@ class _BattleSceneState extends State<BattleScene> {
                 ),
               ],
             ),
-            //Buttons
+            //Buttons & Inventory
             SizedBox(
               height: screenSize.height * 0.30,
               width: screenSize.width,
@@ -290,33 +295,107 @@ class _BattleSceneState extends State<BattleScene> {
                       child: Row(
                         children: [
                           //Attack Button
-                          ElevatedButton(
-                            onPressed: () {
-                              Gameplay.classTranslation(
-                                  playerDamageCalculationInEnemy: true,
-                                  values: null,
-                                  context: context);
-                              if (gameplay.enemyLife <= 0) {
-                                GlobalFunctions.lootDialog(
-                                  errorMsgTitle: 'battle_loot',
-                                  errorMsgContext: '',
-                                  context: context,
-                                  enemySpecialLoot: [],
-                                );
-                              }
-                            },
-                            child: Text(Language.Translate(
-                                    'attack', options.language) ??
-                                'Attack'),
-                          ),
+                          !isFighting
+                              ? ElevatedButton(
+                                  onPressed: () async {
+                                    setState(() {
+                                      isFighting = true;
+                                    });
+                                    final resultPlayer =
+                                        await ClassAtributes.battleFunctions(
+                                            playerDamageCalculationInEnemy:
+                                                true,
+                                            values: 'playerTurn',
+                                            context: context);
+                                    //Add battlelog
+                                    setState(() {
+                                      gameplay.addBattleLog(
+                                          '${Language.Translate('battle_log_playerAttack1', options.language) ?? 'You did'} ${resultPlayer[0]} ${Language.Translate('battle_log_playerAttack2', options.language) ?? 'damage to'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
+                                    });
+                                    //Delay to fix animation bug
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 10));
+                                    //Animation
+                                    _scrollController.animateTo(
+                                        _scrollController
+                                            .position.maxScrollExtent,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeOut);
+                                    //Verification if the player is dead
+                                    if (resultPlayer == 'dead') {
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const MainMenu()),
+                                          (Route<dynamic> route) => false);
+                                      gameplay.changeEnemyMove(true);
+                                    }
+                                    final resultEnemy =
+                                        await ClassAtributes.battleFunctions(
+                                            playerDamageCalculationInEnemy:
+                                                true,
+                                            values: 'enemyTurn',
+                                            context: context);
+                                    //Add battlelog
+                                    setState(() {
+                                      gameplay.addBattleLog(
+                                          '${Language.Translate('battle_log_enemyAttack1', options.language) ?? 'You received'} ${resultEnemy[0]} ${Language.Translate('battle_log_enemyAttack2', options.language) ?? 'damage from'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
+                                    });
+                                    //Delay to fix animation bug
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 10));
+                                    //Animation
+                                    _scrollController.animateTo(
+                                        _scrollController
+                                            .position.maxScrollExtent,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeOut);
+                                    //Verification if the enemy is dead
+                                    if (gameplay.enemyLife <= 0) {
+                                      GlobalFunctions.lootDialog(
+                                        errorMsgTitle: 'battle_loot',
+                                        errorMsgContext: '',
+                                        context: context,
+                                        enemySpecialLoot: [],
+                                      );
+                                    }
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 100));
+                                    //Enable buttons
+                                    setState(() {
+                                      isFighting = false;
+                                    });
+                                  },
+                                  child: Text(Language.Translate(
+                                          'battle_attack', options.language) ??
+                                      'Attack'),
+                                )
+                              : ElevatedButton(
+                                  onPressed: null,
+                                  child: Text(Language.Translate(
+                                          'battle_attack', options.language) ??
+                                      'Attack'),
+                                ),
                           const SizedBox(width: 20),
                           //Defence Button
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Text(Language.Translate(
-                                    'defence', options.language) ??
-                                'Defence'),
-                          ),
+                          !isFighting
+                              ? ElevatedButton(
+                                  onPressed: () {
+                                    isFighting = true;
+                                  },
+                                  child: Text(Language.Translate(
+                                          'battle_defence', options.language) ??
+                                      'Defence'),
+                                )
+                              : ElevatedButton(
+                                  onPressed: null,
+                                  child: Text(Language.Translate(
+                                          'battle_defence', options.language) ??
+                                      'Defence'),
+                                ),
                         ],
                       ),
                     ),
@@ -336,17 +415,44 @@ class _BattleSceneState extends State<BattleScene> {
                               Navigator.pushNamed(context, '/inventory');
                             },
                             child: Container(
-                              width: 70,
-                              height: 50,
+                              width: screenSize.width * 0.2,
+                              height: screenSize.height * 0.1,
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(100),
                               ),
-                              child: const Icon(Icons.inventory_2_outlined),
+                              child: const FittedBox(
+                                  child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(Icons.inventory_2_outlined),
+                              )),
                             ),
                           ),
-                          SizedBox(
-                            width: screenSize.width * 0.3,
+                          //Battle Log
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Theme.of(context).colorScheme.secondary),
+                            width: screenSize.width * 0.6,
+                            height: screenSize.height * 0.1,
+                            child: FittedBox(
+                              child: SizedBox(
+                                width: screenSize.width * 0.6,
+                                height: screenSize.height * 0.1,
+                                child: ListView.builder(
+                                    controller: _scrollController,
+                                    itemCount: gameplay.battleLog.length,
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
+                                      return Text(
+                                        gameplay.battleLog[index],
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                      );
+                                    }),
+                              ),
+                            ),
                           ),
                           //Magics
                           TextButton(
@@ -354,13 +460,17 @@ class _BattleSceneState extends State<BattleScene> {
                               Navigator.pushNamed(context, '/inventory');
                             },
                             child: Container(
-                              width: 70,
-                              height: 50,
+                              width: screenSize.width * 0.2,
+                              height: screenSize.height * 0.1,
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(100),
                               ),
-                              child: const Icon(Icons.menu_book),
+                              child: const FittedBox(
+                                  child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(Icons.menu_book),
+                              )),
                             ),
                           ),
                         ],

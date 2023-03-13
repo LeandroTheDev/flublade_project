@@ -5,14 +5,18 @@ import 'package:provider/provider.dart';
 
 class EnemySmallSpider extends SimpleEnemy {
   bool stopLoading = false;
+  late String enemyName;
   late double enemyLife;
   late double enemyMana;
+  late double enemyDamage;
   late double enemyArmor;
   late int enemyLevel;
   EnemySmallSpider({
     required Vector2 position,
+    required String name,
     required double life,
     required double mana,
+    required double damage,
     required double armor,
     required int level,
   }) : super(
@@ -152,8 +156,10 @@ class EnemySmallSpider extends SimpleEnemy {
             ),
           ),
         ) {
+    enemyName = name;
     enemyLife = life;
     enemyMana = mana;
+    enemyDamage = damage;
     enemyArmor = armor;
     enemyLevel = level;
   }
@@ -172,9 +178,13 @@ class EnemySmallSpider extends SimpleEnemy {
                 .changeEnemyMove(false);
             //Add Enemy Stats
             Provider.of<Gameplay>(context, listen: false)
+                .changeEnemyName(enemyName);
+            Provider.of<Gameplay>(context, listen: false)
                 .changeStats(value: enemyLife, stats: 'elife');
             Provider.of<Gameplay>(context, listen: false)
                 .changeStats(value: enemyMana, stats: 'emana');
+            Provider.of<Gameplay>(context, listen: false)
+                .changeStats(value: enemyDamage, stats: 'edamage');
             Provider.of<Gameplay>(context, listen: false)
                 .changeStats(value: enemyArmor, stats: 'earmor');
             Provider.of<Gameplay>(context, listen: false)

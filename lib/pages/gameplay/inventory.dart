@@ -1,5 +1,6 @@
 import 'package:flublade_project/components/item_widget.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
+import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
@@ -80,7 +81,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                   ),
                   //Damage
                   Text(
-                    '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${Gameplay.classTranslation(
+                    '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${ClassAtributes.classTranslation(
                       context: context,
                       playerDamageCalculationInStats: true,
                     )}',
@@ -111,11 +112,21 @@ class _GameplayInventoryState extends State<GameplayInventory>
     //Show Unequip Items Dialog
     void unequipItem(itemName, equipIndex) {
       String itemTranslation;
+      //Translate
       if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {
         itemTranslation = itemName.substring(0, itemName.length - 2);
       } else {
         itemTranslation = itemName;
       }
+      //Verify if tier is 0
+      String verifyTier(itemName) {
+        if (Items.returnTier(itemName) == '0') {
+          return '';
+        } else {
+          return '+${Items.returnTier(itemName)}';
+        }
+      }
+
       showDialog(
           barrierColor: const Color.fromARGB(167, 0, 0, 0),
           context: context,
@@ -127,7 +138,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Unequip item Text
                 title: Text(
-                  '${Language.Translate('response_unequip', Provider.of<Options>(context, listen: false).language) ?? 'Unequip item'} ${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} +${Items.returnTier(itemName)}',
+                  '${Language.Translate('response_unequip', Provider.of<Options>(context, listen: false).language) ?? 'Unequip item'} ${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${verifyTier(itemName)}',
                   style: TextStyle(
                       color: Theme.of(context).primaryColor, fontSize: 40),
                 ),
@@ -348,7 +359,6 @@ class _GameplayInventoryState extends State<GameplayInventory>
 
     //Show Item Infos
     void showItemInfo(String itemName) async {
-      // final connection = await MySQL.database;
       String itemTranslation;
       //Translate
       if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {

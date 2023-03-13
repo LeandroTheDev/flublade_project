@@ -476,43 +476,51 @@ class MySQLGameplay {
     List<Enemy> enemy = [];
     //Add Enemys to the gameplay
     if (enemysdb != '{}') {
+      String name;
       double life;
       double mana;
+      double damage;
       double armor;
       int level;
       double positionx;
       double positiony;
       //Transforming in MAP
       enemysdb = jsonDecode(enemysdb);
+      name = enemysdb['enemy0']['name'].toString();
       life = double.parse(enemysdb['enemy0']['life'].toString());
       mana = double.parse(enemysdb['enemy0']['mana'].toString());
+      damage = double.parse(enemysdb['enemy0']['damage'].toString());
       armor = double.parse(enemysdb['enemy0']['armor'].toString());
       level = int.parse(enemysdb['enemy0']['level'].toString());
       positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
       positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
       //Adding the first enemy
       enemy.add(parseEnemy(
-        enemyname: enemysdb['enemy0']['name'],
+        enemyname: name,
         position: Vector2(positionx, positiony),
         life: life,
         mana: mana,
+        damage: damage,
         armor: armor,
         level: level,
       ));
       int i = 1;
       while (true) {
         if (enemysdb['enemy$i'] != null) {
+          name = enemysdb['enemy$i']['name'].toString();
           life = double.parse(enemysdb['enemy$i']['life'].toString());
           mana = double.parse(enemysdb['enemy$i']['mana'].toString());
+          damage = double.parse(enemysdb['enemy$i']['damage'].toString());
           armor = double.parse(enemysdb['enemy$i']['armor'].toString());
           level = int.parse(enemysdb['enemy$i']['level'].toString());
           positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
           positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
           enemy.add(parseEnemy(
-            enemyname: enemysdb['enemy$i']['name'],
+            enemyname: name,
             position: Vector2(positionx, positiony),
             life: life,
             mana: mana,
+            damage: damage,
             armor: armor,
             level: level,
           ));
@@ -542,19 +550,28 @@ class MySQLGameplay {
     required Vector2 position,
     required double life,
     required double mana,
+    required double damage,
     required double armor,
     required int level,
   }) {
     switch (enemyname) {
       case "smallspider":
         return EnemySmallSpider(
+            name: enemyname,
             life: life,
             mana: mana,
+            damage: damage,
             armor: armor,
             level: level,
             position: position);
     }
     return EnemySmallSpider(
-        life: 100, mana: 100, armor: 0, level: 0, position: position);
+        name: 'smallspider',
+        life: 100,
+        mana: 100,
+        damage: 1,
+        armor: 0,
+        level: 0,
+        position: position);
   }
 }

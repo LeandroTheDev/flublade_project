@@ -80,8 +80,6 @@ class ClassSpriteSheet {
   };
 }
 
-
-
 class BaseCharacters {
   static const baseAtributes = {
     'archer': {

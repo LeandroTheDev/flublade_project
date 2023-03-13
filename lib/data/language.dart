@@ -140,6 +140,11 @@ class Language {
     'battle_loot_all': 'Take All',
     'battle_loot_exit': 'Exit',
     'battle_loot_selected': 'Selected',
+    'battle_log_enemyAttack1': 'You received',
+    'battle_log_enemyAttack2': 'damage from',
+    'battle_log_playerAttack1': 'You did',
+    'battle_log_playerAttack2': 'damage to',
+    'battle_log_enemyDead': 'You killed',
     //Items Name
     'items_gold': 'Gold',
     'items_gold_desc':
@@ -153,6 +158,8 @@ class Language {
     'items_cloth': 'Cloth',
     'items_cloth_desc':
         'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
+    //Enemy Names
+    'enemy_smallspider': 'Small Spider',
   };
   //
   //
@@ -290,7 +297,12 @@ class Language {
     'battle_loot_all': 'Pegar Tudo',
     'battle_loot_exit': 'Sair',
     'battle_loot_selected': 'Selecionado',
-    //Items Name
+    'battle_log_playerAttack1': 'Você causou',
+    'battle_log_playerAttack2': 'dano em',
+    'battle_log_enemyAttack1': 'Você recebeu',
+    'battle_log_enemyAttack2': 'dano de',
+    'battle_log_enemyDead': 'Você matou',
+    //Items Names
     'items_gold': 'Ouro',
     'items_gold_desc':
         'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
@@ -302,6 +314,8 @@ class Language {
         'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
     'items_cloth': 'Pano',
     'items_cloth_desc':
-        'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.'
+        'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
+    //Enemy Names
+    'enemy_smallspider': 'Aranha Pequena',
   };
 }
