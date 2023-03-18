@@ -109,10 +109,10 @@ class _CharactersMenuState extends State<CharactersMenu> {
                               Navigator.pop(context);
                               // ignore: use_build_context_synchronously
                               Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              super.widget));
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          super.widget));
                             } else {
                               GlobalFunctions.errorDialog(
                                   errorMsgTitle: 'response_error',
@@ -144,6 +144,14 @@ class _CharactersMenuState extends State<CharactersMenu> {
               ),
             );
           });
+    }
+
+    returnGold(index) {
+      try {
+        return characters['character$index']['inventory']['gold']['quantity'];
+      } catch (error) {
+        return '0';
+      }
     }
 
     return Scaffold(
@@ -270,7 +278,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                     ),
                                     //Gold
                                     Text(
-                                      '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${characters['character$index']['gold']}',
+                                      '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${returnGold(index)}',
                                       maxLines: 1,
                                       style: TextStyle(
                                           fontFamily: 'Explora',

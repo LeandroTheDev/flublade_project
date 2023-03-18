@@ -134,7 +134,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                             alignment: Alignment.topLeft,
                             width: screenSize.width * 0.95,
                             height: 45,
-                            child: TextFormField(controller: registerPassword),
+                            child: TextFormField(
+                                obscureText: true,
+                                controller: registerPassword),
                           ),
                         ],
                       ),

@@ -145,6 +145,8 @@ class Language {
     'battle_log_playerAttack1': 'You did',
     'battle_log_playerAttack2': 'damage to',
     'battle_log_enemyDead': 'You killed',
+    'battle_log_playerHealed1': 'You healed',
+    'battle_log_playerHealed2' 'life'
     //Items Name
     'items_gold': 'Gold',
     'items_gold_desc':

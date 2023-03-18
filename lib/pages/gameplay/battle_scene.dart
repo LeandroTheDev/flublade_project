@@ -298,9 +298,11 @@ class _BattleSceneState extends State<BattleScene> {
                           !isFighting
                               ? ElevatedButton(
                                   onPressed: () async {
+                                    //Disable Buttons
                                     setState(() {
                                       isFighting = true;
                                     });
+                                    //Player Turn
                                     final resultPlayer =
                                         await ClassAtributes.battleFunctions(
                                             playerDamageCalculationInEnemy:
@@ -312,16 +314,16 @@ class _BattleSceneState extends State<BattleScene> {
                                       gameplay.addBattleLog(
                                           '${Language.Translate('battle_log_playerAttack1', options.language) ?? 'You did'} ${resultPlayer[0]} ${Language.Translate('battle_log_playerAttack2', options.language) ?? 'damage to'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
                                     });
-                                    //Delay to fix animation bug
+                                    //Animation scroll down
                                     await Future.delayed(
-                                        const Duration(milliseconds: 10));
-                                    //Animation
-                                    _scrollController.animateTo(
-                                        _scrollController
-                                            .position.maxScrollExtent,
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        curve: Curves.easeOut);
+                                            const Duration(milliseconds: 10))
+                                        .then((value) => //Animation
+                                            _scrollController.animateTo(
+                                                _scrollController
+                                                    .position.maxScrollExtent,
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                curve: Curves.easeOut));
                                     //Verification if the player is dead
                                     if (resultPlayer == 'dead') {
                                       // ignore: use_build_context_synchronously
@@ -332,6 +334,7 @@ class _BattleSceneState extends State<BattleScene> {
                                           (Route<dynamic> route) => false);
                                       gameplay.changeEnemyMove(true);
                                     }
+                                    //Enemy Turn
                                     final resultEnemy =
                                         await ClassAtributes.battleFunctions(
                                             playerDamageCalculationInEnemy:
@@ -343,16 +346,16 @@ class _BattleSceneState extends State<BattleScene> {
                                       gameplay.addBattleLog(
                                           '${Language.Translate('battle_log_enemyAttack1', options.language) ?? 'You received'} ${resultEnemy[0]} ${Language.Translate('battle_log_enemyAttack2', options.language) ?? 'damage from'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
                                     });
-                                    //Delay to fix animation bug
+                                    //Animation scroll down
                                     await Future.delayed(
-                                        const Duration(milliseconds: 10));
-                                    //Animation
-                                    _scrollController.animateTo(
-                                        _scrollController
-                                            .position.maxScrollExtent,
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        curve: Curves.easeOut);
+                                            const Duration(milliseconds: 10))
+                                        .then((value) => //Animation
+                                            _scrollController.animateTo(
+                                                _scrollController
+                                                    .position.maxScrollExtent,
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                curve: Curves.easeOut));
                                     //Verification if the enemy is dead
                                     if (gameplay.enemyLife <= 0) {
                                       GlobalFunctions.lootDialog(
@@ -362,6 +365,51 @@ class _BattleSceneState extends State<BattleScene> {
                                         enemySpecialLoot: [],
                                       );
                                     }
+                                    await Future.delayed(
+                                        const Duration(milliseconds: 700));
+                                    //Late Buff Results
+                                    final resultLateBuffs =
+                                        await ClassAtributes.battleFunctions(
+                                            playerDamageCalculationInEnemy:
+                                                true,
+                                            values: 'lateBuffs',
+                                            context: context);
+                                    //Late Buff Activation
+                                    if (resultLateBuffs.length > 0) {
+                                      for (int i = 0;
+                                          i <= resultLateBuffs.length - 1;
+                                          i++) {
+                                        try {
+                                          //Add Life activation
+                                          if (resultLateBuffs[i][0] ==
+                                              'addLife') {
+                                            gameplay.changeStats(
+                                                value: gameplay.playerLife +
+                                                    resultLateBuffs[i][1],
+                                                stats: 'life');
+                                            setState(() {
+                                              gameplay.addBattleLog(
+                                                  '${Language.Translate('battle_log_playerHealed1', options.language) ?? 'You healed'} ${resultLateBuffs[i][1]} ${Language.Translate('battle_log_playerHealed2', options.language) ?? 'life'}');
+                                            });
+                                            //Animation
+                                            await Future.delayed(const Duration(
+                                                    milliseconds: 10))
+                                                .then((value) => //Animation
+                                                    _scrollController.animateTo(
+                                                        _scrollController
+                                                            .position
+                                                            .maxScrollExtent,
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    300),
+                                                        curve: Curves.easeOut));
+                                          }
+                                          // ignore: empty_catches
+                                        } catch (error) {}
+                                      }
+                                    }
+                                    //Design Delay
                                     await Future.delayed(
                                         const Duration(milliseconds: 100));
                                     //Enable buttons

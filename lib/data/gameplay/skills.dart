@@ -1,26 +1,67 @@
 import 'dart:convert';
 
+import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PassivesSkills {
   static const passivesId = {
     'healthTurbo': {
-      'image': 'assets/skills/passives',
+      'image': 'assets/skills/passives/healthTurbo',
       'name': 'healthTurbo',
-    }
+    },
+    'damageTurbo': {
+      'image': 'assets/skills/passives/damageTurbo',
+      'name': 'damageTurbo',
+    },
   };
-  static passives(context, passiveName) {
+  static passives(context, passiveName, methodTranlation) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final options = Provider.of<Options>(context, listen: false);
-
     //Health Turbo Function
-    healthTurbo() {}
+    healthTurbo() {
+      //Variables Creation
+      final maxLife = ClassAtributes.classTranslation(
+          context: context, playerMaxLifeCalculationInGeneral: true);
+      final porcentage = double.parse(
+          (((maxLife - gameplay.playerLife) / maxLife) * 100)
+              .toStringAsFixed(2));
+      double totalLifeRecovery = 0.0;
+
+      //Porcentage Calculation
+      for (double i = 100.0 - porcentage; i <= 100; i += 2) {
+        totalLifeRecovery += maxLife * 0.005;
+      }
+
+      //Returning
+      totalLifeRecovery = double.parse(totalLifeRecovery.toStringAsFixed(2));
+      return ['addLife', totalLifeRecovery];
+    }
+
     //Damage Turbo Function
-    damageTurbo() {}
+    damageTurbo() {
+      //Variables Creation
+      final baseDamage = ClassAtributes.classTranslation(
+          context: context, playerDamageCalculationInStats: true);
+      final maxLife = ClassAtributes.classTranslation(
+          context: context, playerMaxLifeCalculationInGeneral: true);
+      final porcentage = double.parse(
+          (((maxLife - gameplay.playerLife) / maxLife) * 100)
+              .toStringAsFixed(2));
+      double totalDamage = 0.0;
+
+      //Porcentage Calculation
+      for (double i = 100.0 - porcentage; i <= 100; i += 5) {
+        totalDamage += baseDamage * 0.03;
+      }
+
+      //Returning
+      totalDamage = double.parse(totalDamage.toStringAsFixed(2));
+      return ['addDamage', totalDamage];
+    }
+
+    //Passive Translation
     switch (passiveName) {
       case 'healthTurbo':
         //Health Turbo
@@ -85,15 +126,22 @@ class ClassAtributes {
 
       return double.parse(damageCalculator().toStringAsFixed(1));
     }
-    //Player Max Life Calculation to General
+    //Player Class Max Life Calculation
     if (playerMaxLifeCalculationInGeneral) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
       final character = jsonDecode(gameplay.characters);
-      //Berserk Class
-      if (character['character${gameplay.selectedCharacter}']['class'] ==
-          'berserk') {
-        for (int i = 1; i > gameplay.playerStrength; i++) {}
+      //Pickup base Max life
+      double maxLife = double.parse(BaseCharacters.baseAtributes[
+              character['character${gameplay.selectedCharacter}']
+                  ['class']]!['life']
+          .toString());
+      //Calculation by strength
+      for (int i = 0; i < gameplay.playerStrength; i++) {
+        maxLife = maxLife + (maxLife * 0.05);
       }
+      //Rounded Life
+      maxLife = double.parse(maxLife.toStringAsFixed(2));
+      return maxLife;
     }
   }
 
@@ -173,6 +221,7 @@ class ClassAtributes {
       //Berserk Class
       if (character['character${gameplay.selectedCharacter}']['class'] ==
           'berserk') {
+        //Variables Creation
         List result = [0.0, ''];
         double damage = double.parse(damageCalculator().toStringAsFixed(1));
         double life = gameplay.playerLife;
@@ -182,10 +231,29 @@ class ClassAtributes {
             armorPorcentageCalculator(gameplay.enemyArmor);
         double edamage = gameplay.enemyDamage;
 
+        //Buffs Searchs
+        List buffs = [];
+        gameplay.playerBuffs.forEach((value, index) => buffs.add(value));
+        List buffsNumbers = [];
+        for (int i = 0; i <= buffs.length - 1; i++) {
+          buffsNumbers.add(PassivesSkills.passives(context, buffs[i], false));
+        }
         //Player Turn
         if (values == 'playerTurn') {
+          //Early Buffs Calculation
+          for (int i = 0; i <= buffsNumbers.length - 1; i++) {
+            try {
+              //Add Damage activation
+              if (buffsNumbers[i][0] == 'addDamage') {
+                damage += buffsNumbers[i][1];
+              }
+              // ignore: empty_catches
+            } catch (error) {}
+          }
+          //Damage Calculation
           elife = elife - (damage * ((100 - earmorPorcentage) / 100));
           result[0] = (damage * ((100 - earmorPorcentage) / 100));
+          //Damage on Provider
           await Future.delayed(const Duration(milliseconds: 700));
           gameplay.changeStats(
               value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
@@ -217,6 +285,10 @@ class ClassAtributes {
           return result;
         }
 
+        //Late Buffs
+        if (values == 'lateBuffs') {
+          return buffsNumbers;
+        }
         return;
       }
       //Archer Class

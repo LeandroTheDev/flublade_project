@@ -363,9 +363,6 @@ class MySQL {
         value: double.parse(selectedCharacter['armor'].toString()),
         stats: 'armor');
     gameplay.changeStats(
-        value: double.parse(selectedCharacter['gold'].toString()),
-        stats: 'gold');
-    gameplay.changeStats(
         value: double.parse(selectedCharacter['xp'].toString()), stats: 'xp');
     gameplay.changeStats(
         value: int.parse(selectedCharacter['level'].toString()),
@@ -384,6 +381,7 @@ class MySQL {
     gameplay.changeStats(
         value: selectedCharacter['inventory'], stats: 'inventory');
     gameplay.changeStats(value: selectedCharacter['equips'], stats: 'equips');
+    gameplay.changeStats(value: selectedCharacter['buffs'], stats: 'buffs');
   }
 }
 

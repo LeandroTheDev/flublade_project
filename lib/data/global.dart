@@ -579,7 +579,7 @@ class Gameplay with ChangeNotifier {
   bool _isTalkable = false;
   bool _enemysMove = true;
   String _selectedTalk = '';
-  List<String> _battleLog = [];
+  final List<String> _battleLog = [];
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
@@ -594,6 +594,7 @@ class Gameplay with ChangeNotifier {
   Map _playerInventory = {};
   List _playerInventorySelected = [];
   List _playerEquips = [];
+  Map _playerBuffs = {};
 
   String _enemyName = '';
   double _enemyLife = 0;
@@ -620,6 +621,7 @@ class Gameplay with ChangeNotifier {
   Map get playerInventory => _playerInventory;
   List get playerInventorySelected => _playerInventorySelected;
   List get playerEquips => _playerEquips;
+  Map get playerBuffs => _playerBuffs;
 
   String get enemyName => _enemyName;
   double get enemyLife => _enemyLife;
@@ -763,6 +765,10 @@ class Gameplay with ChangeNotifier {
       } catch (_) {
         _playerEquips = jsonDecode(value);
       }
+      notifyListeners();
+      return;
+    } else if (stats == 'buffs') {
+      _playerBuffs = jsonDecode(value);
       notifyListeners();
       return;
     }
@@ -1004,7 +1010,6 @@ class Gameplay with ChangeNotifier {
           'life': BaseCharacters.baseAtributes[playerClass]!['life'],
           'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
           'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
-          'gold': 0,
           'level': 1,
           'xp': 0,
           'skillpoint': 0,
@@ -1014,6 +1019,8 @@ class Gameplay with ChangeNotifier {
               BaseCharacters.baseAtributes[playerClass]!['intelligence'],
           'luck': 0,
           'inventory': '{}',
+          'buffs':
+              jsonEncode(BaseCharacters.baseAtributes[playerClass]!['buffs']),
           'equips': [
             'none',
             'none',
@@ -1063,7 +1070,6 @@ class Gameplay with ChangeNotifier {
       'life': BaseCharacters.baseAtributes[playerClass]!['life'],
       'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
       'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
-      'gold': 0,
       'level': 1,
       'xp': 0,
       'skillpoint': 0,
@@ -1073,6 +1079,7 @@ class Gameplay with ChangeNotifier {
           BaseCharacters.baseAtributes[playerClass]!['intelligence'],
       'luck': 0,
       'inventory': '{}',
+      'buffs': jsonEncode(BaseCharacters.baseAtributes[playerClass]!['buffs']),
       'equips': [
         'none',
         'none',

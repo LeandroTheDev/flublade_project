@@ -2,6 +2,7 @@ import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:bonfire/bonfire.dart';
 import 'package:flutter/material.dart';
+
 class PlayerClient extends SimplePlayer with ObjectCollision {
   PlayerClient(
     Vector2 position,
@@ -89,6 +90,7 @@ class BaseCharacters {
       'strength': 5,
       'agility': 13,
       'intelligence': 5,
+      'buffs': {},
     },
     'assassin': {
       'life': 7,
@@ -97,6 +99,7 @@ class BaseCharacters {
       'strength': 2,
       'agility': 15,
       'intelligence': 8,
+      'buffs': {},
     },
     'berserk': {
       'life': 20,
@@ -105,6 +108,28 @@ class BaseCharacters {
       'strength': 12,
       'agility': 6,
       'intelligence': 2,
+      'buffs': {
+        'healthTurbo': {
+          'name': 'healthTurbo',
+          'rounds': 'racial',
+        },
+        'damageTurbo': {
+          'name': 'damageTurbo',
+          'rounds': 'racial',
+        },
+        'magicalBlock': {
+          'name': 'magicalBlock',
+          'rounds': 'racial',
+        },
+        'petsBlock': {
+          'name': 'petsBlock',
+          'rounds': 'racial',
+        },
+        'noisy': {
+          'name': 'noisy',
+          'rounds': 'racial',
+        },
+      },
     }
   };
 }

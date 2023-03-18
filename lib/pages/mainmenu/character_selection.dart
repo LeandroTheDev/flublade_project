@@ -15,6 +15,15 @@ class CharacterSelection extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
     final characters = jsonDecode(Provider.of<Gameplay>(context).characters);
+
+    returnGold(index) {
+      try {
+        return characters['character$index']['inventory']['gold']['quantity'];
+      } catch (error) {
+        return '0';
+      }
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -116,7 +125,7 @@ class CharacterSelection extends StatelessWidget {
                                     ),
                                     //Gold
                                     Text(
-                                      '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${characters['character$index']['gold']}',
+                                      '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${returnGold(index)}',
                                       maxLines: 1,
                                       style: TextStyle(
                                           fontFamily: 'Explora',
