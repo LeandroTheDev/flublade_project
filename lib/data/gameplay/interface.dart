@@ -1,3 +1,4 @@
+import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,41 +26,89 @@ class _IngameInterfaceState extends State<IngameInterface> {
             children: [
               SizedBox(
                 width: screenSize.width,
-                child: Row(
-                  children: [
-                    //Inventory
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/inventory');
-                      },
-                      child: Container(
-                        width: 70,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          borderRadius: BorderRadius.circular(100),
+                height: screenSize.height * 0.10,
+                child: FittedBox(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //Inventory
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/inventory');
+                        },
+                        child: Container(
+                          width: screenSize.width * 0.2,
+                          height: screenSize.height * 0.1,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondary,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: const FittedBox(
+                              child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.inventory_2_outlined),
+                          )),
                         ),
-                        child: const Icon(Icons.inventory_2_outlined),
                       ),
-                    ),
-                    const Spacer(),
-                    //Pause Button
-                    TextButton(
-                      onPressed: () {
-                        GlobalFunctions.pauseDialog(
-                            context: context, options: options);
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
+                      //Xp Bar
+                      Container(
+                        padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Icon(Icons.pause),
+                        width: screenSize.width * 0.6,
+                        height: screenSize.height * 0.1,
+                        child: FittedBox(
+                            child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 11, vertical: 5),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    color: Colors.purple),
+                                width: ((gameplay.playerXP /
+                                            BaseCharacters.levelCaps[
+                                                gameplay.playerLevel]!) *
+                                        100) *
+                                    5.9,
+                                height: 90,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 600,
+                              height: 100,
+                              child: Image.asset(
+                                'assets/images/interface/xpBar.png',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ],
+                        )),
                       ),
-                    ),
-                  ],
+                      //Pause Button
+                      TextButton(
+                        onPressed: () {
+                          GlobalFunctions.pauseDialog(
+                              context: context, options: options);
+                        },
+                        child: Container(
+                          width: screenSize.width * 0.2,
+                          height: screenSize.height * 0.1,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondary,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: const FittedBox(
+                              child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.pause),
+                          )),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const Spacer(),

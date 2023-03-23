@@ -1,4 +1,5 @@
 import 'package:flublade_project/components/item_widget.dart';
+import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
@@ -45,7 +46,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                 children: [
                   //Life
                   Text(
-                    '${Language.Translate('battle_life', Provider.of<Options>(context, listen: false).language) ?? 'Life'}: ${Provider.of<Gameplay>(context, listen: false).playerLife}',
+                    '${Language.Translate('battle_life', Provider.of<Options>(context, listen: false).language) ?? 'Life'}: ${Provider.of<Gameplay>(context, listen: false).playerLife.toStringAsFixed(2)} / ${ClassAtributes.classTranslation(context: context, playerMaxLifeCalculationInGeneral: true).toStringAsFixed(2)}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
@@ -85,6 +86,18 @@ class _GameplayInventoryState extends State<GameplayInventory>
                       context: context,
                       playerDamageCalculationInStats: true,
                     )}',
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Level
+                  Text(
+                    '${Language.Translate('characters_create_level', Provider.of<Options>(context, listen: false).language) ?? 'Level'}: ${Provider.of<Gameplay>(context, listen: false).playerLevel}',
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Experience
+                  Text(
+                    '${Language.Translate('battle_loot_experience', Provider.of<Options>(context, listen: false).language) ?? 'Experience'} ${Provider.of<Gameplay>(context, listen: false).playerXP.toStringAsFixed(2)} / ${BaseCharacters.levelCaps[Provider.of<Gameplay>(context, listen: false).playerLevel]!.toStringAsFixed(2)}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),

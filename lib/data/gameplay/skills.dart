@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/language.dart';
 import 'package:provider/provider.dart';
 
 class PassivesSkills {
@@ -81,6 +80,7 @@ class ClassAtributes {
     bool playerDamageCalculationInEnemy = false,
     bool playerDamageCalculationInStats = false,
     bool playerMaxLifeCalculationInGeneral = false,
+    bool playterMaxLifeCalculationCharacterCreation = false,
   }) {
     //Player Damage Calculation to Stats
     if (playerDamageCalculationInStats) {
@@ -124,7 +124,7 @@ class ClassAtributes {
         return 0.0;
       }
 
-      return double.parse(damageCalculator().toStringAsFixed(1));
+      return double.parse(damageCalculator().toStringAsFixed(2));
     }
     //Player Class Max Life Calculation
     if (playerMaxLifeCalculationInGeneral) {
@@ -137,6 +137,23 @@ class ClassAtributes {
           .toString());
       //Calculation by strength
       for (int i = 0; i < gameplay.playerStrength; i++) {
+        maxLife = maxLife + (maxLife * 0.05);
+      }
+      //Rounded Life
+      maxLife = double.parse(maxLife.toStringAsFixed(2));
+      return maxLife;
+    }
+    //Player Class Max Life Calculation Creation
+    if (playterMaxLifeCalculationCharacterCreation) {
+      //Pickup base Max life
+      double maxLife = double.parse(
+          BaseCharacters.baseAtributes[values]!['life'].toString());
+      //Calculation by strength
+      for (int i = 0;
+          i <
+              int.parse(
+                  BaseCharacters.baseAtributes[values]!['strength'].toString());
+          i++) {
         maxLife = maxLife + (maxLife * 0.05);
       }
       //Rounded Life
@@ -223,7 +240,7 @@ class ClassAtributes {
           'berserk') {
         //Variables Creation
         List result = [0.0, ''];
-        double damage = double.parse(damageCalculator().toStringAsFixed(1));
+        double damage = double.parse(damageCalculator().toStringAsFixed(2));
         double life = gameplay.playerLife;
         double armorPorcentage = armorPorcentageCalculator(gameplay.enemyArmor);
         double elife = gameplay.enemyLife;
@@ -256,12 +273,9 @@ class ClassAtributes {
           //Damage on Provider
           await Future.delayed(const Duration(milliseconds: 700));
           gameplay.changeStats(
-              value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
+              value: double.parse(elife.toStringAsFixed(2)), stats: 'elife');
           //Check if enemy is dead
           if (elife <= 0) {
-            gameplay.addBattleLog(
-                Language.Translate('battle_log_enemyDead', options.language) ??
-                    'You killed');
             result[1] = 'edead';
           } else {
             result[1] = 'notedead';
@@ -275,7 +289,7 @@ class ClassAtributes {
           result[0] = (edamage * ((100 - armorPorcentage) / 100));
           await Future.delayed(const Duration(milliseconds: 700));
           gameplay.changeStats(
-              value: double.parse(life.toStringAsFixed(1)), stats: 'life');
+              value: double.parse(life.toStringAsFixed(2)), stats: 'life');
           //Check if player is dead
           if (life <= 0) {
             result[1] = 'dead';
@@ -294,11 +308,11 @@ class ClassAtributes {
       //Archer Class
       if (character['character${gameplay.selectedCharacter}']['class'] ==
           'archer') {
-        double damage = double.parse(damageCalculator().toStringAsFixed(1));
+        double damage = double.parse(damageCalculator().toStringAsFixed(2));
         double elife = gameplay.enemyLife;
         elife = elife - damage;
         gameplay.changeStats(
-            value: double.parse(elife.toStringAsFixed(1)), stats: 'elife');
+            value: double.parse(elife.toStringAsFixed(2)), stats: 'elife');
       }
     }
   }

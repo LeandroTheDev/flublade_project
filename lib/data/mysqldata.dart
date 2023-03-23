@@ -227,12 +227,30 @@ class MySQL {
     charactersdb = charactersdb.substring(0, charactersdb.length - 2);
     //Transform into MAP
     charactersdb = jsonDecode(charactersdb);
-    //Add new or remove items
+    //Update Inventory
     charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
         gameplay.playerInventory;
-    //Add new equips
+    //Update Equips
     charactersdb['character${gameplay.selectedCharacter}']['equips'] =
         gameplay.playerEquips;
+    //Update Level
+    charactersdb['character${gameplay.selectedCharacter}']['level'] =
+        gameplay.playerLevel;
+    //Update XP
+    charactersdb['character${gameplay.selectedCharacter}']['xp'] =
+        gameplay.playerXP;
+    //Update Skillpoints
+    charactersdb['character${gameplay.selectedCharacter}']['skillpoint'] =
+        gameplay.playerSkillpoint;
+    //Update Strength
+    charactersdb['character${gameplay.selectedCharacter}']['strength'] =
+        gameplay.playerStrength;
+    //Update Agility
+    charactersdb['character${gameplay.selectedCharacter}']['agility'] =
+        gameplay.playerIntelligence;
+    //Update Intelligence
+    charactersdb['character${gameplay.selectedCharacter}']['intelligence'] =
+        gameplay.playerIntelligence;
     //Transform into String
     charactersdb = jsonEncode(charactersdb);
     //Upload to database
@@ -261,7 +279,6 @@ class MySQL {
       }
       return true;
     } catch (error) {
-      print(error);
       return false;
     }
   }
@@ -382,6 +399,9 @@ class MySQL {
         value: selectedCharacter['inventory'], stats: 'inventory');
     gameplay.changeStats(value: selectedCharacter['equips'], stats: 'equips');
     gameplay.changeStats(value: selectedCharacter['buffs'], stats: 'buffs');
+    gameplay.changeStats(value: selectedCharacter['xp'], stats: 'xp');
+    gameplay.changeStats(
+        value: selectedCharacter['skillpoint'], stats: 'skillpoint');
   }
 }
 
@@ -480,6 +500,7 @@ class MySQLGameplay {
       double damage;
       double armor;
       int level;
+      double xp;
       double positionx;
       double positiony;
       //Transforming in MAP
@@ -490,6 +511,7 @@ class MySQLGameplay {
       damage = double.parse(enemysdb['enemy0']['damage'].toString());
       armor = double.parse(enemysdb['enemy0']['armor'].toString());
       level = int.parse(enemysdb['enemy0']['level'].toString());
+      xp = double.parse(enemysdb['enemy0']['xp'].toString());
       positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
       positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
       //Adding the first enemy
@@ -501,6 +523,7 @@ class MySQLGameplay {
         damage: damage,
         armor: armor,
         level: level,
+        xp: xp,
       ));
       int i = 1;
       while (true) {
@@ -511,20 +534,22 @@ class MySQLGameplay {
           damage = double.parse(enemysdb['enemy$i']['damage'].toString());
           armor = double.parse(enemysdb['enemy$i']['armor'].toString());
           level = int.parse(enemysdb['enemy$i']['level'].toString());
+          xp = double.parse(enemysdb['enemy$i']['xp'].toString());
           positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
           positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
           enemy.add(parseEnemy(
-            enemyname: name,
-            position: Vector2(positionx, positiony),
-            life: life,
-            mana: mana,
-            damage: damage,
-            armor: armor,
-            level: level,
-          ));
+              enemyname: name,
+              position: Vector2(positionx, positiony),
+              life: life,
+              mana: mana,
+              damage: damage,
+              armor: armor,
+              level: level,
+              xp: xp));
+        } else {
+          break;
         }
         i++;
-        break;
       }
     }
     return enemy;
@@ -551,6 +576,7 @@ class MySQLGameplay {
     required double damage,
     required double armor,
     required int level,
+    required double xp,
   }) {
     switch (enemyname) {
       case "smallspider":
@@ -561,6 +587,7 @@ class MySQLGameplay {
             damage: damage,
             armor: armor,
             level: level,
+            xp: xp,
             position: position);
     }
     return EnemySmallSpider(
@@ -570,6 +597,7 @@ class MySQLGameplay {
         damage: 1,
         armor: 0,
         level: 0,
+        xp: 0,
         position: position);
   }
 }

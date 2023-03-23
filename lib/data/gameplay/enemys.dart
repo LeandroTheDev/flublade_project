@@ -1,5 +1,6 @@
 import 'package:bonfire/bonfire.dart';
 import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ class EnemySmallSpider extends SimpleEnemy {
   late double enemyDamage;
   late double enemyArmor;
   late int enemyLevel;
+  late double enemyXP;
   EnemySmallSpider({
     required Vector2 position,
     required String name,
@@ -19,6 +21,7 @@ class EnemySmallSpider extends SimpleEnemy {
     required double damage,
     required double armor,
     required int level,
+    required double xp,
   }) : super(
           position: position,
           size: Vector2(32, 32),
@@ -162,6 +165,7 @@ class EnemySmallSpider extends SimpleEnemy {
     enemyDamage = damage;
     enemyArmor = armor;
     enemyLevel = level;
+    enemyXP = xp;
   }
 
   @override
@@ -189,8 +193,16 @@ class EnemySmallSpider extends SimpleEnemy {
                 .changeStats(value: enemyArmor, stats: 'earmor');
             Provider.of<Gameplay>(context, listen: false)
                 .changeStats(value: enemyLevel, stats: 'elevel');
+            Provider.of<Gameplay>(context, listen: false)
+                .changeStats(value: enemyXP, stats: 'exp');
             //Push to battle scene
-            Navigator.pushNamed(gameRef.context, '/battlescene');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BattleScene(
+                        backContext: gameRef.context,
+                      )),
+            );
             stopLoading = true;
             die();
           }

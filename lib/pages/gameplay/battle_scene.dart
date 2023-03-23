@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
@@ -6,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class BattleScene extends StatefulWidget {
-  const BattleScene({super.key});
+  final BuildContext backContext;
+  const BattleScene({required this.backContext, super.key});
 
   @override
   State<BattleScene> createState() => _BattleSceneState();
@@ -17,10 +21,20 @@ class _BattleSceneState extends State<BattleScene> {
   final ScrollController _scrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    //Start battle in last log
+    Future.delayed(const Duration(milliseconds: 1)).then((value) =>
+        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 1), curve: Curves.linear));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context);
     final screenSize = MediaQuery.of(context).size;
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -309,113 +323,167 @@ class _BattleSceneState extends State<BattleScene> {
                                                 true,
                                             values: 'playerTurn',
                                             context: context);
-                                    //Add battlelog
-                                    setState(() {
-                                      gameplay.addBattleLog(
-                                          '${Language.Translate('battle_log_playerAttack1', options.language) ?? 'You did'} ${resultPlayer[0]} ${Language.Translate('battle_log_playerAttack2', options.language) ?? 'damage to'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
-                                    });
-                                    //Animation scroll down
-                                    await Future.delayed(
-                                            const Duration(milliseconds: 10))
-                                        .then((value) => //Animation
-                                            _scrollController.animateTo(
-                                                _scrollController
-                                                    .position.maxScrollExtent,
-                                                duration: const Duration(
-                                                    milliseconds: 300),
-                                                curve: Curves.easeOut));
-                                    //Verification if the player is dead
-                                    if (resultPlayer == 'dead') {
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const MainMenu()),
-                                          (Route<dynamic> route) => false);
-                                      gameplay.changeEnemyMove(true);
-                                    }
-                                    //Enemy Turn
-                                    final resultEnemy =
-                                        await ClassAtributes.battleFunctions(
-                                            playerDamageCalculationInEnemy:
-                                                true,
-                                            values: 'enemyTurn',
-                                            context: context);
-                                    //Add battlelog
-                                    setState(() {
-                                      gameplay.addBattleLog(
-                                          '${Language.Translate('battle_log_enemyAttack1', options.language) ?? 'You received'} ${resultEnemy[0]} ${Language.Translate('battle_log_enemyAttack2', options.language) ?? 'damage from'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
-                                    });
-                                    //Animation scroll down
-                                    await Future.delayed(
-                                            const Duration(milliseconds: 10))
-                                        .then((value) => //Animation
-                                            _scrollController.animateTo(
-                                                _scrollController
-                                                    .position.maxScrollExtent,
-                                                duration: const Duration(
-                                                    milliseconds: 300),
-                                                curve: Curves.easeOut));
                                     //Verification if the enemy is dead
                                     if (gameplay.enemyLife <= 0) {
+                                      //Add Battlelog
+                                      setState(() => gameplay.addBattleLog(
+                                            '${Language.Translate('battle_log_enemyDead', options.language) ?? 'You killed'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language)}',
+                                          ));
+                                      //Animation scroll down
+                                      Future.delayed(
+                                              const Duration(milliseconds: 10))
+                                          .then((value) => //Animation
+                                              _scrollController.animateTo(
+                                                  _scrollController
+                                                      .position.maxScrollExtent,
+                                                  duration: const Duration(
+                                                      milliseconds: 300),
+                                                  curve: Curves.easeOut));
+                                      //Xp Calculation
+                                      double xp = 0;
+                                      if (gameplay.enemyLevel <= 10) {
+                                        // 2 additional xp chance
+                                        xp = gameplay.enemyXP +
+                                            double.parse(Random()
+                                                .nextDouble()
+                                                .toStringAsFixed(2)) +
+                                            Random().nextInt(3);
+                                      } else if (gameplay.enemyLevel >= 11 &&
+                                          gameplay.enemyLevel <= 20) {
+                                        // 10 additional xp chance
+                                        xp = gameplay.enemyXP +
+                                            double.parse(Random()
+                                                .nextDouble()
+                                                .toStringAsFixed(2)) +
+                                            Random().nextInt(11);
+                                      } else if (gameplay.enemyLevel >= 21 &&
+                                          gameplay.enemyLevel <= 30) {
+                                        // 30 additional xp chance
+                                        xp = gameplay.enemyXP +
+                                            double.parse(Random()
+                                                .nextDouble()
+                                                .toStringAsFixed(2)) +
+                                            Random().nextInt(31);
+                                      } else if (gameplay.enemyLevel >= 31) {
+                                        // 60 additional xp chance
+                                        xp = gameplay.enemyXP +
+                                            double.parse(Random()
+                                                .nextDouble()
+                                                .toStringAsFixed(2)) +
+                                            Random().nextInt(60);
+                                      }
+                                      //Loot Dialog
                                       GlobalFunctions.lootDialog(
-                                        errorMsgTitle: 'battle_loot',
-                                        errorMsgContext: '',
                                         context: context,
+                                        xp: xp,
                                         enemySpecialLoot: [],
                                       );
-                                    }
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 700));
-                                    //Late Buff Results
-                                    final resultLateBuffs =
-                                        await ClassAtributes.battleFunctions(
-                                            playerDamageCalculationInEnemy:
-                                                true,
-                                            values: 'lateBuffs',
-                                            context: context);
-                                    //Late Buff Activation
-                                    if (resultLateBuffs.length > 0) {
-                                      for (int i = 0;
-                                          i <= resultLateBuffs.length - 1;
-                                          i++) {
-                                        try {
-                                          //Add Life activation
-                                          if (resultLateBuffs[i][0] ==
-                                              'addLife') {
-                                            gameplay.changeStats(
-                                                value: gameplay.playerLife +
-                                                    resultLateBuffs[i][1],
-                                                stats: 'life');
-                                            setState(() {
-                                              gameplay.addBattleLog(
-                                                  '${Language.Translate('battle_log_playerHealed1', options.language) ?? 'You healed'} ${resultLateBuffs[i][1]} ${Language.Translate('battle_log_playerHealed2', options.language) ?? 'life'}');
-                                            });
-                                            //Animation
-                                            await Future.delayed(const Duration(
-                                                    milliseconds: 10))
-                                                .then((value) => //Animation
-                                                    _scrollController.animateTo(
-                                                        _scrollController
-                                                            .position
-                                                            .maxScrollExtent,
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    300),
-                                                        curve: Curves.easeOut));
+                                    } else {
+                                      //Add battlelog
+                                      setState(() {
+                                        gameplay.addBattleLog(
+                                            '${Language.Translate('battle_log_playerAttack1', options.language) ?? 'You did'} ${resultPlayer[0].toStringAsFixed(2)} ${Language.Translate('battle_log_playerAttack2', options.language) ?? 'damage to'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
+                                      });
+                                      //Animation scroll down
+                                      await Future.delayed(
+                                              const Duration(milliseconds: 10))
+                                          .then((value) => //Animation
+                                              _scrollController.animateTo(
+                                                  _scrollController
+                                                      .position.maxScrollExtent,
+                                                  duration: const Duration(
+                                                      milliseconds: 300),
+                                                  curve: Curves.easeOut));
+                                      //Enemy Turn
+                                      final resultEnemy =
+                                          await ClassAtributes.battleFunctions(
+                                              playerDamageCalculationInEnemy:
+                                                  true,
+                                              values: 'enemyTurn',
+                                              context: context);
+                                      //Verification if the player is dead
+                                      if (gameplay.playerLife <= 0) {
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.of(context)
+                                            .pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                    builder:
+                                                        (context) =>
+                                                            const MainMenu()),
+                                                (Route<dynamic> route) =>
+                                                    false);
+                                        gameplay.changeEnemyMove(true);
+                                      } else {
+                                        //Add battlelog
+                                        setState(() {
+                                          gameplay.addBattleLog(
+                                              '${Language.Translate('battle_log_enemyAttack1', options.language) ?? 'You received'} ${resultEnemy[0].toStringAsFixed(2)} ${Language.Translate('battle_log_enemyAttack2', options.language) ?? 'damage from'} ${Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error'}');
+                                        });
+                                        //Animation scroll down
+                                        await Future.delayed(const Duration(
+                                                milliseconds: 10))
+                                            .then((value) => //Animation
+                                                _scrollController.animateTo(
+                                                    _scrollController.position
+                                                        .maxScrollExtent,
+                                                    duration: const Duration(
+                                                        milliseconds: 300),
+                                                    curve: Curves.easeOut));
+                                        await Future.delayed(
+                                            const Duration(milliseconds: 700));
+                                        //Late Buff Results
+                                        final resultLateBuffs =
+                                            await ClassAtributes.battleFunctions(
+                                                playerDamageCalculationInEnemy:
+                                                    true,
+                                                values: 'lateBuffs',
+                                                context: context);
+                                        //Late Buff Activation
+                                        if (resultLateBuffs.length > 0) {
+                                          for (int i = 0;
+                                              i <= resultLateBuffs.length - 1;
+                                              i++) {
+                                            try {
+                                              //Add Life activation
+                                              if (resultLateBuffs[i][0] ==
+                                                  'addLife') {
+                                                gameplay.changeStats(
+                                                    value: gameplay.playerLife +
+                                                        resultLateBuffs[i][1],
+                                                    stats: 'life');
+                                                setState(() {
+                                                  gameplay.addBattleLog(
+                                                      '${Language.Translate('battle_log_playerHealed1', options.language) ?? 'You healed'} ${resultLateBuffs[i][1]} ${Language.Translate('battle_log_playerHealed2', options.language) ?? 'life'}');
+                                                });
+                                                //Animation
+                                                await Future.delayed(
+                                                        const Duration(
+                                                            milliseconds: 10))
+                                                    .then((value) => //Animation
+                                                        _scrollController.animateTo(
+                                                            _scrollController
+                                                                .position
+                                                                .maxScrollExtent,
+                                                            duration:
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        300),
+                                                            curve: Curves
+                                                                .easeOut));
+                                              }
+                                              // ignore: empty_catches
+                                            } catch (error) {}
                                           }
-                                          // ignore: empty_catches
-                                        } catch (error) {}
+                                        }
+                                        //Design Delay
+                                        await Future.delayed(
+                                            const Duration(milliseconds: 100));
+                                        //Enable buttons
+                                        setState(() {
+                                          isFighting = false;
+                                        });
                                       }
                                     }
-                                    //Design Delay
-                                    await Future.delayed(
-                                        const Duration(milliseconds: 100));
-                                    //Enable buttons
-                                    setState(() {
-                                      isFighting = false;
-                                    });
                                   },
                                   child: Text(Language.Translate(
                                           'battle_attack', options.language) ??
@@ -449,7 +517,7 @@ class _BattleSceneState extends State<BattleScene> {
                     ),
                   ),
                   const Spacer(),
-                  //Inventory & Magics
+                  //Inventory & Magics & Log
                   SizedBox(
                     width: screenSize.width,
                     height: screenSize.height * 0.10,

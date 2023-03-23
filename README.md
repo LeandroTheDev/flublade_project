@@ -7,3 +7,7 @@ This is a MMORPG turn based game, it uses the MYSQL database to work, the idea i
 - provider: ^6.0.5
 - mysql1: ^0.20.0
 - shared_preferences: ^2.0.17
+
+# Wiki
+
+On the [wiki](https://github.com/LeandroTheDev/flublade_project/wiki) you will find all the information about the game to know how to deal with enemies and understand the main mechanics.

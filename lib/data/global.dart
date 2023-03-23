@@ -5,10 +5,10 @@ import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
 import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
+import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
-import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
 import 'package:flublade_project/pages/gameplay/inventory.dart';
 import 'package:flublade_project/pages/mainmenu/character_selection.dart';
@@ -136,7 +136,6 @@ class GlobalFunctions {
     '/characterselection': (context) => const CharacterSelection(),
     '/ingame': (context) => const InGame(),
     '/inventory': (context) => const GameplayInventory(),
-    '/battlescene': (context) => const BattleScene(),
   };
 
   //Disconnect Dialog
@@ -200,9 +199,8 @@ class GlobalFunctions {
 
   //Loot Dialog
   static void lootDialog({
-    required String errorMsgTitle,
-    required String errorMsgContext,
     required BuildContext context,
+    xp,
     enemySpecialLoot,
     int enemySpecialGold = 0,
   }) {
@@ -324,7 +322,7 @@ class GlobalFunctions {
                     borderRadius: BorderRadius.all(Radius.circular(32.0))),
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: Text(
-                  Language.Translate(errorMsgTitle, options.language) ??
+                  Language.Translate('battle_loot', options.language) ??
                       'Language Error',
                   style: TextStyle(color: Theme.of(context).primaryColor),
                 ),
@@ -333,11 +331,11 @@ class GlobalFunctions {
                   width: 100,
                   height: 100,
                   child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          GridView.builder(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: GridView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -352,8 +350,16 @@ class GlobalFunctions {
                               );
                             },
                           ),
-                        ],
-                      ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Text(
+                            '${Language.Translate('battle_loot_experience', options.language) ?? 'Language Error'} $xp',
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -363,7 +369,30 @@ class GlobalFunctions {
                     onPressed: () async {
                       MySQL.loadingWidget(
                           context: context, language: options.language);
+                      //Earn Xp
+                      gameplay.changeStats(
+                          value: gameplay.playerXP + xp, stats: 'xp');
+                      //Add items
                       gameplay.addInventoryItem(loots);
+                      //Level Update
+                      bool levelUpDialog = false;
+                      while (true) {
+                        if (gameplay.playerXP >=
+                            BaseCharacters.levelCaps[gameplay.playerLevel]!) {
+                          //Removing the xp difference
+                          gameplay.changeStats(
+                              value: gameplay.playerXP -
+                                  BaseCharacters
+                                      .levelCaps[gameplay.playerLevel]!,
+                              stats: 'xp');
+                          //Increasing the level
+                          gameplay.changeStats(
+                              value: gameplay.playerLevel + 1, stats: 'level');
+                          levelUpDialog = true;
+                        } else {
+                          break;
+                        }
+                      }
                       await MySQL.pushUploadCharacters(context: context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
@@ -371,9 +400,103 @@ class GlobalFunctions {
                       Navigator.pop(context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
-                      // ignore: use_build_context_synchronously
-                      Provider.of<Gameplay>(context, listen: false)
-                          .changeEnemyMove(true);
+                      if (levelUpDialog == false) {
+                        // ignore: use_build_context_synchronously
+                        Provider.of<Gameplay>(context, listen: false)
+                            .changeEnemyMove(true);
+                      } else {
+                        final characters = jsonDecode(
+                            // ignore: use_build_context_synchronously
+                            Provider.of<Gameplay>(context, listen: false)
+                                .characters);
+                        final characterClass =
+                            characters['character${gameplay.selectedCharacter}']
+                                ['class'];
+                        showDialog(
+                            barrierColor: const Color.fromARGB(167, 0, 0, 0),
+                            context: context,
+                            builder: (context) {
+                              return WillPopScope(
+                                onWillPop: () async => false,
+                                child: FittedBox(
+                                  child: AlertDialog(
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(32.0))),
+                                      backgroundColor: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      title: Text(
+                                        Language.Translate('response_levelup',
+                                                options.language) ??
+                                            'Level UP',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor),
+                                      ),
+                                      content: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          //Armor Text
+                                          Text(
+                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${BaseCharacters.baseAtributes[characterClass]!['armorLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Strength Text
+                                          Text(
+                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${BaseCharacters.baseAtributes[characterClass]!['strengthLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Agility Text
+                                          Text(
+                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${BaseCharacters.baseAtributes[characterClass]!['agilityLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Intelligence Text
+                                          Text(
+                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${BaseCharacters.baseAtributes[characterClass]!['intelligenceLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          //Skillpoints TExt
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              Provider.of<Gameplay>(context,
+                                                      listen: false)
+                                                  .changeEnemyMove(true);
+                                            },
+                                            child: Center(
+                                              child: Text(Language.Translate(
+                                                      'response_ok',
+                                                      options.language) ??
+                                                  'Ok'),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              );
+                            });
+                      }
                     },
                     child: Text(
                       Language.Translate('battle_loot_all', options.language) ??
@@ -387,9 +510,30 @@ class GlobalFunctions {
                         //Loading
                         MySQL.loadingWidget(
                             context: context, language: options.language);
-                        //Update Local
+                        //Earn Xp
+                        gameplay.changeStats(
+                            value: gameplay.playerXP + xp, stats: 'xp');
+                        //Add Items
                         gameplay
                             .addInventoryItem(gameplay.playerInventorySelected);
+                        //Level Update
+                        while (true) {
+                          if (gameplay.playerXP >=
+                              BaseCharacters.levelCaps[gameplay.playerLevel]!) {
+                            //Removing the xp difference
+                            gameplay.changeStats(
+                                value: gameplay.playerXP -
+                                    BaseCharacters
+                                        .levelCaps[gameplay.playerLevel]!,
+                                stats: 'xp');
+                            //Increasing the level
+                            gameplay.changeStats(
+                                value: gameplay.playerLevel + 1,
+                                stats: 'level');
+                          } else {
+                            break;
+                          }
+                        }
                         //Update Database
                         await MySQL.pushUploadCharacters(context: context);
                         // ignore: use_build_context_synchronously
@@ -595,6 +739,7 @@ class Gameplay with ChangeNotifier {
   List _playerInventorySelected = [];
   List _playerEquips = [];
   Map _playerBuffs = {};
+  int _playerSkillpoint = 0;
 
   String _enemyName = '';
   double _enemyLife = 0;
@@ -602,6 +747,7 @@ class Gameplay with ChangeNotifier {
   double _enemyArmor = 0;
   int _enemyLevel = 0;
   double _enemyDamage = 0;
+  double _enemyXP = 0;
 
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
@@ -622,6 +768,7 @@ class Gameplay with ChangeNotifier {
   List get playerInventorySelected => _playerInventorySelected;
   List get playerEquips => _playerEquips;
   Map get playerBuffs => _playerBuffs;
+  int get playerSkillpoint => _playerSkillpoint;
 
   String get enemyName => _enemyName;
   double get enemyLife => _enemyLife;
@@ -629,6 +776,12 @@ class Gameplay with ChangeNotifier {
   double get enemyArmor => _enemyArmor;
   int get enemyLevel => _enemyLevel;
   double get enemyDamage => _enemyDamage;
+  double get enemyXP => _enemyXP;
+
+  //Change enemy XP
+  void changeEnemyXP(value) {
+    _enemyXP += value;
+  }
 
   //Change enemy name
   void changeEnemyName(value) {
@@ -728,7 +881,7 @@ class Gameplay with ChangeNotifier {
       notifyListeners();
       return;
     } else if (stats == 'xp') {
-      _playerXP = value;
+      _playerXP = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'strength') {
@@ -771,6 +924,10 @@ class Gameplay with ChangeNotifier {
       _playerBuffs = jsonDecode(value);
       notifyListeners();
       return;
+    } else if (stats == 'skillpoint') {
+      _playerSkillpoint = value;
+      notifyListeners();
+      return;
     }
     //Enemy Stats
     if (stats == 'elife') {
@@ -791,6 +948,10 @@ class Gameplay with ChangeNotifier {
       return;
     } else if (stats == 'edamage') {
       _enemyDamage = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'exp') {
+      _enemyXP = value;
       notifyListeners();
       return;
     }
@@ -1007,7 +1168,9 @@ class Gameplay with ChangeNotifier {
         charactersdb['character${charactersdb.length}'] = {
           'name': characterUsername,
           'class': playerClass,
-          'life': BaseCharacters.baseAtributes[playerClass]!['life'],
+          'life': ClassAtributes.classTranslation(
+              values: playerClass,
+              playterMaxLifeCalculationCharacterCreation: true),
           'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
           'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
           'level': 1,
@@ -1067,7 +1230,9 @@ class Gameplay with ChangeNotifier {
     characterFormat['character${characterFormat.length}'] = {
       'name': characterUsername,
       'class': playerClass,
-      'life': BaseCharacters.baseAtributes[playerClass]!['life'],
+      'life': ClassAtributes.classTranslation(
+          values: playerClass,
+          playterMaxLifeCalculationCharacterCreation: true),
       'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
       'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
       'level': 1,

@@ -39,6 +39,7 @@ class Language {
     'response_comparation': 'Comparation',
     'response_equipped': 'Equipped',
     'response_inventory': 'Inventory',
+    'response_levelup': 'Level UP',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -140,13 +141,20 @@ class Language {
     'battle_loot_all': 'Take All',
     'battle_loot_exit': 'Exit',
     'battle_loot_selected': 'Selected',
+    'battle_loot_experience': 'Experience:',
     'battle_log_enemyAttack1': 'You received',
     'battle_log_enemyAttack2': 'damage from',
     'battle_log_playerAttack1': 'You did',
     'battle_log_playerAttack2': 'damage to',
     'battle_log_enemyDead': 'You killed',
     'battle_log_playerHealed1': 'You healed',
-    'battle_log_playerHealed2' 'life'
+    'battle_log_playerHealed2': 'life',
+    //Level Texts
+    'levelup_armor': 'Armor earned:',
+    'levelup_strength': 'Strength earned:',
+    'levelup_agility': 'Agility earned:',
+    'levelup_intelligence': 'Intelligence earned:',
+    'levelup_skillpoints': 'Skillpoints earned:',
     //Items Name
     'items_gold': 'Gold',
     'items_gold_desc':
@@ -200,6 +208,7 @@ class Language {
     'response_comparation': 'Comparação',
     'response_equipped': 'Equipado',
     'response_inventory': 'Inventário',
+    'response_levelup': 'Subiu de Nível',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -299,11 +308,20 @@ class Language {
     'battle_loot_all': 'Pegar Tudo',
     'battle_loot_exit': 'Sair',
     'battle_loot_selected': 'Selecionado',
+    'battle_loot_experience': 'Expêriencia:',
     'battle_log_playerAttack1': 'Você causou',
     'battle_log_playerAttack2': 'dano em',
     'battle_log_enemyAttack1': 'Você recebeu',
     'battle_log_enemyAttack2': 'dano de',
     'battle_log_enemyDead': 'Você matou',
+    'battle_log_playerHealed1': 'Você curou',
+    'battle_log_playerHealed2': 'vida',
+    //Level Texts
+    'levelup_armor': 'Armadura ganha:',
+    'levelup_strength': 'Força ganha:',
+    'levelup_agility': 'Agilidade ganha:',
+    'levelup_intelligence': 'Inteligência ganha:',
+    'levelup_skillpoints': 'Pontos de Habilidade ganha:',
     //Items Names
     'items_gold': 'Ouro',
     'items_gold_desc':
