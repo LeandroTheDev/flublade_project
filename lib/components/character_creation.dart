@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class CharacterCreation extends StatefulWidget {
   const CharacterCreation({super.key});
@@ -20,6 +23,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
 
     //Change Class Button
     void changeClass(bool value) {
@@ -96,54 +100,82 @@ class _CharacterCreationState extends State<CharacterCreation> {
                     //Create Button
                     ElevatedButton(
                       onPressed: () async {
-                        if (createName.text.isEmpty) {
+                        //Class declaration
+                        String characterClass =
+                            Gameplay.classes[selectedClass].substring(18);
+                        characterClass = characterClass.substring(
+                            0, characterClass.length - 4);
+                        //Loading Widget
+                        MySQL.loadingWidget(
+                            context: context, language: options.language);
+                        dynamic result;
+                        try {
+                          //Connection
+                          result = await http.post(
+                              Uri.http(MySQL.url, '/createCharacters'),
+                              headers: MySQL.headers,
+                              body: jsonEncode({
+                                'id': options.id,
+                                'token': options.token,
+                                'name': createName.text,
+                                'class': characterClass
+                              }));
+                        } catch (error) {
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          //Connection Error
+                          GlobalFunctions.errorDialog(
+                            errorMsgTitle: 'characters_create_error',
+                            errorMsgContext:
+                                'Ops, there\'s was a problem creating your character try again later',
+                            context: context,
+                          );
+                          return;
+                        }
+                        result = jsonDecode(result.body);
+                        //Empty Text
+                        if (result['message'] == 'Empty') {
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
                           GlobalFunctions.errorDialog(
                               errorMsgTitle: 'characters_create_error_empty',
                               errorMsgContext:
                                   'You need to make a name to your character',
-                              context: context,
-                              options:
-                                  Provider.of<Options>(context, listen: false));
+                              context: context);
+                          return;
+                        }
+                        //Too big Text
+                        if (result['message'] == 'Too big') {
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          GlobalFunctions.errorDialog(
+                              errorMsgTitle:
+                                  'characters_create_error_namelimit',
+                              errorMsgContext:
+                                  'Character name cannot be longer than 10 characters',
+                              context: context);
+                          return;
+                        }
+                        //Success
+                        if (result['message'] == 'Success') {
+                          gameplay.changeCharacters(result['characters']);
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
                         } else {
-                          if (createName.text.length > 10) {
-                            GlobalFunctions.errorDialog(
-                                errorMsgTitle:
-                                    'characters_create_error_namelimit',
-                                errorMsgContext:
-                                    'Character name cannot be longer than 10 characters',
-                                context: context,
-                                options: Provider.of<Options>(context,
-                                    listen: false));
-                          } else {
-                            //Loading Widget
-                            MySQL.loadingWidget(
-                                context: context, language: options.language);
-                            //Uploading to database
-                            bool result = await MySQL.createCharacter(
-                                context: context,
-                                characterUsername: createName.text,
-                                characterClass:
-                                    Gameplay.classes[selectedClass]);
-                            if (result) {
-                              //Pop until the character menu
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                            } else {
-                              GlobalFunctions.errorDialog(
-                                errorMsgTitle: 'characters_create_error',
-                                errorMsgContext:
-                                    'Ops, there\'s was a problem creating your character try again later',
-                                context: context,
-                                options: options,
-                                popUntil: '/charactercreation',
-                              );
-                            }
-                          }
+                          // ignore: use_build_context_synchronously
+                          Navigator.pop(context);
+                          //Connection Error
+                          GlobalFunctions.errorDialog(
+                            errorMsgTitle: 'characters_create_error',
+                            errorMsgContext:
+                                'Ops, there\'s was a problem creating your character try again later',
+                            context: context,
+                          );
+                          return;
                         }
                       },
                       child: Text(

@@ -176,7 +176,7 @@ class CharacterSelection extends StatelessWidget {
                                             language: options.language);
                                         final result =
                                             await MySQL.pushCharacters(
-                                                options: options, update: true);
+                                                context: context);
                                         //Check if connection success
                                         if (result != false) {
                                           // ignore: use_build_context_synchronously
@@ -193,12 +193,12 @@ class CharacterSelection extends StatelessWidget {
                                                   (Route route) => false);
                                         } else {
                                           GlobalFunctions.errorDialog(
-                                              errorMsgTitle:
-                                                  'authentication_register_problem_connection',
-                                              errorMsgContext:
-                                                  'Failed to connect to the Servers',
-                                              context: context,
-                                              options: options);
+                                            errorMsgTitle:
+                                                'authentication_register_problem_connection',
+                                            errorMsgContext:
+                                                'Failed to connect to the Servers',
+                                            context: context,
+                                          );
                                         }
                                       },
                                       child: FittedBox(

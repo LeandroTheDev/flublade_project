@@ -88,40 +88,27 @@ class _CharactersMenuState extends State<CharactersMenu> {
                         onPressed: () async {
                           if (input.text != 'DELETE') {
                             GlobalFunctions.errorDialog(
-                                errorMsgTitle: 'response_incorrect',
-                                errorMsgContext: 'Incorrect',
-                                context: context,
-                                options: options);
+                              errorMsgTitle: 'response_incorrect',
+                              errorMsgContext: 'Incorrect',
+                              context: context,
+                            );
                           } else {
                             MySQL.loadingWidget(
                                 context: context, language: options.language);
-                            final result = await MySQL.removeCharacters(
+                            await MySQL.removeCharacters(
                               index: index,
-                              options:
-                                  Provider.of<Options>(context, listen: false),
-                              gameplay:
-                                  Provider.of<Gameplay>(context, listen: false),
+                              context: context,
                             );
-                            if (result) {
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                              // ignore: use_build_context_synchronously
-                              Navigator.pop(context);
-                              // ignore: use_build_context_synchronously
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          super.widget));
-                            } else {
-                              GlobalFunctions.errorDialog(
-                                  errorMsgTitle: 'response_error',
-                                  errorMsgContext:
-                                      'Ops, There was a problem with your processing, try again later',
-                                  context: context,
-                                  options: options,
-                                  popUntil: '/charactersmenu');
-                            }
+                            // ignore: use_build_context_synchronously
+                            Navigator.pop(context);
+                            // ignore: use_build_context_synchronously
+                            Navigator.pop(context);
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        super.widget));
                           }
                         },
                         child: Text(Language.Translate(
@@ -146,6 +133,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
           });
     }
 
+    //Return Character Gold
     returnGold(index) {
       try {
         return characters['character$index']['inventory']['gold']['quantity'];

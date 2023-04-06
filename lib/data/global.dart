@@ -25,13 +25,13 @@ import 'package:bonfire/bonfire.dart';
 class Options with ChangeNotifier {
   String _language = 'en_US';
   String _username = '';
-  String _password = '';
+  String _token = '';
   bool _remember = false;
   int _id = 0;
 
   String get language => _language;
   String get username => _username;
-  String get password => _password;
+  String get token => _token;
   bool get remember => _remember;
   int get id => _id;
 
@@ -43,8 +43,8 @@ class Options with ChangeNotifier {
     _username = value;
   }
 
-  void changePassword(value) {
-    _password = value;
+  void changeToken(value) {
+    _token = value;
   }
 
   void changeRemember({value}) {
@@ -91,7 +91,7 @@ class SaveDatas {
 
   //Storage Login
   static const _keyUsername = 'username';
-  static const _keyPassword = 'password';
+  static const _keyToken = 'token';
   static const _keyId = 0;
   static const _keyRemember = false;
   //Storage Options
@@ -105,8 +105,8 @@ class SaveDatas {
   //Set Datas
   static Future setUsername(String username) async =>
       await _preferences.setString(_keyUsername, username);
-  static Future setPassword(String password) async =>
-      await _preferences.setString(_keyPassword, password);
+  static Future setToken(String token) async =>
+      await _preferences.setString(_keyToken, token);
   static Future setId(int id) async =>
       await _preferences.setInt(_keyId.toString(), id);
   static Future setRemember(bool remember) async =>
@@ -118,7 +118,7 @@ class SaveDatas {
 
   //Get Datas
   static String? getUsername() => _preferences.getString(_keyUsername);
-  static String? getPassword() => _preferences.getString(_keyPassword);
+  static String? getToken() => _preferences.getString(_keyToken);
   static int? getId() => _preferences.getInt(_keyId.toString());
   static bool? getRemember() => _preferences.getBool(_keyRemember.toString());
   static String? getLanguage() => _preferences.getString(_keyLanguage);
@@ -168,7 +168,7 @@ class GlobalFunctions {
               ElevatedButton(
                 onPressed: () {
                   options.changeUsername('');
-                  options.changePassword('');
+                  options.changeToken('');
                   options.changeRemember(value: false);
                   options.changeId(0);
                   SaveDatas.setRemember(false);
@@ -565,9 +565,9 @@ class GlobalFunctions {
     required String errorMsgTitle,
     required String errorMsgContext,
     required BuildContext context,
-    required options,
     String? popUntil,
   }) {
+    final options = Provider.of<Options>(context, listen: false);
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -593,8 +593,8 @@ class GlobalFunctions {
                     child: ElevatedButton(
                   onPressed: () {
                     if (popUntil != null) {
-                      Navigator.popUntil(
-                          context, ModalRoute.withName(popUntil));
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          popUntil, (Route<dynamic> route) => false);
                     } else {
                       Navigator.pop(context);
                     }

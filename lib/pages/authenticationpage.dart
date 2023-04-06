@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:http/http.dart' as http;
 
 class AuthenticationPage extends StatefulWidget {
   const AuthenticationPage({super.key});
@@ -22,9 +26,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
-    final optionsFalse = Provider.of<Options>(context, listen: false);
     final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
+    final accountCreateUrl = Uri.http(MySQL.url, '/createAcc');
+    final accountLoginUrl = Uri.http(MySQL.url, '/login');
 
     //Register Modal
     registerModal() {
@@ -154,37 +159,99 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                   width: 250,
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      //Username Error
-                                      if (registerUsername.text.length < 3 ||
-                                          registerUsername.text.length > 20) {
+                                      //Loading Widget
+                                      MySQL.loadingWidget(
+                                          context: context,
+                                          language: options.language);
+                                      late final http.Response result;
+                                      try {
+                                        //Backend Work
+                                        result = await http.post(
+                                            accountCreateUrl,
+                                            headers: MySQL.headers,
+                                            body: jsonEncode({
+                                              "username": registerUsername.text,
+                                              "password": registerPassword.text,
+                                              "language": options.language
+                                            }));
+                                        //No connection
+                                      } catch (error) {
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.pop(context);
                                         GlobalFunctions.errorDialog(
+                                            errorMsgTitle:
+                                                'authentication_register_problem_connection',
+                                            errorMsgContext:
+                                                'Failed to connect to the Servers',
+                                            context: context);
+                                        return;
+                                      }
+                                      //Account Rules Check
+                                      if (true) {
+                                        //Too small username or password
+                                        if (jsonDecode(
+                                                result.body)["message"] ==
+                                            'Too small or too big username') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          GlobalFunctions.errorDialog(
                                             errorMsgTitle:
                                                 'authentication_register_problem_username',
                                             errorMsgContext:
                                                 'Username needs to have 3 or more Caracters',
                                             context: context,
-                                            options: optionsFalse);
-                                        //Password Error
-                                      } else if (registerPassword.text.length <
-                                          3) {
-                                        GlobalFunctions.errorDialog(
+                                          );
+                                          return;
+                                        }
+                                        //Too small or too big password
+                                        if (jsonDecode(
+                                                result.body)["message"] ==
+                                            'Too small password or too big password') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          GlobalFunctions.errorDialog(
                                             errorMsgTitle:
                                                 'authentication_register_problem_password',
                                             errorMsgContext:
                                                 'Password needs to have 3 or more Caracters',
                                             context: context,
-                                            options: optionsFalse);
-                                        //Connect
-                                      } else {
-                                        MySQL.loadingWidget(
+                                          );
+                                          return;
+                                        }
+                                        //Username already exists
+                                        if (jsonDecode(
+                                                result.body)["message"] ==
+                                            'Username already exists') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          GlobalFunctions.errorDialog(
+                                            errorMsgTitle:
+                                                'authentication_register_problem_existusername',
+                                            errorMsgContext:
+                                                'Username already exist',
                                             context: context,
-                                            language: options.language);
-                                        final result =
-                                            await MySQL.createAccount(
-                                                name: registerUsername.text,
-                                                password: registerPassword.text,
-                                                language: options.language);
-                                        if (result == 'sucess') {
+                                          );
+                                          return;
+                                        }
+                                        //Connection Error
+                                        if (jsonDecode(
+                                                result.body)["message"] ==
+                                            'Unkown error') {
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pop(context);
+                                          GlobalFunctions.errorDialog(
+                                            errorMsgTitle:
+                                                'authentication_register_problem_connection',
+                                            errorMsgContext:
+                                                'Failed to connect to the Servers',
+                                            context: context,
+                                          );
+                                          return;
+                                        }
+                                        //Success
+                                        if (jsonDecode(
+                                                result.body)["message"] ==
+                                            'Success') {
                                           // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           //Show Result Dialog
@@ -244,26 +311,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                 TextEditingController();
                                             Navigator.pop(context);
                                           });
-                                        } else if (result == 'exists') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.pop(context);
-                                          GlobalFunctions.errorDialog(
-                                              errorMsgTitle:
-                                                  'authentication_register_problem_existusername',
-                                              errorMsgContext:
-                                                  'Username already exist',
-                                              context: context,
-                                              options: optionsFalse);
-                                        } else if (result == 'failed') {
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.pop(context);
-                                          GlobalFunctions.errorDialog(
-                                              errorMsgTitle:
-                                                  'authentication_register_problem_connection',
-                                              errorMsgContext:
-                                                  'Failed to connect to the Servers',
-                                              context: context,
-                                              options: optionsFalse);
                                         }
                                       }
                                     },
@@ -441,10 +488,21 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                               settings.isLoading
                                   ? SizedBox(
                                       width: 310,
+                                      height: 30,
                                       child: Row(
                                         children: const [
                                           Spacer(),
-                                          CircularProgressIndicator(),
+                                          //Circular Progress Indicator
+                                          SizedBox(
+                                            width: 20,
+                                            height: 30,
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 8.0),
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          ),
                                           Spacer(),
                                         ],
                                       ))
@@ -452,92 +510,102 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 100),
                                       width: 310,
+                                      height: 30,
                                       child: ElevatedButton(
                                         onPressed: () async {
                                           settings.changeIsLoading(value: true);
-                                          if (username.text.length < 3) {
+                                          dynamic result;
+                                          try {
+                                            //Credentials Check
+                                            result = await http.post(
+                                                accountLoginUrl,
+                                                headers: MySQL.headers,
+                                                body: jsonEncode({
+                                                  "username": username.text,
+                                                  "password": password.text
+                                                }));
+                                          } catch (error) {
+                                            //Connection error
                                             settings.changeIsLoading(
                                                 value: false);
                                             GlobalFunctions.errorDialog(
-                                                errorMsgTitle:
-                                                    'authentication_login_notfound',
-                                                errorMsgContext:
-                                                    'Username or password is Invalid',
-                                                context: context,
-                                                options: optionsFalse);
-                                          } else if (password.text.length < 3) {
-                                            settings.changeIsLoading(
-                                                value: false);
-                                            GlobalFunctions.errorDialog(
-                                                errorMsgTitle:
-                                                    'authentication_login_notfound',
-                                                errorMsgContext:
-                                                    'Username or password is Invalid',
-                                                context: context,
-                                                options: optionsFalse);
-                                          } else {
-                                            final result = await MySQL.login(
-                                              username: username.text,
-                                              password: password.text,
+                                              errorMsgTitle:
+                                                  'authentication_register_problem_connection',
+                                              errorMsgContext:
+                                                  'Failed to connect to the Servers',
                                               context: context,
                                             );
-                                            if (result == 'notfound') {
-                                              settings.changeIsLoading(
-                                                  value: false);
-                                              GlobalFunctions.errorDialog(
-                                                  errorMsgTitle:
-                                                      'authentication_login_notfound',
-                                                  errorMsgContext:
-                                                      'Username or password is Invalid',
-                                                  context: context,
-                                                  options: optionsFalse);
-                                            } else if (result == 'failed') {
-                                              settings.changeIsLoading(
-                                                  value: false);
-                                              GlobalFunctions.errorDialog(
-                                                  errorMsgTitle:
-                                                      'authentication_register_problem_connection',
-                                                  errorMsgContext:
-                                                      'Failed to connect to the Servers',
-                                                  context: context,
-                                                  options: optionsFalse);
-                                            } else if (result == 'success') {
-                                              if (options.remember) {
-                                                SaveDatas.setUsername(
-                                                    options.username);
-                                                SaveDatas.setPassword(
-                                                    options.password);
-                                                SaveDatas.setRemember(
-                                                    options.remember);
-                                                //Push Characters
-                                                String characters =
-                                                    await MySQL.pushCharacters(
-                                                        options: options);
-                                                // ignore: use_build_context_synchronously
-                                                Provider.of<Gameplay>(context,
-                                                        listen: false)
-                                                    .changeCharacters(
-                                                        characters);
-                                                SaveDatas.setCharacters(
-                                                    characters);
-                                              } else {
-                                                //Push Characters
-                                                String characters =
-                                                    await MySQL.pushCharacters(
-                                                        options: options);
-                                                // ignore: use_build_context_synchronously
-                                                Provider.of<Gameplay>(context,
-                                                        listen: false)
-                                                    .changeCharacters(
-                                                        characters);
-                                              }
-                                              settings.changeIsLoading(
-                                                  value: false);
-                                              // ignore: use_build_context_synchronously
-                                              Navigator.pushReplacementNamed(
-                                                  context, '/mainmenu');
-                                            }
+                                            return;
                                           }
+                                          //Json Decoding
+                                          result = (jsonDecode(result.body));
+                                          //Wrong Credentials
+                                          if (result['message'] ==
+                                              'Wrong Credentials') {
+                                            settings.changeIsLoading(
+                                                value: false);
+                                            GlobalFunctions.errorDialog(
+                                              errorMsgTitle:
+                                                  'authentication_login_notfound',
+                                              errorMsgContext:
+                                                  'Username or password is Invalid',
+                                              context: context,
+                                            );
+                                          }
+                                          //Proceed to connection
+                                          if (result['message'] == 'Success') {
+                                            if (options.remember) {
+                                              //Update Providers
+                                              options.changeId(result['id']);
+                                              options.changeUsername(
+                                                  result['username']);
+                                              options.changeLanguage(
+                                                  result['language']);
+                                              options
+                                                  .changeToken(result['token']);
+                                              //Update Save
+                                              SaveDatas.setUsername(
+                                                  options.username);
+                                              SaveDatas.setToken(
+                                                  result['token']);
+                                              SaveDatas.setRemember(
+                                                  options.remember);
+                                              //Push Characters
+                                              String characters =
+                                                  await MySQL.pushCharacters(
+                                                      context: context);
+                                              // ignore: use_build_context_synchronously
+                                              Provider.of<Gameplay>(context,
+                                                      listen: false)
+                                                  .changeCharacters(characters);
+                                              SaveDatas.setCharacters(
+                                                  characters);
+                                            } else {
+                                              //Update Providers
+                                              options.changeId(result['id']);
+                                              options.changeUsername(
+                                                  result['username']);
+                                              options.changeLanguage(
+                                                  result['language']);
+                                              options
+                                                  .changeToken(result['token']);
+                                              //Push Characters
+                                              String characters =
+                                                  await MySQL.pushCharacters(
+                                                      context: context);
+                                              // ignore: use_build_context_synchronously
+                                              Provider.of<Gameplay>(context,
+                                                      listen: false)
+                                                  .changeCharacters(characters);
+                                            }
+                                            settings.changeIsLoading(
+                                                value: false);
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.pushReplacementNamed(
+                                                context, '/mainmenu');
+                                          }
+                                          settings.changeIsLoading(
+                                              value: false);
                                         },
                                         child: Text(Language.Translate(
                                                 'authentication_login',

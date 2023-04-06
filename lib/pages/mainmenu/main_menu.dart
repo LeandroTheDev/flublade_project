@@ -1,5 +1,6 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +60,12 @@ class _MainMenuState extends State<MainMenu> {
                 ),
                 //Menu Buttons
                 isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Column(
+                        children: [
+                          SizedBox(height: screenSize.height * 0.2),
+                          const CircularProgressIndicator(),
+                        ],
+                      )
                     : FittedBox(
                         child: Padding(
                           padding: const EdgeInsets.all(400.0),
@@ -73,13 +79,19 @@ class _MainMenuState extends State<MainMenu> {
                                     isLoading = true;
                                   });
                                   await Future.delayed(
-                                      const Duration(milliseconds: 100));
+                                      const Duration(milliseconds: 50));
+                                  Future.delayed(
+                                          const Duration(milliseconds: 100))
+                                      .then((value) {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  });
+                                  //Refresh
+                                  await MySQL.pushCharacters(context: context);
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(
                                       context, '/characterselection');
-                                  setState(() {
-                                    isLoading = false;
-                                  });
                                 },
                                 child: FittedBox(
                                   child: Text(
@@ -97,14 +109,16 @@ class _MainMenuState extends State<MainMenu> {
                               //Characters Button
                               TextButton(
                                 onPressed: () async {
+                                  //Loading
                                   setState(() {
                                     isLoading = true;
                                   });
-                                  await Future.delayed(
-                                      const Duration(milliseconds: 100));
+                                  //Refresh
+                                  await MySQL.pushCharacters(context: context);
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(
                                       context, '/charactersmenu');
+                                  //Loading disable
                                   setState(() {
                                     isLoading = false;
                                   });

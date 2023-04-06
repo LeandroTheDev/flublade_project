@@ -62,6 +62,7 @@ class Language {
     'authentication_register_loading': 'Loading...',
     'authentication_register_sucess': 'Sucess',
     'authentication_register_sucess_account': 'Account Created',
+    'authentication_invalidlogin': 'Invalid Session',
     //Main Menu
     'mainmenu_play': 'Play',
     'mainmenu_characters': 'Characters',
@@ -222,15 +223,16 @@ class Language {
     'authentication_register_password': 'Sua Senha',
     'authentication_register_create': 'Criar',
     'authentication_register_problem_username':
-        'Usuário precisa ter 3 Caracteres e menos que 20 Caracteres',
+        'Usuário precisa ter mais de 3 letras e menos que 20 letras',
     'authentication_register_problem_existusername': 'Usuário já existe',
     'authentication_register_problem_password':
-        'Senha precisa ter 3 ou mais Caracteres',
+        'Senha precisa ter 3 ou mais dígitos e menos que 100 dígitos',
     'authentication_register_problem_connection':
         'Falha ao connectar no Servidor',
     'authentication_register_loading': 'Carregando...',
     'authentication_register_sucess': 'Sucesso',
     'authentication_register_sucess_account': 'Conta Criada',
+    'authentication_invalidlogin': 'Sessão Inválida',
     //Main Menu
     'mainmenu_play': 'Jogar',
     'mainmenu_characters': 'Personagens',

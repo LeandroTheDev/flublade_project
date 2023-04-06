@@ -63,16 +63,15 @@ class _IngameInterfaceState extends State<IngameInterface> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 11, vertical: 5),
+                                  horizontal: 14, vertical: 5),
                               child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
+                                decoration: const BoxDecoration(
                                     color: Colors.purple),
                                 width: ((gameplay.playerXP /
                                             BaseCharacters.levelCaps[
                                                 gameplay.playerLevel]!) *
                                         100) *
-                                    5.9,
+                                    5.74,
                                 height: 90,
                               ),
                             ),

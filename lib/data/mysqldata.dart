@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flublade_project/data/gameplay/enemys.dart';
 import 'package:flublade_project/data/gameplay/npc.dart';
@@ -9,9 +10,18 @@ import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:bonfire/bonfire.dart';
+import 'package:http/http.dart' as http;
 
 class MySQL {
-  //Connection
+  //Backend Connection
+  static const ip = 'localhost';
+  static const ports = 8080;
+  static const url = '$ip:$ports';
+  static const headers = {
+    HttpHeaders.contentTypeHeader: 'application/json',
+  };
+
+  //Database Connection
   static final database = MySqlConnection.connect(
     ConnectionSettings(
       host: '192.168.0.13',
@@ -21,28 +31,6 @@ class MySQL {
       db: 'flublade',
     ),
   );
-
-  //Account Creation
-  static Future<String> createAccount({
-    required String name,
-    required String password,
-    required String language,
-  }) async {
-    //Connection to the database
-    final connection = await database;
-    try {
-      //Insert new account to the database
-      await connection.query(
-          'insert into accounts (username, password, language) values (?, ?, ?)',
-          [name, password, language]);
-      return 'sucess';
-    } catch (error) {
-      if (error.toString().contains('Duplicate entry')) {
-        return 'exists';
-      }
-      return 'failed';
-    }
-  }
 
   //Loading
   static void loadingWidget(
@@ -76,65 +64,43 @@ class MySQL {
         });
   }
 
-  //Login
-  static login(
-      {required String username,
-      required String password,
-      required context}) async {
-    //Connection
-    final connection = await database;
-    try {
-      int id = 1;
-      //Credentials Checking
-      while (true) {
-        dynamic usernamedb = await connection
-            .query('select username from accounts where id = ?', [id]);
-        usernamedb =
-            usernamedb.toString().replaceFirst('(Fields: {username: ', '');
-        usernamedb = usernamedb.substring(0, usernamedb.length - 2);
-        if (username == usernamedb) {
-          dynamic passworddb = await connection
-              .query('select password from accounts where id = ?', [id]);
-          passworddb =
-              passworddb.toString().replaceFirst('(Fields: {password: ', '');
-          passworddb = passworddb.substring(0, passworddb.length - 2);
-          if (password == passworddb) {
-            final options = Provider.of<Options>(context, listen: false);
-            options.changeUsername(username);
-            options.changePassword(password);
-            options.changeId(id);
-            SaveDatas.setUsername(username);
-            SaveDatas.setPassword(password);
-            SaveDatas.setId(id);
-            SaveDatas.setRemember(options.remember);
-            return 'success';
-          }
-        } else if (usernamedb == '') {
-          return 'notfound';
-        } else {
-          id++;
-        }
-      }
-    } catch (error) {
-      return 'failed';
-    }
-  }
-
   //Change Language
   static Future<void> changeLanguage(context, widget) async {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context, listen: false);
     //Upload to MySQL
-    uploadData(String language) {
+    uploadData(String language) async {
+      loadingWidget(context: context, language: language);
       //Update Datas
       options.changeLanguage(language);
       SaveDatas.setLanguage(language);
-      database.then((connection) async {
-        await connection.query('update accounts set language=? where id=?',
-            [language, options.id]);
-      });
-
+      late final http.Response result;
+      try {
+        //Credentials Check
+        result = await http.post(
+          Uri.http(url, '/updateLanguage'),
+          headers: headers,
+          body: jsonEncode(
+              {"id": options.id, "language": language, "token": options.token}),
+        );
+      } catch (error) {
+        GlobalFunctions.errorDialog(
+            errorMsgTitle: 'authentication_register_problem_connection',
+            errorMsgContext: 'Failed to connect to the Servers',
+            context: context);
+        return;
+      }
+      if (jsonDecode(result.body)['message'] == 'Invalid Login') {
+        Navigator.pushNamed(context, '/authenticationpage');
+        GlobalFunctions.errorDialog(
+            errorMsgTitle: 'authentication_invalidlogin',
+            errorMsgContext: 'Invalid Session',
+            context: context,
+            popUntil: '/authenticationpage');
+        return;
+      }
       //Pop the Dialog
+      Navigator.pop(context);
       Navigator.pop(context);
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (BuildContext context) => widget));
@@ -257,49 +223,37 @@ class MySQL {
     await updateCharacters(charactersdb, options);
   }
 
-  //Create Character
-  static Future<bool> createCharacter({
-    required context,
-    required characterUsername,
-    required characterClass,
-  }) async {
+  //Push Characters
+  static Future<dynamic> pushCharacters({required context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    dynamic charactersdb;
     try {
-      final connection = await database;
-      String characters = await gameplay.addCharacter(
-        characterUsername: characterUsername,
-        characterClass: characterClass,
-        connection: connection,
-        options: options,
-        gameplay: gameplay,
-      );
-      if (characters == 'Cannot Connect to The Servers') {
-        return false;
-      }
-      return true;
+      //Connection
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
+          headers: MySQL.headers,
+          body: jsonEncode({'id': options.id, 'token': options.token}));
     } catch (error) {
-      return false;
+      //Connection Error
+      GlobalFunctions.errorDialog(
+          errorMsgTitle: 'authentication_register_problem_connection',
+          errorMsgContext: 'Failed to connect to the Servers',
+          context: context);
+      return;
     }
-  }
-
-  //Push Characters
-  static Future<dynamic> pushCharacters(
-      {required options, update = false}) async {
-    try {
-      final connection = await database;
-      dynamic charactersdb = await connection
-          .query('select characters from accounts where id = ?', [options.id]);
-      charactersdb =
-          charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
-      charactersdb = charactersdb.substring(0, charactersdb.length - 2);
-      if (update) {
-        await updateCharacters(charactersdb, options);
-      }
-      return charactersdb;
-    } catch (error) {
-      return false;
+    charactersdb = jsonDecode(charactersdb.body);
+    //Token Check
+    if (charactersdb['message'] == 'Invalid Login') {
+      Navigator.pushNamed(context, '/authenticationpage');
+      GlobalFunctions.errorDialog(
+          errorMsgTitle: 'authentication_invalidlogin',
+          errorMsgContext: 'Invalid Session',
+          context: context,
+          popUntil: '/authenticationpage');
+      return;
     }
+    gameplay.changeCharacters(charactersdb['characters']);
+    return charactersdb['characters'];
   }
 
   //Update Characters
@@ -310,29 +264,41 @@ class MySQL {
   }
 
   //Remove Characters
-  static Future<bool> removeCharacters(
-      {required index, required options, required gameplay}) async {
-    dynamic charactersdb = await pushCharacters(options: options);
-    //Check Connection
-    if (charactersdb == false) {
-      return false;
-    }
-    charactersdb = jsonDecode(charactersdb);
-    charactersdb.remove('character$index');
-    int lenght = charactersdb.length;
-    for (int i = index; i <= lenght - 1; i++) {
-      charactersdb['character$i'] = charactersdb['character${i + 1}'];
-    }
-    charactersdb.remove('character$lenght');
-    charactersdb = jsonEncode(charactersdb);
+  static Future removeCharacters({required index, required context}) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    dynamic charactersdb;
     try {
-      updateCharacters(charactersdb, options);
+      //Connection
+      charactersdb = await http.post(Uri.http(url, '/removeCharacters'),
+          headers: MySQL.headers,
+          body: jsonEncode(
+              {'id': options.id, 'token': options.token, 'index': index}));
     } catch (error) {
-      return false;
+      //Connection Error
+      GlobalFunctions.errorDialog(
+          errorMsgTitle: 'authentication_register_problem_connection',
+          errorMsgContext: 'Failed to connect to the Servers',
+          context: context,
+          popUntil: '/charactercreation');
+      return;
     }
-    SaveDatas.setCharacters(charactersdb);
-    gameplay.changeCharacters(charactersdb);
-    return true;
+    charactersdb = jsonDecode(charactersdb.body);
+    //Token Check
+    if (charactersdb['message'] == 'Invalid Login') {
+      Navigator.pushNamed(context, '/authenticationpage');
+      GlobalFunctions.errorDialog(
+          errorMsgTitle: 'authentication_invalidlogin',
+          errorMsgContext: 'Invalid Session',
+          context: context,
+          popUntil: '/authenticationpage');
+      return;
+    }
+    //Success
+    if (charactersdb['message'] == 'Success') {
+      gameplay.changeCharacters(charactersdb['characters']);
+    }
+    return;
   }
 
   //Return Info

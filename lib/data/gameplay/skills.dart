@@ -170,7 +170,6 @@ class ClassAtributes {
     //Player Damage Calculation to Enemy
     if (playerDamageCalculationInEnemy) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
-      final options = Provider.of<Options>(context, listen: false);
       final character = jsonDecode(gameplay.characters);
       //Returns the player total damage
       double damageCalculator() {

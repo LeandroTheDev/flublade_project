@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
@@ -584,7 +583,7 @@ class _BattleSceneState extends State<BattleScene> {
                               ),
                               child: const FittedBox(
                                   child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(8.0),
                                 child: Icon(Icons.menu_book),
                               )),
                             ),
