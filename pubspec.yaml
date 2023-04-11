@@ -61,11 +61,7 @@ dev_dependencies:
 flutter:
   assets:
     # Menu
-    - assets/authentication_image.png
-    - assets/main_menu_background.png
-    - assets/open_book.png
-    - assets/tavern.png
-    - assets/character.png
+    - assets/
     # Items
     - assets/items/
     # NPC

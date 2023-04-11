@@ -13,11 +13,93 @@ class OptionsMenu extends StatefulWidget {
 }
 
 class _OptionsMenuState extends State<OptionsMenu> {
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
+
+    //Change Text Speed
+    changeTextSpeed(context) {
+      final screenSize = MediaQuery.of(context).size;
+      final options = Provider.of<Options>(context, listen: false);
+
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            return FittedBox(
+              child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                //Language Text
+                title: Text(
+                  Language.Translate('options_fasttext', options.language) ??
+                      'Text Speed',
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
+                content: SizedBox(
+                  width: screenSize.width * 0.5,
+                  height: screenSize.height * 0.3,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        //Small
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              options.changeTextSpeed(700);
+                              SaveDatas.setTextSpeed(options.textSpeed);
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              Language.Translate('options_fasttext_small',
+                                      options.language) ??
+                                  'Small',
+                            ),
+                          ),
+                        ),
+                        //Medium
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              options.changeTextSpeed(300);
+                              SaveDatas.setTextSpeed(options.textSpeed);
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              Language.Translate('options_fasttext_medium',
+                                      options.language) ??
+                                  'Medium',
+                            ),
+                          ),
+                        ),
+                        //High
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              options.changeTextSpeed(50);
+                              SaveDatas.setTextSpeed(options.textSpeed);
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              Language.Translate('options_fasttext_high',
+                                      options.language) ??
+                                  'High',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -36,50 +118,97 @@ class _OptionsMenuState extends State<OptionsMenu> {
               fit: BoxFit.cover,
             ),
           ),
-          Column(
-            children: [
-              //Change Language
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 100),
-                child: Center(
-                  child: TextButton(
-                    onPressed: () {
-                      MySQL.changeLanguage(context, super.widget);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      height: screenSize.height * 0.2,
-                      width: screenSize.width * 0.8,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context).colorScheme.secondary),
-                      child: FittedBox(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            //Icon and Text
-                            Row(
-                              children: [
-                                Icon(Icons.language,
-                                    color: Theme.of(context).primaryColor),
-                                const SizedBox(width: 5),
-                                Text(
-                                  Language.Translate('options_language',
-                                          options.language) ??
-                                      'Change Language',
-                                  style: TextStyle(
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                //Change Language
+                Padding(
+                  padding: const EdgeInsets.only(top: 100),
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          MySQL.changeLanguage(context, super.widget);
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        height: screenSize.height * 0.2,
+                        width: screenSize.width * 0.8,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Theme.of(context).colorScheme.secondary),
+                        child: FittedBox(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //Icon and Text
+                              Row(
+                                children: [
+                                  Icon(Icons.language,
                                       color: Theme.of(context).primaryColor),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    Language.Translate('options_language',
+                                            options.language) ??
+                                        'Change Language',
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                //Change Text Speed
+                Padding(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          changeTextSpeed(context);
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        height: screenSize.height * 0.2,
+                        width: screenSize.width * 0.8,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Theme.of(context).colorScheme.secondary),
+                        child: FittedBox(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              //Icon and Text
+                              Row(
+                                children: [
+                                  Icon(Icons.text_fields,
+                                      color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    Language.Translate('options_fasttext',
+                                            options.language) ??
+                                        'Change Language',
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           )
         ],
       ),

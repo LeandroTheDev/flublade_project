@@ -71,6 +71,10 @@ class Language {
     'mainmenu_confirmation': 'Logout and return to Login Page',
     //Options
     'options_language': 'Change Language',
+    'options_fasttext': 'Change Text Speed',
+    'options_fasttext_small': 'Small',
+    'options_fasttext_medium': 'Medium',
+    'options_fasttext_high': 'High',
     //Characters
     'characters_create': 'Create Character',
     'characters_create_class': 'Class',
@@ -241,6 +245,10 @@ class Language {
     'mainmenu_confirmation': 'Desconectar e voltar para Pagina de Entrada?',
     //Options
     'options_language': 'Trocar Linguagem',
+    'options_fasttext': 'Trocar Velocidade do Texto',
+    'options_fasttext_small': 'Baixo',
+    'options_fasttext_medium': 'Médio',
+    'options_fasttext_high': 'Alto',
     //Characters
     'characters_create': 'Criar Personagem',
     'characters_create_class': 'Classe',

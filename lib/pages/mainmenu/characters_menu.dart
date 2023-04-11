@@ -174,6 +174,15 @@ class _CharactersMenuState extends State<CharactersMenu> {
                             .pushNamed("/charactercreation")
                             .then((value) => setState(() {}));
                       },
+                      style: ButtonStyle(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(300.0),
+                            side: const BorderSide(color: Colors.black),
+                          ),
+                        ),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(200.0),
                         child: Text(
@@ -277,7 +286,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                     ),
                                     //Location
                                     Text(
-                                      '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location']}', options.language) ?? 'Language Error'}',
+                                      '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location'].substring(0, characters['character$index']['location'].length - 3)}', options.language) ?? 'Language Error'}',
                                       maxLines: 1,
                                       style: TextStyle(
                                           fontFamily: 'Explora',
@@ -308,24 +317,38 @@ class _CharactersMenuState extends State<CharactersMenu> {
                               padding: const EdgeInsets.only(
                                   left: 1100.0, top: 1673),
                               child: SizedBox(
-                                  width: 600,
-                                  height: 170,
-                                  child: ElevatedButton(
-                                      onPressed: () {
-                                        removeCharacterDialog(index);
-                                      },
-                                      child: FittedBox(
-                                          child: Padding(
-                                        padding: const EdgeInsets.all(200.0),
-                                        child: Text(
-                                          Language.Translate('response_remove',
-                                                  options.language) ??
-                                              'remove',
-                                          style: const TextStyle(
-                                              fontFamily: 'PressStart',
-                                              fontSize: 500),
-                                        ),
-                                      )))),
+                                width: 600,
+                                height: 170,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    removeCharacterDialog(index);
+                                  },
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(40.0),
+                                        side: const BorderSide(
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(200.0),
+                                      child: Text(
+                                        Language.Translate('response_remove',
+                                                options.language) ??
+                                            'remove',
+                                        style: const TextStyle(
+                                            fontFamily: 'PressStart',
+                                            fontSize: 500),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             )
                           ],
                         ),

@@ -11,6 +11,7 @@ class InGame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Screen Resolution
     double zoomResolution() {
       if(MediaQuery.of(context).size.height <= 320) {
         if(MediaQuery.of(context).size.width <= 240) {
@@ -45,6 +46,7 @@ class InGame extends StatelessWidget {
         return 3.0;
       }
     }
+    
     return FutureBuilder(
       //Level Load
       future: MySQLGameplay.returnLevel(

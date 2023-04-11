@@ -428,8 +428,8 @@ class _BattleSceneState extends State<BattleScene> {
                                                     duration: const Duration(
                                                         milliseconds: 300),
                                                     curve: Curves.easeOut));
-                                        await Future.delayed(
-                                            const Duration(milliseconds: 700));
+                                        await Future.delayed(Duration(
+                                            milliseconds: options.textSpeed));
                                         //Late Buff Results
                                         final resultLateBuffs =
                                             await ClassAtributes.battleFunctions(

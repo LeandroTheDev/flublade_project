@@ -5,7 +5,6 @@ import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
 import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
-import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -17,19 +16,20 @@ import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 
 import 'package:flutter/material.dart';
-import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bonfire/bonfire.dart';
 
 class Options with ChangeNotifier {
   String _language = 'en_US';
+  int _textSpeed = 700;
   String _username = '';
   String _token = '';
   bool _remember = false;
   int _id = 0;
 
   String get language => _language;
+  int get textSpeed => _textSpeed;
   String get username => _username;
   String get token => _token;
   bool get remember => _remember;
@@ -37,6 +37,10 @@ class Options with ChangeNotifier {
 
   void changeLanguage(value) {
     _language = value;
+  }
+
+  void changeTextSpeed(value) {
+    _textSpeed = value;
   }
 
   void changeUsername(value) {
@@ -97,6 +101,7 @@ class SaveDatas {
   //Storage Options
   static const _keyCharacters = '{}';
   static const _keyLanguage = 'en_US';
+  static const _keyTextSpeed = 700;
 
   //Load Datas
   static Future init() async =>
@@ -115,6 +120,8 @@ class SaveDatas {
       await _preferences.setString(_keyLanguage, language);
   static Future setCharacters(String characters) async =>
       await _preferences.setString(_keyCharacters, characters);
+  static Future setTextSpeed(int textSpeed) async =>
+      await _preferences.setInt(_keyTextSpeed.toString(), textSpeed);
 
   //Get Datas
   static String? getUsername() => _preferences.getString(_keyUsername);
@@ -123,6 +130,7 @@ class SaveDatas {
   static bool? getRemember() => _preferences.getBool(_keyRemember.toString());
   static String? getLanguage() => _preferences.getString(_keyLanguage);
   static String? getCharacters() => _preferences.getString(_keyCharacters);
+  static int? getTextSpeed() => _preferences.getInt(_keyTextSpeed.toString());
 }
 
 class GlobalFunctions {
@@ -376,6 +384,7 @@ class GlobalFunctions {
                       gameplay.addInventoryItem(loots);
                       //Level Update
                       bool levelUpDialog = false;
+                      //XP Add
                       while (true) {
                         if (gameplay.playerXP >=
                             BaseCharacters.levelCaps[gameplay.playerLevel]!) {
@@ -393,13 +402,42 @@ class GlobalFunctions {
                           break;
                         }
                       }
-                      await MySQL.pushUploadCharacters(context: context);
+                      final result =
+                          await MySQL.pushUploadCharacters(context: context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
+                      //Error Treatment
+                      if (true) {
+                        //Connection
+                        if (result == 'Connection Error') {
+                          // ignore: use_build_context_synchronously
+                          Navigator.pushNamed(context, '/authenticationpage');
+                          GlobalFunctions.errorDialog(
+                              errorMsgTitle:
+                                  'authentication_register_problem_connection',
+                              errorMsgContext:
+                                  'Failed to connect to the Servers',
+                              context: context,
+                              popUntil: '/authenticationpage');
+                          return;
+                        }
+                        //Invalid Login
+                        if (result == 'Invalid Login') {
+                          // ignore: use_build_context_synchronously
+                          Navigator.pushNamed(context, '/authenticationpage');
+                          GlobalFunctions.errorDialog(
+                              errorMsgTitle: 'authentication_invalidlogin',
+                              errorMsgContext: 'Invalid Session',
+                              context: context,
+                              popUntil: '/authenticationpage');
+                          return;
+                        }
+                      }
+                      //Level up dialog
                       if (levelUpDialog == false) {
                         // ignore: use_build_context_synchronously
                         Provider.of<Gameplay>(context, listen: false)
@@ -412,6 +450,7 @@ class GlobalFunctions {
                         final characterClass =
                             characters['character${gameplay.selectedCharacter}']
                                 ['class'];
+                        //Level up Dialog
                         showDialog(
                             barrierColor: const Color.fromARGB(167, 0, 0, 0),
                             context: context,
@@ -498,6 +537,7 @@ class GlobalFunctions {
                             });
                       }
                     },
+                    //Text
                     child: Text(
                       Language.Translate('battle_loot_all', options.language) ??
                           'Take All',
@@ -506,6 +546,7 @@ class GlobalFunctions {
                   //Exit
                   ElevatedButton(
                     onPressed: () async {
+                      bool levelUpDialog = false;
                       if (gameplay.playerInventorySelected.isNotEmpty) {
                         //Loading
                         MySQL.loadingWidget(
@@ -516,7 +557,7 @@ class GlobalFunctions {
                         //Add Items
                         gameplay
                             .addInventoryItem(gameplay.playerInventorySelected);
-                        //Level Update
+                        //XP Add
                         while (true) {
                           if (gameplay.playerXP >=
                               BaseCharacters.levelCaps[gameplay.playerLevel]!) {
@@ -530,23 +571,202 @@ class GlobalFunctions {
                             gameplay.changeStats(
                                 value: gameplay.playerLevel + 1,
                                 stats: 'level');
+                            levelUpDialog = true;
                           } else {
                             break;
                           }
                         }
                         //Update Database
-                        await MySQL.pushUploadCharacters(context: context);
+                        final result =
+                            await MySQL.pushUploadCharacters(context: context);
+                        //Error Treatment
+                        if (true) {
+                          //Connection
+                          if (result == 'Connection Error') {
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushNamed(context, '/authenticationpage');
+                            GlobalFunctions.errorDialog(
+                                errorMsgTitle:
+                                    'authentication_register_problem_connection',
+                                errorMsgContext:
+                                    'Failed to connect to the Servers',
+                                context: context,
+                                popUntil: '/authenticationpage');
+                            return;
+                          }
+                          //Invalid Login
+                          if (result == 'Invalid Login') {
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushNamed(context, '/authenticationpage');
+                            GlobalFunctions.errorDialog(
+                                errorMsgTitle: 'authentication_invalidlogin',
+                                errorMsgContext: 'Invalid Session',
+                                context: context,
+                                popUntil: '/authenticationpage');
+                            return;
+                          }
+                        }
                         // ignore: use_build_context_synchronously
                         Navigator.pop(context);
+                      } else {
+                        //Earn Xp
+                        gameplay.changeStats(
+                            value: gameplay.playerXP + xp, stats: 'xp');
+                        //XP Add
+                        while (true) {
+                          if (gameplay.playerXP >=
+                              BaseCharacters.levelCaps[gameplay.playerLevel]!) {
+                            //Removing the xp difference
+                            gameplay.changeStats(
+                                value: gameplay.playerXP -
+                                    BaseCharacters
+                                        .levelCaps[gameplay.playerLevel]!,
+                                stats: 'xp');
+                            //Increasing the level
+                            gameplay.changeStats(
+                                value: gameplay.playerLevel + 1,
+                                stats: 'level');
+                            levelUpDialog = true;
+                          } else {
+                            break;
+                          }
+                        }
+                        //Update Database
+                        final result =
+                            await MySQL.pushUploadCharacters(context: context);
+                        //Error Treatment
+                        if (true) {
+                          //Connection
+                          if (result == 'Connection Error') {
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushNamed(context, '/authenticationpage');
+                            GlobalFunctions.errorDialog(
+                                errorMsgTitle:
+                                    'authentication_register_problem_connection',
+                                errorMsgContext:
+                                    'Failed to connect to the Servers',
+                                context: context,
+                                popUntil: '/authenticationpage');
+                            return;
+                          }
+                          //Invalid Login
+                          if (result == 'Invalid Login') {
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushNamed(context, '/authenticationpage');
+                            GlobalFunctions.errorDialog(
+                                errorMsgTitle: 'authentication_invalidlogin',
+                                errorMsgContext: 'Invalid Session',
+                                context: context,
+                                popUntil: '/authenticationpage');
+                            return;
+                          }
+                        }
                       }
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
-                      // ignore: use_build_context_synchronously
-                      Provider.of<Gameplay>(context, listen: false)
-                          .changeEnemyMove(true);
+                      //Level up dialog
+                      if (levelUpDialog == false) {
+                        // ignore: use_build_context_synchronously
+                        Provider.of<Gameplay>(context, listen: false)
+                            .changeEnemyMove(true);
+                      } else {
+                        final characters = jsonDecode(
+                            // ignore: use_build_context_synchronously
+                            Provider.of<Gameplay>(context, listen: false)
+                                .characters);
+                        final characterClass =
+                            characters['character${gameplay.selectedCharacter}']
+                                ['class'];
+                        //Level up Dialog
+                        showDialog(
+                            barrierColor: const Color.fromARGB(167, 0, 0, 0),
+                            context: context,
+                            builder: (context) {
+                              return WillPopScope(
+                                onWillPop: () async => false,
+                                child: FittedBox(
+                                  child: AlertDialog(
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(32.0))),
+                                      backgroundColor: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      title: Text(
+                                        Language.Translate('response_levelup',
+                                                options.language) ??
+                                            'Level UP',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).primaryColor),
+                                      ),
+                                      content: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          //Armor Text
+                                          Text(
+                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${BaseCharacters.baseAtributes[characterClass]!['armorLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Strength Text
+                                          Text(
+                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${BaseCharacters.baseAtributes[characterClass]!['strengthLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Agility Text
+                                          Text(
+                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${BaseCharacters.baseAtributes[characterClass]!['agilityLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Intelligence Text
+                                          Text(
+                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${BaseCharacters.baseAtributes[characterClass]!['intelligenceLevel']}',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          //Skillpoints TExt
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              Provider.of<Gameplay>(context,
+                                                      listen: false)
+                                                  .changeEnemyMove(true);
+                                            },
+                                            child: Center(
+                                              child: Text(Language.Translate(
+                                                      'response_ok',
+                                                      options.language) ??
+                                                  'Ok'),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              );
+                            });
+                      }
                     },
+                    //Text
                     child: Text(
                       Language.Translate(
                               'battle_loot_exit', options.language) ??
@@ -723,6 +943,7 @@ class Gameplay with ChangeNotifier {
   bool _isTalkable = false;
   bool _enemysMove = true;
   String _selectedTalk = '';
+  int _worldId = 0;
   final List<String> _battleLog = [];
   double _playerLife = 0;
   double _playerMana = 0;
@@ -751,6 +972,7 @@ class Gameplay with ChangeNotifier {
 
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
+  int get worldId => _worldId;
   String get selectedTalk => _selectedTalk;
   List<String> get battleLog => _battleLog;
   double get playerLife => _playerLife;
@@ -809,6 +1031,11 @@ class Gameplay with ChangeNotifier {
     } else {
       removingFunction(itemName);
     }
+  }
+
+  //Change world id
+  void changeWorldId(value) {
+    _worldId = value;
   }
 
   //Add Specific Item in inventory
@@ -1000,6 +1227,7 @@ class Gameplay with ChangeNotifier {
     return _playerInventory;
   }
 
+  //Returns item color
   String translateItemRarity(itemName) {
     if (Items.list[itemName]['rarity'].toString().length == 1) {
       return '${itemName}0${Items.list[itemName]['rarity']}';
@@ -1139,151 +1367,6 @@ class Gameplay with ChangeNotifier {
             ),
           );
         });
-  }
-
-  //Add new Character
-  Future<String> addCharacter({
-    required String characterUsername,
-    required String characterClass,
-    required MySqlConnection connection,
-    required options,
-    required gameplay,
-  }) async {
-    dynamic charactersdb = {};
-    final playerClass = characterClass
-        .replaceFirst('assets/characters/', '')
-        .substring(0,
-            characterClass.replaceFirst('assets/characters/', '').length - 4);
-    //Connection
-    try {
-      charactersdb = await connection
-          .query('select characters from accounts where id = ?', [options.id]);
-      charactersdb =
-          charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
-      charactersdb = charactersdb.substring(0, charactersdb.length - 2);
-      //Verify if Database and Provider is the Same
-      if (charactersdb != gameplay.characters) {
-        //Add new character
-        charactersdb = jsonDecode(charactersdb);
-        charactersdb['character${charactersdb.length}'] = {
-          'name': characterUsername,
-          'class': playerClass,
-          'life': ClassAtributes.classTranslation(
-              values: playerClass,
-              playterMaxLifeCalculationCharacterCreation: true),
-          'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
-          'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
-          'level': 1,
-          'xp': 0,
-          'skillpoint': 0,
-          'strength': BaseCharacters.baseAtributes[playerClass]!['strength'],
-          'agility': BaseCharacters.baseAtributes[playerClass]!['agility'],
-          'intelligence':
-              BaseCharacters.baseAtributes[playerClass]!['intelligence'],
-          'luck': 0,
-          'inventory': '{}',
-          'buffs':
-              jsonEncode(BaseCharacters.baseAtributes[playerClass]!['buffs']),
-          'equips': [
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none',
-            'none'
-          ],
-          'location': 'prologue',
-        };
-        charactersdb = jsonEncode(charactersdb);
-        //Upload to Database
-        await connection.query('update accounts set characters=? where id=?',
-            [charactersdb, options.id]);
-        return charactersdb;
-      }
-    } catch (error) {
-      return 'Cannot Connect to The Servers';
-    }
-    //Add new character in Provider
-    Map characterFormat = jsonDecode(_characters);
-    characterFormat['character${characterFormat.length}'] = {
-      'name': characterUsername,
-      'class': playerClass,
-      'life': ClassAtributes.classTranslation(
-          values: playerClass,
-          playterMaxLifeCalculationCharacterCreation: true),
-      'mana': BaseCharacters.baseAtributes[playerClass]!['mana'],
-      'armor': BaseCharacters.baseAtributes[playerClass]!['armor'],
-      'level': 1,
-      'xp': 0,
-      'skillpoint': 0,
-      'strength': BaseCharacters.baseAtributes[playerClass]!['strength'],
-      'agility': BaseCharacters.baseAtributes[playerClass]!['agility'],
-      'intelligence':
-          BaseCharacters.baseAtributes[playerClass]!['intelligence'],
-      'luck': 0,
-      'inventory': '{}',
-      'buffs': jsonEncode(BaseCharacters.baseAtributes[playerClass]!['buffs']),
-      'equips': [
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none',
-        'none'
-      ],
-      'location': 'prologue',
-    };
-    //Saving Datas
-    _characters = jsonEncode(characterFormat);
-    SaveDatas.setCharacters(_characters);
-    //Upload to Database
-    await connection.query('update accounts set characters=? where id=?',
-        [_characters, options.id]);
-    return _characters;
   }
 
   //Load Tiles

@@ -6,16 +6,21 @@ import 'package:flublade_project/data/global.dart';
 import 'package:provider/provider.dart';
 
 class PassivesSkills {
+  //Passives Names and Images
   static const passivesId = {
     'healthTurbo': {
       'image': 'assets/skills/passives/healthTurbo',
       'name': 'healthTurbo',
+      'isLate': false
     },
     'damageTurbo': {
       'image': 'assets/skills/passives/damageTurbo',
       'name': 'damageTurbo',
+      'isLate': false
     },
   };
+
+  //Return Calculation
   static passives(context, passiveName, methodTranlation) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Health Turbo Function
@@ -35,7 +40,11 @@ class PassivesSkills {
 
       //Returning
       totalLifeRecovery = double.parse(totalLifeRecovery.toStringAsFixed(2));
-      return ['addLife', totalLifeRecovery];
+      return [
+        'addLife',
+        totalLifeRecovery,
+        passivesId['healthTurbo']!['isLate'],
+      ];
     }
 
     //Damage Turbo Function
@@ -57,7 +66,7 @@ class PassivesSkills {
 
       //Returning
       totalDamage = double.parse(totalDamage.toStringAsFixed(2));
-      return ['addDamage', totalDamage];
+      return ['addDamage', totalDamage, passivesId['damageTurbo']!['isLate']];
     }
 
     //Passive Translation
@@ -170,7 +179,7 @@ class ClassAtributes {
     //Player Damage Calculation to Enemy
     if (playerDamageCalculationInEnemy) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
-      final character = jsonDecode(gameplay.characters);
+      final options = Provider.of<Options>(context, listen: false);
       //Returns the player total damage
       double damageCalculator() {
         //No weapons equipped
@@ -234,85 +243,75 @@ class ClassAtributes {
         }
       }
 
-      //Berserk Class
-      if (character['character${gameplay.selectedCharacter}']['class'] ==
-          'berserk') {
-        //Variables Creation
-        List result = [0.0, ''];
-        double damage = double.parse(damageCalculator().toStringAsFixed(2));
-        double life = gameplay.playerLife;
-        double armorPorcentage = armorPorcentageCalculator(gameplay.enemyArmor);
-        double elife = gameplay.enemyLife;
-        double earmorPorcentage =
-            armorPorcentageCalculator(gameplay.enemyArmor);
-        double edamage = gameplay.enemyDamage;
+      //Variables Creation
+      List result = [0.0, ''];
+      double damage = double.parse(damageCalculator().toStringAsFixed(2));
+      double life = gameplay.playerLife;
+      double armorPorcentage = armorPorcentageCalculator(gameplay.enemyArmor);
+      double elife = gameplay.enemyLife;
+      double earmorPorcentage = armorPorcentageCalculator(gameplay.enemyArmor);
+      double edamage = gameplay.enemyDamage;
 
-        //Buffs Searchs
-        List buffs = [];
-        gameplay.playerBuffs.forEach((value, index) => buffs.add(value));
-        List buffsNumbers = [];
-        for (int i = 0; i <= buffs.length - 1; i++) {
-          buffsNumbers.add(PassivesSkills.passives(context, buffs[i], false));
-        }
-        //Player Turn
-        if (values == 'playerTurn') {
-          //Early Buffs Calculation
-          for (int i = 0; i <= buffsNumbers.length - 1; i++) {
-            try {
-              //Add Damage activation
-              if (buffsNumbers[i][0] == 'addDamage') {
-                damage += buffsNumbers[i][1];
-              }
-              // ignore: empty_catches
-            } catch (error) {}
-          }
-          //Damage Calculation
-          elife = elife - (damage * ((100 - earmorPorcentage) / 100));
-          result[0] = (damage * ((100 - earmorPorcentage) / 100));
-          //Damage on Provider
-          await Future.delayed(const Duration(milliseconds: 700));
-          gameplay.changeStats(
-              value: double.parse(elife.toStringAsFixed(2)), stats: 'elife');
-          //Check if enemy is dead
-          if (elife <= 0) {
-            result[1] = 'edead';
-          } else {
-            result[1] = 'notedead';
-          }
-          return result;
-        }
-
-        //Enemy Turn
-        if (values == 'enemyTurn') {
-          life = life - (edamage * ((100 - armorPorcentage) / 100));
-          result[0] = (edamage * ((100 - armorPorcentage) / 100));
-          await Future.delayed(const Duration(milliseconds: 700));
-          gameplay.changeStats(
-              value: double.parse(life.toStringAsFixed(2)), stats: 'life');
-          //Check if player is dead
-          if (life <= 0) {
-            result[1] = 'dead';
-          } else {
-            result[1] = 'notdead';
-          }
-          return result;
-        }
-
-        //Late Buffs
-        if (values == 'lateBuffs') {
-          return buffsNumbers;
-        }
-        return;
+      //Buffs Searchs
+      List buffs = [];
+      gameplay.playerBuffs.forEach((value, index) => buffs.add(value));
+      List buffsNumbers = [];
+      for (int i = 0; i <= buffs.length - 1; i++) {
+        buffsNumbers.add(PassivesSkills.passives(context, buffs[i], false));
       }
-      //Archer Class
-      if (character['character${gameplay.selectedCharacter}']['class'] ==
-          'archer') {
-        double damage = double.parse(damageCalculator().toStringAsFixed(2));
-        double elife = gameplay.enemyLife;
-        elife = elife - damage;
+      //Player Turn
+      if (values == 'playerTurn') {
+        //Early Buffs Calculation
+        for (int i = 0; i <= buffsNumbers.length - 1; i++) {
+          try {
+            //Add Damage activation
+            if (buffsNumbers[i][0] == 'addDamage' &&
+                buffsNumbers[i][2] == false) {
+              damage += buffsNumbers[i][1];
+            }
+            // ignore: empty_catches
+          } catch (error) {}
+        }
+
+        //Damage Calculation
+        elife = elife - (damage * ((100 - earmorPorcentage) / 100));
+        result[0] = (damage * ((100 - earmorPorcentage) / 100));
+
+        //Damage on Provider
+        await Future.delayed(Duration(milliseconds: options.textSpeed));
         gameplay.changeStats(
             value: double.parse(elife.toStringAsFixed(2)), stats: 'elife');
+
+        //Check if enemy is dead
+        if (elife <= 0) {
+          result[1] = 'edead';
+        } else {
+          result[1] = 'notedead';
+        }
+        return result;
       }
+
+      //Enemy Turn
+      if (values == 'enemyTurn') {
+        life = life - (edamage * ((100 - armorPorcentage) / 100));
+        result[0] = (edamage * ((100 - armorPorcentage) / 100));
+        await Future.delayed(Duration(milliseconds: options.textSpeed));
+        gameplay.changeStats(
+            value: double.parse(life.toStringAsFixed(2)), stats: 'life');
+        //Check if player is dead
+        if (life <= 0) {
+          result[1] = 'dead';
+        } else {
+          result[1] = 'notdead';
+        }
+        return result;
+      }
+
+      //Late Buffs
+      if (values == 'lateBuffs') {
+        return buffsNumbers;
+      }
+      return;
     }
   }
 }

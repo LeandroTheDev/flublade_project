@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -118,7 +119,13 @@ class _CharacterCreationState extends State<CharacterCreation> {
                                 'id': options.id,
                                 'token': options.token,
                                 'name': createName.text,
-                                'class': characterClass
+                                'class': characterClass,
+                                'maxLife': ClassAtributes.classTranslation(
+                                  context: context,
+                                  playterMaxLifeCalculationCharacterCreation:
+                                      true,
+                                  values: characterClass,
+                                ),
                               }));
                         } catch (error) {
                           // ignore: use_build_context_synchronously

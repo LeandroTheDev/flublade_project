@@ -110,47 +110,50 @@ class MySQL {
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
         builder: (context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            //Language Text
-            title: Text(
-              Language.Translate('authentication_language', options.language) ??
-                  'Language',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
-            content: SizedBox(
-              width: screenSize.width * 0.5,
-              height: screenSize.height * 0.3,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    //en_US
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          uploadData('en_US');
-                        },
-                        child: const Text(
-                          'English',
+          return FittedBox(
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Language Text
+              title: Text(
+                Language.Translate(
+                        'authentication_language', options.language) ??
+                    'Language',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: SizedBox(
+                width: screenSize.width * 0.5,
+                height: screenSize.height * 0.3,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      //en_US
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            uploadData('en_US');
+                          },
+                          child: const Text(
+                            'English',
+                          ),
                         ),
                       ),
-                    ),
-                    //pt_BR
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          uploadData('pt_BR');
-                        },
-                        child: const Text(
-                          'Português',
+                      //pt_BR
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            uploadData('pt_BR');
+                          },
+                          child: const Text(
+                            'Português',
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -180,19 +183,27 @@ class MySQL {
   }
 
   //Push and Upload Characters
-  static Future<void> pushUploadCharacters(
+  static Future<String> pushUploadCharacters(
       {required BuildContext context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final connection = await database;
-    //Pickup from database
-    dynamic charactersdb = await connection
-        .query('select characters from accounts where id = ?', [options.id]);
-    charactersdb =
-        charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
-    charactersdb = charactersdb.substring(0, charactersdb.length - 2);
+    dynamic charactersdb;
+
+    try {
+      //Connection
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
+          headers: MySQL.headers,
+          body: jsonEncode({'id': options.id, 'token': options.token}));
+      //Token check
+      if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
+        return 'Invalid Login';
+      }
+    } catch (error) {
+      return 'Connection Error';
+    }
     //Transform into MAP
-    charactersdb = jsonDecode(charactersdb);
+    charactersdb = jsonDecode(charactersdb.body);
+    charactersdb = jsonDecode(charactersdb['characters']);
     //Update Inventory
     charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
         gameplay.playerInventory;
@@ -220,7 +231,15 @@ class MySQL {
     //Transform into String
     charactersdb = jsonEncode(charactersdb);
     //Upload to database
-    await updateCharacters(charactersdb, options);
+    final result =
+        await updateCharacters(characters: charactersdb, context: context);
+    if (result == 'Invalid Login') {
+      return 'Invalid Login';
+    }
+    if (result == 'Connection Error') {
+      return 'Connection Error';
+    }
+    return 'Success';
   }
 
   //Push Characters
@@ -239,7 +258,7 @@ class MySQL {
           errorMsgTitle: 'authentication_register_problem_connection',
           errorMsgContext: 'Failed to connect to the Servers',
           context: context);
-      return;
+      return 'Connection Error';
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
@@ -250,17 +269,66 @@ class MySQL {
           errorMsgContext: 'Invalid Session',
           context: context,
           popUntil: '/authenticationpage');
-      return;
+      return 'Invalid Login';
     }
     gameplay.changeCharacters(charactersdb['characters']);
     return charactersdb['characters'];
   }
 
   //Update Characters
-  static updateCharacters(String characters, options) async {
-    final connection = await database;
-    await connection.query('update accounts set characters=? where id=?',
-        [characters, options.id]);
+  static updateCharacters({String characters = '', context}) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    dynamic charactersdb = jsonDecode(characters);
+    dynamic result;
+    try {
+      //Connection
+      result = await http.post(Uri.http(url, '/updateCharacters'),
+          headers: MySQL.headers,
+          body: jsonEncode({
+            'id': options.id,
+            'token': options.token,
+            'selectedCharacter': gameplay.selectedCharacter,
+            'name': charactersdb['character${gameplay.selectedCharacter}']
+                ['name'],
+            'life': charactersdb['character${gameplay.selectedCharacter}']
+                ['life'],
+            'mana': charactersdb['character${gameplay.selectedCharacter}']
+                ['mana'],
+            'armor': charactersdb['character${gameplay.selectedCharacter}']
+                ['armor'],
+            'level': charactersdb['character${gameplay.selectedCharacter}']
+                ['level'],
+            'xp': charactersdb['character${gameplay.selectedCharacter}']['xp'],
+            'skillpoint': charactersdb['character${gameplay.selectedCharacter}']
+                ['skillpoint'],
+            'strength': charactersdb['character${gameplay.selectedCharacter}']
+                ['strength'],
+            'agility': charactersdb['character${gameplay.selectedCharacter}']
+                ['agility'],
+            'intelligence':
+                charactersdb['character${gameplay.selectedCharacter}']
+                    ['intelligence'],
+            'luck': charactersdb['character${gameplay.selectedCharacter}']
+                ['luck'],
+            'inventory': charactersdb['character${gameplay.selectedCharacter}']
+                ['inventory'],
+            'buffs': charactersdb['character${gameplay.selectedCharacter}']
+                ['buffs'],
+            'equips': charactersdb['character${gameplay.selectedCharacter}']
+                ['equips'],
+            'location': charactersdb['character${gameplay.selectedCharacter}']
+                ['location'],
+          }));
+      //Token Check
+      if (jsonDecode(result.body)['message'] == 'Invalid Login') {
+        return 'Invalid Login';
+      }
+    } catch (error) {
+      //Connection Error
+      return 'Connection Error';
+    }
+    return 'Success';
   }
 
   //Remove Characters
@@ -314,8 +382,25 @@ class MySQL {
     //Return Player Location
     if (returned == 'location') {
       final Map characters = jsonDecode(gameplay.characters);
+      //World Name
       final String location =
-          characters['character${gameplay.selectedCharacter}']['location'];
+          characters['character${gameplay.selectedCharacter}']['location']
+              .substring(
+                  0,
+                  characters['character${gameplay.selectedCharacter}']
+                              ['location']
+                          .length -
+                      3);
+      //World ID
+      gameplay.changeWorldId(
+        int.parse(
+          characters['character${gameplay.selectedCharacter}']['location']
+              .substring(characters['character${gameplay.selectedCharacter}']
+                          ['location']
+                      .length -
+                  3),
+        ),
+      );
       return location;
     }
   }

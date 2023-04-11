@@ -48,10 +48,6 @@ class FluBlade extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
-      //Change This
-      //To
-      //Bypass login
-      //Default FlubladeProject()
       home: const FlubladeProject(),
       routes: GlobalFunctions.routes,
     );
@@ -77,6 +73,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     options.changeToken(SaveDatas.getToken() ?? '');
     options.changeId(SaveDatas.getId() ?? 0);
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
+    options.changeTextSpeed(SaveDatas.getTextSpeed() ?? 700);
     gameplay.changeCharacters(SaveDatas.getCharacters() ?? '{}');
     Future.delayed(const Duration(seconds: 1), () async {
       options.changeRemember(value: SaveDatas.getRemember() ?? false);
@@ -141,9 +138,49 @@ class _FlubladeProjectState extends State<FlubladeProject> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+    final screenSize = MediaQuery.of(context).size;
+    return Scaffold(
+      body: Stack(
+        children: [
+          SizedBox(
+            width: screenSize.width,
+            height: screenSize.height,
+            child: Stack(
+              children: [
+                //Background
+                FittedBox(
+                  child: SizedBox(
+                    width: screenSize.width,
+                    height: screenSize.height,
+                    child: Image.asset(
+                      'assets/loading_cover_background.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                //Logo
+                Center(
+                  child: FittedBox(
+                    child: Padding(
+                      padding: const EdgeInsets.all(100.0),
+                      child: SizedBox(
+                        width: 2300,
+                        height: 3900,
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ],
       ),
     );
   }
