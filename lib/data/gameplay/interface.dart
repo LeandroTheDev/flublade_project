@@ -1,4 +1,3 @@
-import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +14,7 @@ class _IngameInterfaceState extends State<IngameInterface> {
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context);
+    final settings = Provider.of<Settings>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
     return Padding(
@@ -65,11 +65,12 @@ class _IngameInterfaceState extends State<IngameInterface> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 14, vertical: 5),
                               child: Container(
-                                decoration: const BoxDecoration(
-                                    color: Colors.purple),
+                                decoration:
+                                    const BoxDecoration(color: Colors.purple),
                                 width: ((gameplay.playerXP /
-                                            BaseCharacters.levelCaps[
-                                                gameplay.playerLevel]!) *
+                                            settings.levelCaps[gameplay
+                                                .playerLevel
+                                                .toString()]) *
                                         100) *
                                     5.74,
                                 height: 90,

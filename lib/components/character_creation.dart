@@ -111,7 +111,9 @@ class _CharacterCreationState extends State<CharacterCreation> {
                             context: context, language: options.language);
                         dynamic result;
                         try {
-                          //Connection
+                          //Load Stats
+                          await MySQLGameplay.returnGameplayStats(context);
+                          //Server Creation
                           result = await http.post(
                               Uri.http(MySQL.url, '/createCharacters'),
                               headers: MySQL.headers,

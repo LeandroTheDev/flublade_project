@@ -162,24 +162,34 @@ class MySQL {
   }
 
   //Return Character Inventory
-  static Future<bool> returnPlayerInventory(BuildContext context) async {
+  static Future<String> returnPlayerInventory(BuildContext context) async {
     final options = Provider.of<Options>(context);
     final gameplay = Provider.of<Gameplay>(context);
-    final connection = await database;
     //Pickup from database
-    dynamic charactersdb = await connection
-        .query('select characters from accounts where id = ?', [options.id]);
-    charactersdb =
-        charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
-    charactersdb = charactersdb.substring(0, charactersdb.length - 2);
-    charactersdb = jsonDecode(charactersdb);
-    final inventory =
-        charactersdb['character${gameplay.selectedCharacter}']['inventory'];
-    if (inventory == '{}') {
-      return false;
+    dynamic charactersdb;
+    try {
+      //Connection
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
+          headers: MySQL.headers,
+          body: jsonEncode({
+            'id': options.id,
+            'token': options.token,
+            'selectedCharacter': gameplay.selectedCharacter,
+            'onlyInventory': true
+          }));
+      //Token check
+      if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
+        return 'Invalid Login';
+      }
+    } catch (error) {
+      return 'Connection Error';
     }
-    gameplay.changePlayerInventory(inventory);
-    return true;
+    charactersdb = jsonDecode(charactersdb.body)['inventory'];
+    if (charactersdb == '{}') {
+      return 'Empty';
+    }
+    gameplay.changePlayerInventory(charactersdb);
+    return 'Success';
   }
 
   //Push and Upload Characters
@@ -204,40 +214,46 @@ class MySQL {
     //Transform into MAP
     charactersdb = jsonDecode(charactersdb.body);
     charactersdb = jsonDecode(charactersdb['characters']);
-    //Update Inventory
-    charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
-        gameplay.playerInventory;
-    //Update Equips
-    charactersdb['character${gameplay.selectedCharacter}']['equips'] =
-        gameplay.playerEquips;
-    //Update Level
-    charactersdb['character${gameplay.selectedCharacter}']['level'] =
-        gameplay.playerLevel;
-    //Update XP
-    charactersdb['character${gameplay.selectedCharacter}']['xp'] =
-        gameplay.playerXP;
-    //Update Skillpoints
-    charactersdb['character${gameplay.selectedCharacter}']['skillpoint'] =
-        gameplay.playerSkillpoint;
-    //Update Strength
-    charactersdb['character${gameplay.selectedCharacter}']['strength'] =
-        gameplay.playerStrength;
-    //Update Agility
-    charactersdb['character${gameplay.selectedCharacter}']['agility'] =
-        gameplay.playerIntelligence;
-    //Update Intelligence
-    charactersdb['character${gameplay.selectedCharacter}']['intelligence'] =
-        gameplay.playerIntelligence;
+    //Updates
+    if (true) {
+      //Update Inventory
+      charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
+          gameplay.playerInventory;
+      //Update Equips
+      charactersdb['character${gameplay.selectedCharacter}']['equips'] =
+          gameplay.playerEquips;
+      //Update Level
+      charactersdb['character${gameplay.selectedCharacter}']['level'] =
+          gameplay.playerLevel;
+      //Update XP
+      charactersdb['character${gameplay.selectedCharacter}']['xp'] =
+          gameplay.playerXP;
+      //Update Skillpoints
+      charactersdb['character${gameplay.selectedCharacter}']['skillpoint'] =
+          gameplay.playerSkillpoint;
+      //Update Strength
+      charactersdb['character${gameplay.selectedCharacter}']['strength'] =
+          gameplay.playerStrength;
+      //Update Agility
+      charactersdb['character${gameplay.selectedCharacter}']['agility'] =
+          gameplay.playerIntelligence;
+      //Update Intelligence
+      charactersdb['character${gameplay.selectedCharacter}']['intelligence'] =
+          gameplay.playerIntelligence;
+    }
     //Transform into String
     charactersdb = jsonEncode(charactersdb);
     //Upload to database
     final result =
         await updateCharacters(characters: charactersdb, context: context);
-    if (result == 'Invalid Login') {
-      return 'Invalid Login';
-    }
-    if (result == 'Connection Error') {
-      return 'Connection Error';
+    //Error Treatment
+    if (true) {
+      if (result == 'Invalid Login') {
+        return 'Invalid Login';
+      }
+      if (result == 'Connection Error') {
+        return 'Connection Error';
+      }
     }
     return 'Success';
   }
@@ -276,50 +292,71 @@ class MySQL {
   }
 
   //Update Characters
-  static updateCharacters({String characters = '', context}) async {
+  static updateCharacters(
+      {String characters = '', context, bool isLevelUp = false}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     dynamic charactersdb = jsonDecode(characters);
     dynamic result;
     try {
-      //Connection
-      result = await http.post(Uri.http(url, '/updateCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode({
-            'id': options.id,
-            'token': options.token,
-            'selectedCharacter': gameplay.selectedCharacter,
-            'name': charactersdb['character${gameplay.selectedCharacter}']
-                ['name'],
-            'life': charactersdb['character${gameplay.selectedCharacter}']
-                ['life'],
-            'mana': charactersdb['character${gameplay.selectedCharacter}']
-                ['mana'],
-            'armor': charactersdb['character${gameplay.selectedCharacter}']
-                ['armor'],
-            'level': charactersdb['character${gameplay.selectedCharacter}']
-                ['level'],
-            'xp': charactersdb['character${gameplay.selectedCharacter}']['xp'],
-            'skillpoint': charactersdb['character${gameplay.selectedCharacter}']
-                ['skillpoint'],
-            'strength': charactersdb['character${gameplay.selectedCharacter}']
-                ['strength'],
-            'agility': charactersdb['character${gameplay.selectedCharacter}']
-                ['agility'],
-            'intelligence':
-                charactersdb['character${gameplay.selectedCharacter}']
-                    ['intelligence'],
-            'luck': charactersdb['character${gameplay.selectedCharacter}']
-                ['luck'],
-            'inventory': charactersdb['character${gameplay.selectedCharacter}']
-                ['inventory'],
-            'buffs': charactersdb['character${gameplay.selectedCharacter}']
-                ['buffs'],
-            'equips': charactersdb['character${gameplay.selectedCharacter}']
-                ['equips'],
-            'location': charactersdb['character${gameplay.selectedCharacter}']
-                ['location'],
-          }));
+      if (isLevelUp) {
+        //Connection
+        result = await http.post(Uri.http(url, '/updateCharacters'),
+            headers: MySQL.headers,
+            body: jsonEncode({
+              'id': options.id,
+              'token': options.token,
+              'selectedCharacter': gameplay.selectedCharacter,
+              'isLevelUp': true,
+            }));
+        //Change Stats
+        gameplay.changeStats(
+            value: jsonDecode(jsonDecode(result.body)['characters'])[
+                'character${gameplay.selectedCharacter}']['strength'],
+            stats: 'strength');
+        gameplay.changeStats(
+            value: jsonDecode(jsonDecode(result.body)['characters'])[
+                'character${gameplay.selectedCharacter}']['agility'],
+            stats: 'agility');
+        gameplay.changeStats(
+            value: jsonDecode(jsonDecode(result.body)['characters'])[
+                'character${gameplay.selectedCharacter}']['intelligence'],
+            stats: 'intelligence');
+        gameplay.changeStats(
+            value: jsonDecode(jsonDecode(result.body)['characters'])[
+                'character${gameplay.selectedCharacter}']['armor'],
+            stats: 'armor');
+        gameplay.changeStats(
+            value: jsonDecode(jsonDecode(result.body)['characters'])[
+                'character${gameplay.selectedCharacter}']['skillpoint'],
+            stats: 'skillpoint');
+      } else {
+        //Connection
+        result = await http.post(Uri.http(url, '/updateCharacters'),
+            headers: MySQL.headers,
+            body: jsonEncode({
+              'id': options.id,
+              'token': options.token,
+              'selectedCharacter': gameplay.selectedCharacter,
+              'name': charactersdb['character${gameplay.selectedCharacter}']
+                  ['name'],
+              'life': gameplay.playerLife,
+              'mana': gameplay.playerMana,
+              'armor': gameplay.playerArmor,
+              'level': gameplay.playerLevel,
+              'xp': gameplay.playerXP,
+              'skillpoint': gameplay.playerSkillpoint,
+              'strength': gameplay.playerStrength,
+              'agility': gameplay.playerAgility,
+              'intelligence': gameplay.playerIntelligence,
+              'luck': gameplay.playerLuck,
+              'inventory': gameplay.playerInventory,
+              'buffs': gameplay.playerBuffs,
+              'equips': gameplay.playerEquips,
+              'location': charactersdb['character${gameplay.selectedCharacter}']
+                  ['location'],
+            }));
+      }
       //Token Check
       if (jsonDecode(result.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -409,14 +446,23 @@ class MySQL {
   static Future returnPlayerStats(context) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final connection = await MySQL.database;
     //Receive from database
-    dynamic charactersdb = await connection
-        .query('select characters from accounts where id = ?', [options.id]);
-    charactersdb =
-        charactersdb.toString().replaceFirst('(Fields: {characters: ', '');
-    charactersdb = charactersdb.substring(0, charactersdb.length - 2);
-    charactersdb = jsonDecode(charactersdb);
+    dynamic charactersdb;
+    try {
+      //Connection
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
+          headers: MySQL.headers,
+          body: jsonEncode({'id': options.id, 'token': options.token}));
+      //Token check
+      if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
+        return 'Invalid Login';
+      }
+    } catch (error) {
+      return 'Connection Error';
+    }
+    //Transform into MAP
+    charactersdb = jsonDecode(charactersdb.body);
+    charactersdb = jsonDecode(charactersdb['characters']);
     //Pickup Selected Character
     final selectedCharacter =
         charactersdb['character${gameplay.selectedCharacter}'];
@@ -436,13 +482,13 @@ class MySQL {
         value: int.parse(selectedCharacter['level'].toString()),
         stats: 'level');
     gameplay.changeStats(
-        value: int.parse(selectedCharacter['strength'].toString()),
+        value: double.parse(selectedCharacter['strength'].toString()),
         stats: 'strength');
     gameplay.changeStats(
-        value: int.parse(selectedCharacter['agility'].toString()),
+        value: double.parse(selectedCharacter['agility'].toString()),
         stats: 'agility');
     gameplay.changeStats(
-        value: int.parse(selectedCharacter['intelligence'].toString()),
+        value: double.parse(selectedCharacter['intelligence'].toString()),
         stats: 'intelligence');
     gameplay.changeStats(
         value: int.parse(selectedCharacter['luck'].toString()), stats: 'luck');
@@ -453,10 +499,44 @@ class MySQL {
     gameplay.changeStats(value: selectedCharacter['xp'], stats: 'xp');
     gameplay.changeStats(
         value: selectedCharacter['skillpoint'], stats: 'skillpoint');
+    gameplay.changeStats(value: selectedCharacter['skills'], stats: 'skills');
   }
 }
 
 class MySQLGameplay {
+  //Return Server Stats
+  static Future returnGameplayStats(context) async {
+    final settings = Provider.of<Settings>(context, listen: false);
+    dynamic result;
+    //Receive Base Atributes
+    result = await http.post(
+      Uri.http(MySQL.url, '/gameplayStats'),
+      headers: MySQL.headers,
+      body: jsonEncode({
+        'baseAtributes': true,
+      }),
+    );
+    settings.changeBaseAtributes(jsonDecode(result.body)['baseAtributes']);
+    //Receive Level Caps
+    result = await http.post(
+      Uri.http(MySQL.url, '/gameplayStats'),
+      headers: MySQL.headers,
+      body: jsonEncode({
+        'levelCaps': true,
+      }),
+    );
+    settings.changeLevelCaps(jsonDecode(result.body)['levelCaps']);
+    //Receive Skills Info
+    result = await http.post(
+      Uri.http(MySQL.url, '/gameplayStats'),
+      headers: MySQL.headers,
+      body: jsonEncode({
+        'skillsId': true,
+      }),
+    );
+    settings.changeSkillsId(jsonDecode(result.body)['skillsId']);
+  }
+
   //Return Level
   static Future<List<dynamic>> returnLevel(
       {required BuildContext context, required String level}) async {

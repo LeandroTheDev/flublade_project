@@ -80,18 +80,16 @@ class _MainMenuState extends State<MainMenu> {
                                   });
                                   await Future.delayed(
                                       const Duration(milliseconds: 50));
-                                  Future.delayed(
-                                          const Duration(milliseconds: 100))
-                                      .then((value) {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-                                  });
                                   //Refresh
                                   await MySQL.pushCharacters(context: context);
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(
                                       context, '/characterselection');
+                                  Future.delayed(
+                                          const Duration(milliseconds: 200))
+                                      .then((value) => setState(() {
+                                            isLoading = false;
+                                          }));
                                 },
                                 child: FittedBox(
                                   child: Text(
@@ -118,16 +116,17 @@ class _MainMenuState extends State<MainMenu> {
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(
                                       context, '/charactersmenu');
-                                  //Loading disable
-                                  setState(() {
-                                    isLoading = false;
-                                  });
+                                  Future.delayed(
+                                          const Duration(milliseconds: 200))
+                                      .then((value) => setState(() {
+                                            isLoading = false;
+                                          }));
                                 },
                                 child: FittedBox(
                                   child: Text(
                                     Language.Translate('mainmenu_characters',
                                             options.language) ??
-                                        'Personagens',
+                                        'Characters',
                                     style: TextStyle(
                                         fontFamily: 'PressStart',
                                         fontSize: 500,

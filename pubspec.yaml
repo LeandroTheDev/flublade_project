@@ -62,6 +62,9 @@ flutter:
   assets:
     # Menu
     - assets/
+    # Skills
+    - assets/skills/
+    - assets/skills/passives/
     # Items
     - assets/items/
     # NPC

@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
-import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -19,6 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bonfire/bonfire.dart';
+
+import '../pages/gameplay/magics.dart';
 
 class Options with ChangeNotifier {
   String _language = 'en_US';
@@ -73,8 +74,14 @@ class Options with ChangeNotifier {
 
 class Settings with ChangeNotifier {
   bool _isLoading = false;
+  Map _baseAtributes = {};
+  Map _levelCaps = {};
+  Map _skillsId = {};
 
   bool get isLoading => _isLoading;
+  Map get baseAtributes => _baseAtributes;
+  Map get levelCaps => _levelCaps;
+  Map get skillsId => _skillsId;
 
   void changeIsLoading({value}) {
     if (value == null) {
@@ -87,6 +94,21 @@ class Settings with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  //Change Base Atributes
+  void changeBaseAtributes(Map value) {
+    _baseAtributes = value;
+  }
+
+  //Change Level Caps
+  void changeLevelCaps(Map value) {
+    _levelCaps = value;
+  }
+
+  //Change Skills Id
+  void changeSkillsId(Map value) {
+    _skillsId = value;
   }
 }
 
@@ -144,6 +166,7 @@ class GlobalFunctions {
     '/characterselection': (context) => const CharacterSelection(),
     '/ingame': (context) => const InGame(),
     '/inventory': (context) => const GameplayInventory(),
+    '/magics': (context) => const Magics(),
   };
 
   //Disconnect Dialog
@@ -214,6 +237,7 @@ class GlobalFunctions {
   }) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final settings = Provider.of<Settings>(context, listen: false);
     final enemyLevel = gameplay.enemyLevel;
     gameplay.resetPlayerInventorySelected();
     List lootCalculation() {
@@ -387,17 +411,27 @@ class GlobalFunctions {
                       //XP Add
                       while (true) {
                         if (gameplay.playerXP >=
-                            BaseCharacters.levelCaps[gameplay.playerLevel]!) {
+                            settings
+                                .levelCaps[gameplay.playerLevel.toString()]!) {
                           //Removing the xp difference
                           gameplay.changeStats(
                               value: gameplay.playerXP -
-                                  BaseCharacters
-                                      .levelCaps[gameplay.playerLevel]!,
+                                  settings.levelCaps[
+                                      gameplay.playerLevel.toString()]!,
                               stats: 'xp');
                           //Increasing the level
                           gameplay.changeStats(
                               value: gameplay.playerLevel + 1, stats: 'level');
                           levelUpDialog = true;
+                          //Update Level Stats
+                          await MySQL.updateCharacters(
+                              context: context,
+                              characters: gameplay.characters,
+                              isLevelUp: true);
+                          //Update All Stats
+                          await MySQL.updateCharacters(
+                              context: context,
+                              characters: gameplay.characters);
                         } else {
                           break;
                         }
@@ -443,13 +477,6 @@ class GlobalFunctions {
                         Provider.of<Gameplay>(context, listen: false)
                             .changeEnemyMove(true);
                       } else {
-                        final characters = jsonDecode(
-                            // ignore: use_build_context_synchronously
-                            Provider.of<Gameplay>(context, listen: false)
-                                .characters);
-                        final characterClass =
-                            characters['character${gameplay.selectedCharacter}']
-                                ['class'];
                         //Level up Dialog
                         showDialog(
                             barrierColor: const Color.fromARGB(167, 0, 0, 0),
@@ -459,79 +486,93 @@ class GlobalFunctions {
                                 onWillPop: () async => false,
                                 child: FittedBox(
                                   child: AlertDialog(
-                                      shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(32.0))),
-                                      backgroundColor: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      title: Text(
-                                        Language.Translate('response_levelup',
-                                                options.language) ??
-                                            'Level UP',
-                                        style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor),
-                                      ),
-                                      content: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          //Armor Text
-                                          Text(
-                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${BaseCharacters.baseAtributes[characterClass]!['armorLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          //Strength Text
-                                          Text(
-                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${BaseCharacters.baseAtributes[characterClass]!['strengthLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          //Agility Text
-                                          Text(
-                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${BaseCharacters.baseAtributes[characterClass]!['agilityLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          //Intelligence Text
-                                          Text(
-                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${BaseCharacters.baseAtributes[characterClass]!['intelligenceLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                          //Skillpoints TExt
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
-                                          ),
-                                          const SizedBox(height: 20),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              Provider.of<Gameplay>(context,
-                                                      listen: false)
-                                                  .changeEnemyMove(true);
-                                            },
-                                            child: Center(
-                                              child: Text(Language.Translate(
-                                                      'response_ok',
-                                                      options.language) ??
-                                                  'Ok'),
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(32.0))),
+                                    backgroundColor: Colors.transparent,
+                                    content: Stack(
+                                      children: [
+                                        //Conffeti Level Up
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .scaffoldBackgroundColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(30)),
+                                          width: 280,
+                                          height: 220,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            child: Image.asset(
+                                              'assets/images/interface/levelUp.gif',
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
-                                        ],
-                                      )),
+                                        ),
+                                        //Level Up Interface
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            //Level Up Text
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(20.0),
+                                              child: Text(
+                                                Language.Translate(
+                                                        'response_levelup',
+                                                        options.language) ??
+                                                    'Level UP',
+                                                style: TextStyle(
+                                                    fontFamily: 'PressStart',
+                                                    fontSize: 15,
+                                                    color: Theme.of(context)
+                                                        .primaryColor),
+                                              ),
+                                            ),
+                                            //Level Number
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(30.0),
+                                              child: Center(
+                                                child: Text(
+                                                  gameplay.playerLevel
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontSize: 40,
+                                                      fontFamily: 'PressStart',
+                                                      color: Theme.of(context)
+                                                          .primaryColor),
+                                                ),
+                                              ),
+                                            ),
+                                            //Ok button
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(20.0),
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  Provider.of<Gameplay>(context,
+                                                          listen: false)
+                                                      .changeEnemyMove(true);
+                                                },
+                                                child: Center(
+                                                  child: Text(
+                                                      Language.Translate(
+                                                              'response_ok',
+                                                              options
+                                                                  .language) ??
+                                                          'Ok'),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               );
                             });
@@ -560,12 +601,13 @@ class GlobalFunctions {
                         //XP Add
                         while (true) {
                           if (gameplay.playerXP >=
-                              BaseCharacters.levelCaps[gameplay.playerLevel]!) {
+                              settings.levelCaps[
+                                  gameplay.playerLevel.toString()]!) {
                             //Removing the xp difference
                             gameplay.changeStats(
                                 value: gameplay.playerXP -
-                                    BaseCharacters
-                                        .levelCaps[gameplay.playerLevel]!,
+                                    settings.levelCaps[
+                                        gameplay.playerLevel.toString()]!,
                                 stats: 'xp');
                             //Increasing the level
                             gameplay.changeStats(
@@ -615,12 +657,13 @@ class GlobalFunctions {
                         //XP Add
                         while (true) {
                           if (gameplay.playerXP >=
-                              BaseCharacters.levelCaps[gameplay.playerLevel]!) {
+                              settings.levelCaps[
+                                  gameplay.playerLevel.toString()]!) {
                             //Removing the xp difference
                             gameplay.changeStats(
                                 value: gameplay.playerXP -
-                                    BaseCharacters
-                                        .levelCaps[gameplay.playerLevel]!,
+                                    settings.levelCaps[
+                                        gameplay.playerLevel.toString()]!,
                                 stats: 'xp');
                             //Increasing the level
                             gameplay.changeStats(
@@ -707,7 +750,7 @@ class GlobalFunctions {
                                         children: [
                                           //Armor Text
                                           Text(
-                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${BaseCharacters.baseAtributes[characterClass]!['armorLevel']}',
+                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${settings.baseAtributes[characterClass]!['armorLevel']}',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColor),
@@ -715,7 +758,7 @@ class GlobalFunctions {
                                           const SizedBox(height: 4),
                                           //Strength Text
                                           Text(
-                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${BaseCharacters.baseAtributes[characterClass]!['strengthLevel']}',
+                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${settings.baseAtributes[characterClass]!['strengthLevel']}',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColor),
@@ -723,7 +766,7 @@ class GlobalFunctions {
                                           const SizedBox(height: 4),
                                           //Agility Text
                                           Text(
-                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${BaseCharacters.baseAtributes[characterClass]!['agilityLevel']}',
+                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${settings.baseAtributes[characterClass]!['agilityLevel']}',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColor),
@@ -731,7 +774,7 @@ class GlobalFunctions {
                                           const SizedBox(height: 4),
                                           //Intelligence Text
                                           Text(
-                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${BaseCharacters.baseAtributes[characterClass]!['intelligenceLevel']}',
+                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${settings.baseAtributes[characterClass]!['intelligenceLevel']}',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColor),
@@ -951,9 +994,9 @@ class Gameplay with ChangeNotifier {
   double _playerArmor = 0;
   double _playerXP = 0;
   int _playerLevel = 1;
-  int _playerStrength = 0;
-  int _playerAgility = 0;
-  int _playerIntelligence = 0;
+  double _playerStrength = 0;
+  double _playerAgility = 0;
+  double _playerIntelligence = 0;
   int _playerLuck = 0;
   double _playerDamage = 0;
   Map _playerInventory = {};
@@ -961,6 +1004,8 @@ class Gameplay with ChangeNotifier {
   List _playerEquips = [];
   Map _playerBuffs = {};
   int _playerSkillpoint = 0;
+  Map _playerSkills = {};
+  String _playerSelectedSkill = 'basicAttack';
 
   String _enemyName = '';
   double _enemyLife = 0;
@@ -981,9 +1026,9 @@ class Gameplay with ChangeNotifier {
   double get playerArmor => _playerArmor;
   double get playerXP => _playerXP;
   int get playerLevel => _playerLevel;
-  int get playerStrength => _playerStrength;
-  int get playerAgility => _playerAgility;
-  int get playerIntelligence => _playerIntelligence;
+  double get playerStrength => _playerStrength;
+  double get playerAgility => _playerAgility;
+  double get playerIntelligence => _playerIntelligence;
   int get playerLuck => _playerLuck;
   double get playerDamage => _playerDamage;
   Map get playerInventory => _playerInventory;
@@ -991,6 +1036,8 @@ class Gameplay with ChangeNotifier {
   List get playerEquips => _playerEquips;
   Map get playerBuffs => _playerBuffs;
   int get playerSkillpoint => _playerSkillpoint;
+  Map get playerSkills => _playerSkills;
+  String get playerSelectedSkill => _playerSelectedSkill;
 
   String get enemyName => _enemyName;
   double get enemyLife => _enemyLife;
@@ -999,6 +1046,11 @@ class Gameplay with ChangeNotifier {
   int get enemyLevel => _enemyLevel;
   double get enemyDamage => _enemyDamage;
   double get enemyXP => _enemyXP;
+
+  //Change Selected Skill
+  void changePlayerSelectedSkill(value) {
+    _playerSelectedSkill = value;
+  }
 
   //Change enemy XP
   void changeEnemyXP(value) {
@@ -1092,7 +1144,7 @@ class Gameplay with ChangeNotifier {
       notifyListeners();
       return;
     } else if (stats == 'mana') {
-      _playerMana = value;
+      _playerMana = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'gold') {
@@ -1100,7 +1152,7 @@ class Gameplay with ChangeNotifier {
       notifyListeners();
       return;
     } else if (stats == 'armor') {
-      _playerArmor = value;
+      _playerArmor = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'level') {
@@ -1112,15 +1164,15 @@ class Gameplay with ChangeNotifier {
       notifyListeners();
       return;
     } else if (stats == 'strength') {
-      _playerStrength = value;
+      _playerStrength = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'agility') {
-      _playerAgility = value;
+      _playerAgility = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'intelligence') {
-      _playerIntelligence = value;
+      _playerIntelligence = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'luck') {
@@ -1148,13 +1200,24 @@ class Gameplay with ChangeNotifier {
       notifyListeners();
       return;
     } else if (stats == 'buffs') {
-      _playerBuffs = jsonDecode(value);
+      try {
+        _playerBuffs = jsonDecode(value);
+      } catch (error) {
+        _playerBuffs = value;
+      }
       notifyListeners();
       return;
     } else if (stats == 'skillpoint') {
       _playerSkillpoint = value;
       notifyListeners();
       return;
+    } else if (stats == 'skills') {
+      try {
+        _playerSkills = jsonDecode(value);
+      } catch (error) {
+        _playerSkills = value;
+      }
+      notifyListeners();
     }
     //Enemy Stats
     if (stats == 'elife') {
@@ -1284,6 +1347,11 @@ class Gameplay with ChangeNotifier {
         playerEquips[10] = item;
         return;
     }
+  }
+
+  //Change Skills
+  void changePlayerSkills(value) {
+    _playerSkills = value;
   }
 
   //Show Text Talk Dialog

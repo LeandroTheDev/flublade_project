@@ -485,13 +485,15 @@ class _BattleSceneState extends State<BattleScene> {
                                     }
                                   },
                                   child: Text(Language.Translate(
-                                          'battle_attack', options.language) ??
+                                          'magics_${gameplay.playerSelectedSkill}',
+                                          options.language) ??
                                       'Attack'),
                                 )
                               : ElevatedButton(
                                   onPressed: null,
                                   child: Text(Language.Translate(
-                                          'battle_attack', options.language) ??
+                                          'magics_${gameplay.playerSelectedSkill}',
+                                          options.language) ??
                                       'Attack'),
                                 ),
                           const SizedBox(width: 20),
@@ -572,7 +574,8 @@ class _BattleSceneState extends State<BattleScene> {
                           //Magics
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/inventory');
+                              Navigator.pushNamed(context, '/magics')
+                                  .then((value) => setState(() {}));
                             },
                             child: Container(
                               width: screenSize.width * 0.2,

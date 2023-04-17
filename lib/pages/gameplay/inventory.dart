@@ -1,5 +1,4 @@
 import 'package:flublade_project/components/item_widget.dart';
-import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
@@ -23,6 +22,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
 
   //Show Player Stats Dialog
   void playerStats() {
+    final settings = Provider.of<Settings>(context, listen: false);
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -97,7 +97,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                   ),
                   //Experience
                   Text(
-                    '${Language.Translate('battle_loot_experience', Provider.of<Options>(context, listen: false).language) ?? 'Experience'} ${Provider.of<Gameplay>(context, listen: false).playerXP.toStringAsFixed(2)} / ${BaseCharacters.levelCaps[Provider.of<Gameplay>(context, listen: false).playerLevel]!.toStringAsFixed(2)}',
+                    '${Language.Translate('battle_loot_experience', Provider.of<Options>(context, listen: false).language) ?? 'Experience'} ${Provider.of<Gameplay>(context, listen: false).playerXP.toStringAsFixed(2)} / ${settings.levelCaps[Provider.of<Gameplay>(context, listen: false).playerLevel.toString()]!.toStringAsFixed(2)}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
@@ -1059,7 +1059,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                 child: FutureBuilder(
                   future: MySQL.returnPlayerInventory(context),
                   builder: (context, future) {
-                    if (future.data == true) {
+                    if (future.data == 'Success') {
                       List inventory = [];
                       //Tranforming Inventory in List to use index
                       gameplay.playerInventory
@@ -1090,7 +1090,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                         ),
                       );
                       //If inventory is empty
-                    } else if (future.data == false) {
+                    } else if (future.data == 'Empty') {
                       return const SizedBox();
                       //Loading
                     } else {

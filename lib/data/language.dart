@@ -40,6 +40,9 @@ class Language {
     'response_equipped': 'Equipped',
     'response_inventory': 'Inventory',
     'response_levelup': 'Level UP',
+    'response_magics': 'Magics',
+    'response_skills': 'Skills',
+    'response_passives': 'Passives',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -175,6 +178,13 @@ class Language {
         'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
     //Enemy Names
     'enemy_smallspider': 'Small Spider',
+    //Magics Names
+    'magics_type_fire': 'Fire',
+    'magics_type_physical': 'Physical',
+    'magics_basicAttack': 'Basic Attack',
+    'magics_basicAttack_desc': 'Ataca o inimigo com sua arma, causando dano de ataque total',
+    'magics_furiousAttack': 'Furious Attack',
+    'magics_furiousAttack_desc': 'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
   };
   //
   //
@@ -214,6 +224,9 @@ class Language {
     'response_equipped': 'Equipado',
     'response_inventory': 'Inventário',
     'response_levelup': 'Subiu de Nível',
+    'response_magics': 'Magias',
+    'response_skills': 'Habilidades',
+    'response_passives': 'Passivas',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -347,5 +360,12 @@ class Language {
         'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
     //Enemy Names
     'enemy_smallspider': 'Aranha Pequena',
+    //Magics Names
+    'magics_type_fire': 'Fogo',
+    'magics_type_physical': 'Fisíco',
+    'magics_basicAttack': 'Ataque Básico',
+    'magics_basicAttack_desc': 'Ataca o inimigo com sua arma, causando dano de ataque total',
+    'magics_furiousAttack': 'Ataque Furioso',
+    'magics_furiousAttack_desc': 'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
   };
 }

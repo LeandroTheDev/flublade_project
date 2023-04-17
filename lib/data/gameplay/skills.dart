@@ -1,28 +1,14 @@
 import 'dart:convert';
 
-import 'package:flublade_project/data/gameplay/characters.dart';
 import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:provider/provider.dart';
 
 class PassivesSkills {
-  //Passives Names and Images
-  static const passivesId = {
-    'healthTurbo': {
-      'image': 'assets/skills/passives/healthTurbo',
-      'name': 'healthTurbo',
-      'isLate': false
-    },
-    'damageTurbo': {
-      'image': 'assets/skills/passives/damageTurbo',
-      'name': 'damageTurbo',
-      'isLate': false
-    },
-  };
-
   //Return Calculation
   static passives(context, passiveName, methodTranlation) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final settings = Provider.of<Settings>(context, listen: false);
     //Health Turbo Function
     healthTurbo() {
       //Variables Creation
@@ -43,7 +29,7 @@ class PassivesSkills {
       return [
         'addLife',
         totalLifeRecovery,
-        passivesId['healthTurbo']!['isLate'],
+        settings.skillsId['healthTurbo']!['isLate'],
       ];
     }
 
@@ -66,7 +52,11 @@ class PassivesSkills {
 
       //Returning
       totalDamage = double.parse(totalDamage.toStringAsFixed(2));
-      return ['addDamage', totalDamage, passivesId['damageTurbo']!['isLate']];
+      return [
+        'addDamage',
+        totalDamage,
+        settings.skillsId['damageTurbo']!['isLate']
+      ];
     }
 
     //Passive Translation
@@ -138,9 +128,10 @@ class ClassAtributes {
     //Player Class Max Life Calculation
     if (playerMaxLifeCalculationInGeneral) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
+      final settings = Provider.of<Settings>(context, listen: false);
       final character = jsonDecode(gameplay.characters);
       //Pickup base Max life
-      double maxLife = double.parse(BaseCharacters.baseAtributes[
+      double maxLife = double.parse(settings.baseAtributes[
               character['character${gameplay.selectedCharacter}']
                   ['class']]!['life']
           .toString());
@@ -154,14 +145,13 @@ class ClassAtributes {
     }
     //Player Class Max Life Calculation Creation
     if (playterMaxLifeCalculationCharacterCreation) {
+      final settings = Provider.of<Settings>(context, listen: false);
       //Pickup base Max life
-      double maxLife = double.parse(
-          BaseCharacters.baseAtributes[values]!['life'].toString());
+      double maxLife =
+          double.parse(settings.baseAtributes[values]!['life'].toString());
       //Calculation by strength
       for (int i = 0;
-          i <
-              int.parse(
-                  BaseCharacters.baseAtributes[values]!['strength'].toString());
+          i < int.parse(settings.baseAtributes[values]!['strength'].toString());
           i++) {
         maxLife = maxLife + (maxLife * 0.05);
       }
