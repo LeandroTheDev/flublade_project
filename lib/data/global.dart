@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
-import 'package:flublade_project/data/gameplay/items.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -77,11 +75,13 @@ class Settings with ChangeNotifier {
   Map _baseAtributes = {};
   Map _levelCaps = {};
   Map _skillsId = {};
+  Map _itemsId = {};
 
   bool get isLoading => _isLoading;
   Map get baseAtributes => _baseAtributes;
   Map get levelCaps => _levelCaps;
   Map get skillsId => _skillsId;
+  Map get itemsId => _itemsId;
 
   void changeIsLoading({value}) {
     if (value == null) {
@@ -94,6 +94,16 @@ class Settings with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  //Change Items Id
+  void changeItemsId(Map value) {
+    _itemsId = value;
+  }
+
+  //Translate equip index
+  List translateEquipsIndex(equipIndex) {
+    return [0];
   }
 
   //Change Base Atributes
@@ -109,6 +119,36 @@ class Settings with ChangeNotifier {
   //Change Skills Id
   void changeSkillsId(Map value) {
     _skillsId = value;
+  }
+
+  //Returns the Loot/Item Image
+  String lootImage(itemName) {
+    if (itemName.contains('%')) {
+      itemName = itemName.substring(0, itemName.length - 3);
+      return itemsId[itemName]['image'];
+    }
+    return itemsId[itemName]['image'];
+  }
+
+  //Returns the tier
+  String itemTier(itemName, {addPlus = false}) {
+    if (itemName.contains('%')) {
+      final tier = int.parse(itemName.substring(itemName.length - 2));
+      if (addPlus) {
+        return '+${tier.toString()}';
+      }
+      return tier.toString();
+    }
+    return '';
+  }
+
+  //Returns the item name without Tier
+  String tierCheck(itemName) {
+    if (itemName.contains('%')) {
+      itemName = itemName.substring(0, itemName.length - 3);
+      return itemName;
+    }
+    return itemName;
   }
 }
 
@@ -231,117 +271,13 @@ class GlobalFunctions {
   //Loot Dialog
   static void lootDialog({
     required BuildContext context,
-    xp,
-    enemySpecialLoot,
-    int enemySpecialGold = 0,
+    required List loots,
+    required xp,
   }) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context, listen: false);
-    final enemyLevel = gameplay.enemyLevel;
     gameplay.resetPlayerInventorySelected();
-    List lootCalculation() {
-      List loots = [];
-      int lootQuantity = 0;
-
-      //Gold Quantity Calculator
-      goldQuantity() {
-        if (enemyLevel >= 0 && enemyLevel <= 4) {
-          return 1 + Random().nextInt(3);
-        } else if (enemyLevel >= 5 && enemyLevel <= 10) {
-          return 3 + Random().nextInt(8);
-        } else if (enemyLevel >= 11 && enemyLevel <= 20) {
-          return 6 + Random().nextInt(15);
-        } else if (enemyLevel >= 21 && enemyLevel <= 30) {
-          return 12 + Random().nextInt(20);
-        } else if (enemyLevel >= 31 && enemyLevel <= 45) {
-          return 20 + Random().nextInt(30);
-        } else if (enemyLevel >= 46 && enemyLevel <= 60) {
-          return 30 + Random().nextInt(40);
-        } else if (enemyLevel > 60) {
-          return 50 + Random().nextInt(45);
-        }
-        return 0;
-      }
-
-      //Gold Add
-      loots.add({
-        'name': 'gold',
-        'quantity': goldQuantity() + enemySpecialGold,
-      });
-
-      //Loot Quantity Calculator
-      if (Random().nextInt(10) >= 1) {
-        lootQuantity = lootQuantity + Random().nextInt(2);
-        //60% Chance to increase loot
-        if (Random().nextInt(10) > 2) {
-          lootQuantity = lootQuantity + Random().nextInt(2);
-          //40% Chance to increase loot
-          if (Random().nextInt(10) >= 5) {
-            lootQuantity = lootQuantity + Random().nextInt(3);
-          }
-          //20% Chance to increase loot
-          if (Random().nextInt(10) >= 6) {
-            lootQuantity = lootQuantity + Random().nextInt(4);
-            //10% Chance to increase loot
-            if (Random().nextInt(10) >= 7) {
-              lootQuantity = lootQuantity + Random().nextInt(5);
-            }
-          }
-        }
-      }
-
-      //Loot Ramdomizer
-      lootRandom() {
-        //20% To Rare Items
-        if (Random().nextInt(10) >= 8) {
-          //5% To Ultra Rare Items
-          if (Random().nextInt(10) >= 7) {
-            final int index =
-                Random().nextInt(Items.lootId['ultraRareQuantity']) + 200;
-            return {
-              'name': Items.lootId[index],
-              'quantity': 1,
-            };
-          }
-          final int index =
-              Random().nextInt(Items.lootId['rareQuantity']) + 100;
-          return {
-            'name': Items.lootId[index],
-            'quantity': 1,
-          };
-        }
-        //80% To Common Items
-        final int index = Random().nextInt(Items.lootId['commonQuantity']);
-        int quantity = 1;
-        if (index == 0) {
-          quantity = goldQuantity();
-        }
-        return {
-          'name': Items.lootId[index],
-          'quantity': quantity,
-        };
-      }
-
-      //Loot Special Add
-      if (enemySpecialLoot != null) {
-        for (int i = 0; i <= enemySpecialLoot.length - 1; i++) {
-          loots.add({
-            'name': enemySpecialLoot[i],
-            'quantity': 1,
-          });
-        }
-      }
-
-      //Loot Add
-      for (int i = 1; i <= lootQuantity; i++) {
-        loots.add(lootRandom());
-      }
-
-      return loots;
-    }
-
-    final loots = lootCalculation();
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -1063,7 +999,8 @@ class Gameplay with ChangeNotifier {
   }
 
   //Remove Specific Item in inventory
-  void removeSpecificItemInventory(itemName) {
+  void removeSpecificItemInventory(itemName, context) {
+    final settings = Provider.of<Settings>(context, listen: false);
     //Base Function for removing item name from inventory
     removingFunction(removedItem) {
       //If already have quantity
@@ -1076,9 +1013,10 @@ class Gameplay with ChangeNotifier {
       }
     }
 
-    final equip = Items.translateEquipsIndex(Items.list[itemName]['equip']);
-    if (_playerEquips[equip] != 'none') {
-      addSpecificItemInventory(_playerEquips[equip]);
+    final equip = settings.translateEquipsIndex(
+        settings.itemsId[settings.tierCheck(itemName)]['equip']);
+    if (_playerEquips[equip[0]] != 'none') {
+      addSpecificItemInventory(_playerEquips[equip[0]]);
       removingFunction(itemName);
     } else {
       removingFunction(itemName);
@@ -1091,16 +1029,17 @@ class Gameplay with ChangeNotifier {
   }
 
   //Add Specific Item in inventory
-  void addSpecificItemInventory(itemName) {
-    //If already have quantity
+  void addSpecificItemInventory(item) {
+    //Test if already have in inventory
     try {
-      if (playerInventory[itemName]['quantity'] > 1) {
-        //Remove 1 quantity
-        playerInventory[itemName]['quantity'] =
-            playerInventory[itemName]['quantity'] + 1;
+      if (playerInventory[item['name']]['quantity'] >= 1) {
+        //Add 1 quantity
+        playerInventory[item['name']]['quantity'] =
+            playerInventory[item['name']]['quantity'] + 1;
       }
+      //Add to the inventory if doesnt exist
     } catch (error) {
-      playerInventory[itemName] = {'name': itemName, 'quantity': 1};
+      _playerInventory[item['name']] = item;
     }
   }
 
@@ -1122,8 +1061,19 @@ class Gameplay with ChangeNotifier {
   }
 
   //Add a line to battle log
-  void addBattleLog(value) {
-    _battleLog.add(value);
+  void addBattleLog(value, context) {
+    final options = Provider.of<Options>(context, listen: false);
+    String result = '';
+    for (int i = 1; i <= value.length; i++) {
+      if (!value['log$i'].toString().contains('_')) {
+        result = '$result${value['log$i'].toString()}';
+      } else {
+        result =
+            '$result${Language.Translate(value['log$i'], options.language) ?? 'Language Error'}';
+      }
+    }
+    _battleLog.add(result);
+    notifyListeners();
   }
 
   //Reset Selected Inventory
@@ -1221,15 +1171,15 @@ class Gameplay with ChangeNotifier {
     }
     //Enemy Stats
     if (stats == 'elife') {
-      _enemyLife = value;
+      _enemyLife = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'emana') {
-      _enemyMana = value;
+      _enemyMana = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'earmor') {
-      _enemyArmor = value;
+      _enemyArmor = double.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'elevel') {
@@ -1253,16 +1203,13 @@ class Gameplay with ChangeNotifier {
   }
 
   //Add Items to invetory
-  Map addInventoryItem(items) {
+  Map addInventoryItem(List items) {
     bool jumpClear = false;
     for (int i = 0; i <= items.length - 1; i++) {
       try {
         //If inventory is clear
         if (_playerInventory.isEmpty && !jumpClear) {
-          _playerInventory[items[i]['name']] = {
-            'name': items[i]['name'],
-            'quantity': items[i]['quantity'],
-          };
+          _playerInventory[items[i]['name']] = items[i];
           i++;
           jumpClear = true;
         }
@@ -1270,10 +1217,7 @@ class Gameplay with ChangeNotifier {
         for (int a = 0; a <= _playerInventory.length - 1; a++) {
           //Doesnt Exist in inventory
           if (_playerInventory[items[i]['name']] == null) {
-            _playerInventory[items[i]['name']] = {
-              'name': items[i]['name'],
-              'quantity': items[i]['quantity'],
-            };
+            _playerInventory[items[i]['name']] = items[i];
             //Stop Loop
             break;
             //Exist in inventory
@@ -1288,65 +1232,6 @@ class Gameplay with ChangeNotifier {
       } catch (_) {}
     }
     return _playerInventory;
-  }
-
-  //Returns item color
-  String translateItemRarity(itemName) {
-    if (Items.list[itemName]['rarity'].toString().length == 1) {
-      return '${itemName}0${Items.list[itemName]['rarity']}';
-    } else {
-      return '$itemName${Items.list[itemName]['rarity']}';
-    }
-  }
-
-  //Equip Items
-  void changePlayerEquips(item, index) {
-    switch (index) {
-      //Head
-      case 0:
-        _playerEquips[0] = item;
-        return;
-      //Shoulders1
-      case 1:
-        playerEquips[1] = item;
-        return;
-      //Shoulders2
-      case 2:
-        playerEquips[2] = item;
-        return;
-      //Necklace
-      case 3:
-        playerEquips[3] = item;
-        return;
-      //Hands1
-      case 4:
-        playerEquips[4] = item;
-        return;
-      //Hands2
-      case 5:
-        playerEquips[5] = item;
-        return;
-      //Chest
-      case 6:
-        playerEquips[6] = item;
-        return;
-      //Legs
-      case 7:
-        playerEquips[7] = item;
-        return;
-      //Boots
-      case 8:
-        playerEquips[8] = item;
-        return;
-      //Weapon1
-      case 9:
-        playerEquips[9] = item;
-        return;
-      //Weapon2
-      case 10:
-        playerEquips[10] = item;
-        return;
-    }
   }
 
   //Change Skills

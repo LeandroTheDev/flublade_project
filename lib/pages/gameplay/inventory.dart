@@ -1,11 +1,12 @@
+import 'dart:convert';
+
 import 'package:flublade_project/components/item_widget.dart';
-import 'package:flublade_project/data/gameplay/items.dart';
-import 'package:flublade_project/data/gameplay/skills.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 import '../../data/language.dart';
 
@@ -23,6 +24,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
   //Show Player Stats Dialog
   void playerStats() {
     final settings = Provider.of<Settings>(context, listen: false);
+    final options = Provider.of<Options>(context, listen: false);
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -33,10 +35,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                   borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               title: Text(
-                Language.Translate(
-                        'response_stats',
-                        Provider.of<Options>(context, listen: false)
-                            .language) ??
+                Language.Translate('response_stats', options.language) ??
                     'Stats',
                 style: TextStyle(
                     color: Theme.of(context).primaryColor, fontSize: 40),
@@ -46,58 +45,55 @@ class _GameplayInventoryState extends State<GameplayInventory>
                 children: [
                   //Life
                   Text(
-                    '${Language.Translate('battle_life', Provider.of<Options>(context, listen: false).language) ?? 'Life'}: ${Provider.of<Gameplay>(context, listen: false).playerLife.toStringAsFixed(2)} / ${ClassAtributes.classTranslation(context: context, playerMaxLifeCalculationInGeneral: true).toStringAsFixed(2)}',
+                    '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${Provider.of<Gameplay>(context, listen: false).playerLife.toStringAsFixed(2)} / ToDo',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Mana
                   Text(
-                    '${Language.Translate('battle_mana', Provider.of<Options>(context, listen: false).language) ?? 'Mana'}: ${Provider.of<Gameplay>(context, listen: false).playerMana}',
+                    '${Language.Translate('battle_mana', options.language) ?? 'Mana'}: ${Provider.of<Gameplay>(context, listen: false).playerMana}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Strength
                   Text(
-                    '${Language.Translate('response_strength', Provider.of<Options>(context, listen: false).language) ?? 'Strength'}: ${Provider.of<Gameplay>(context, listen: false).playerStrength}',
+                    '${Language.Translate('response_strength', options.language) ?? 'Strength'}: ${Provider.of<Gameplay>(context, listen: false).playerStrength}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Agility
                   Text(
-                    '${Language.Translate('response_agility', Provider.of<Options>(context, listen: false).language) ?? 'Agility'}: ${Provider.of<Gameplay>(context, listen: false).playerAgility}',
+                    '${Language.Translate('response_agility', options.language) ?? 'Agility'}: ${Provider.of<Gameplay>(context, listen: false).playerAgility}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Intelligence
                   Text(
-                    '${Language.Translate('response_intelligence', Provider.of<Options>(context, listen: false).language) ?? 'Intelligence'}: ${Provider.of<Gameplay>(context, listen: false).playerIntelligence}',
+                    '${Language.Translate('response_intelligence', options.language) ?? 'Intelligence'}: ${Provider.of<Gameplay>(context, listen: false).playerIntelligence}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Armor
                   Text(
-                    '${Language.Translate('response_armor', Provider.of<Options>(context, listen: false).language) ?? 'Armor'}: ${Provider.of<Gameplay>(context, listen: false).playerArmor}',
+                    '${Language.Translate('response_armor', options.language) ?? 'Armor'}: ${Provider.of<Gameplay>(context, listen: false).playerArmor}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Damage
                   Text(
-                    '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${ClassAtributes.classTranslation(
-                      context: context,
-                      playerDamageCalculationInStats: true,
-                    )}',
+                    '${Language.Translate('response_damage', options.language) ?? 'Damage'}: toDo',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Level
                   Text(
-                    '${Language.Translate('characters_create_level', Provider.of<Options>(context, listen: false).language) ?? 'Level'}: ${Provider.of<Gameplay>(context, listen: false).playerLevel}',
+                    '${Language.Translate('characters_create_level', options.language) ?? 'Level'}: ${Provider.of<Gameplay>(context, listen: false).playerLevel}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
                   //Experience
                   Text(
-                    '${Language.Translate('battle_loot_experience', Provider.of<Options>(context, listen: false).language) ?? 'Experience'} ${Provider.of<Gameplay>(context, listen: false).playerXP.toStringAsFixed(2)} / ${settings.levelCaps[Provider.of<Gameplay>(context, listen: false).playerLevel.toString()]!.toStringAsFixed(2)}',
+                    '${Language.Translate('battle_loot_experience', options.language) ?? 'Experience'} ${Provider.of<Gameplay>(context, listen: false).playerXP.toStringAsFixed(2)} / ${settings.levelCaps[Provider.of<Gameplay>(context, listen: false).playerLevel.toString()]!.toStringAsFixed(2)}',
                     style: TextStyle(
                         color: Theme.of(context).primaryColor, fontSize: 30),
                   ),
@@ -113,33 +109,19 @@ class _GameplayInventoryState extends State<GameplayInventory>
     final gameplay = Provider.of<Gameplay>(context);
     final options = Provider.of<Options>(context);
     final screenSize = MediaQuery.of(context).size;
+    final settings = Provider.of<Settings>(context, listen: false);
 
     //Equiped Item Image
     String showItem({required int index, required String defaultImage}) {
       if (gameplay.playerEquips[index] != 'none') {
-        return Items.list[gameplay.playerEquips[index]]['image'];
+        return settings.itemsId[
+            settings.tierCheck(gameplay.playerEquips[index]['name'])]['image'];
       }
       return defaultImage;
     }
 
     //Show Unequip Items Dialog
-    void unequipItem(itemName, equipIndex) {
-      String itemTranslation;
-      //Translate
-      if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {
-        itemTranslation = itemName.substring(0, itemName.length - 2);
-      } else {
-        itemTranslation = itemName;
-      }
-      //Verify if tier is 0
-      String verifyTier(itemName) {
-        if (Items.returnTier(itemName) == '0') {
-          return '';
-        } else {
-          return '+${Items.returnTier(itemName)}';
-        }
-      }
-
+    void unequipItem(item, equipIndex) {
       showDialog(
           barrierColor: const Color.fromARGB(167, 0, 0, 0),
           context: context,
@@ -151,7 +133,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Unequip item Text
                 title: Text(
-                  '${Language.Translate('response_unequip', Provider.of<Options>(context, listen: false).language) ?? 'Unequip item'} ${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${verifyTier(itemName)}',
+                  '${Language.Translate('response_unequip', options.language) ?? 'Unequip item'} ${Language.Translate('items_${settings.tierCheck(item['name'])}', options.language) ?? 'Item Name'} ${settings.itemTier(item['name'], addPlus: true)}',
                   style: TextStyle(
                       color: Theme.of(context).primaryColor, fontSize: 40),
                 ),
@@ -160,18 +142,18 @@ class _GameplayInventoryState extends State<GameplayInventory>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //Damage Stats
-                    Items.list[itemName]['damage'] != null
+                    gameplay.playerEquips[equipIndex]['baseDamage'] != 0
                         ? Text(
-                            '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Sell Price'}: ${Items.list[itemName]['damage']}',
+                            '${Language.Translate('response_damage', options.language) ?? 'Sell Price'}: ${gameplay.playerEquips[equipIndex]['baseDamage']}',
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor,
                                 fontSize: 30),
                           )
                         : const SizedBox(),
                     //Price Stats
-                    Items.list[itemName]['price'] != null
+                    gameplay.playerEquips[equipIndex]['sell'] != 0
                         ? Text(
-                            '${Language.Translate('response_sellprice', Provider.of<Options>(context, listen: false).language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
+                            '${Language.Translate('response_sellprice', options.language) ?? 'Sell Price'}: ${gameplay.playerEquips[equipIndex]['sell']}',
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor,
                                 fontSize: 30),
@@ -194,15 +176,21 @@ class _GameplayInventoryState extends State<GameplayInventory>
                                     language: Provider.of<Options>(context,
                                             listen: false)
                                         .language);
-                                //Adding in the inventory
-                                Provider.of<Gameplay>(context, listen: false)
-                                    .addSpecificItemInventory(itemName);
-                                //Removing from equipments
-                                Provider.of<Gameplay>(context, listen: false)
-                                    .changePlayerEquips('none', equipIndex);
-                                await MySQL.pushUploadCharacters(
-                                    context: context);
-
+                                await http.post(
+                                    Uri.http(MySQL.url, '/changeEquip'),
+                                    headers: MySQL.headers,
+                                    body: jsonEncode({
+                                      'id': options.id,
+                                      'token': options.token,
+                                      'equipped': 'none',
+                                      'inventory': gameplay.playerInventory,
+                                      'equips': gameplay.playerEquips,
+                                      'selectedCharacter':
+                                          gameplay.selectedCharacter,
+                                      'index': equipIndex,
+                                    }));
+                                // ignore: use_build_context_synchronously
+                                await MySQL.returnPlayerStats(context);
                                 setState(() {
                                   Navigator.pop(context);
                                   Navigator.pop(context);
@@ -276,9 +264,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                     child: FittedBox(
                       child: Text(
                         Language.Translate(
-                                'response_comparation',
-                                Provider.of<Options>(context, listen: false)
-                                    .language) ??
+                                'response_comparation', options.language) ??
                             'Compare',
                         style: TextStyle(
                             color: Theme.of(context).primaryColor,
@@ -299,9 +285,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                     child: FittedBox(
                       child: Text(
                         Language.Translate(
-                                'response_equipped',
-                                Provider.of<Options>(context, listen: false)
-                                    .language) ??
+                                'response_equipped', options.language) ??
                             'Equipped',
                         style: TextStyle(
                             color: Theme.of(context).primaryColor,
@@ -310,14 +294,15 @@ class _GameplayInventoryState extends State<GameplayInventory>
                     ),
                   ),
                   //Damage Text
-                  Items.list[itemName]['damage'] != null
+                  settings.itemsId[settings.tierCheck(itemName)]['damage'] !=
+                          null
                       ? Container(
                           height: screenSize.height * 0.06,
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.centerLeft,
                           child: FittedBox(
                             child: Text(
-                              '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${Items.list[gameplay.playerEquips[Items.translateEquipsIndex(Items.list[itemName]['equip'])]]['damage']}',
+                              '${Language.Translate('response_damage', options.language) ?? 'Damage'}: ${settings.itemsId[gameplay.playerEquips[settings.translateEquipsIndex(settings.itemsId[settings.tierCheck(itemName)]['equip'])[0]]]['damage']}',
                               style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 200),
@@ -338,9 +323,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                     child: FittedBox(
                       child: Text(
                         Language.Translate(
-                                'response_inventory',
-                                Provider.of<Options>(context, listen: false)
-                                    .language) ??
+                                'response_inventory', options.language) ??
                             'Equipped',
                         style: TextStyle(
                             color: Theme.of(context).primaryColor,
@@ -349,14 +332,15 @@ class _GameplayInventoryState extends State<GameplayInventory>
                     ),
                   ),
                   //Damage Text
-                  Items.list[itemName]['damage'] != null
+                  settings.itemsId[settings.tierCheck(itemName)]['damage'] !=
+                          null
                       ? Container(
                           height: screenSize.height * 0.06,
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.centerLeft,
                           child: FittedBox(
                             child: Text(
-                              '${Language.Translate('response_damage', Provider.of<Options>(context, listen: false).language) ?? 'Damage'}: ${Items.list[itemName]['damage']}',
+                              '${Language.Translate('response_damage', options.language) ?? 'Damage'}: ${settings.itemsId[settings.tierCheck(itemName)]['damage']}',
                               style: TextStyle(
                                   color: Theme.of(context).primaryColor,
                                   fontSize: 200),
@@ -372,101 +356,20 @@ class _GameplayInventoryState extends State<GameplayInventory>
 
     //Show Item Infos
     void showItemInfo(String itemName) async {
+      //Translate the item name
       String itemTranslation;
-      //Translate
-      if (Language.Translate('items_${itemName}_desc', 'en_US') == null) {
+      if (Language.Translate(
+              'items_${settings.tierCheck(itemName)}_desc', 'en_US') ==
+          null) {
         itemTranslation = itemName.substring(0, itemName.length - 2);
       } else {
-        itemTranslation = itemName;
-      }
-      //Verify if tier is 0
-      String verifyTier(itemName) {
-        if (Items.returnTier(itemName) == '0') {
-          return '';
-        } else {
-          return '+${Items.returnTier(itemName)}';
-        }
+        itemTranslation = settings.tierCheck(itemName);
       }
 
       showDialog(
           barrierColor: const Color.fromARGB(167, 0, 0, 0),
           context: context,
           builder: (context) {
-            //Gold Special
-            if (Items.list[itemName]['name'] == 'gold') {
-              return FittedBox(
-                child: AlertDialog(
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  //Title
-                  title: Text(
-                    Language.Translate(
-                            'items_$itemTranslation', options.language) ??
-                        'Item Name',
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColor, fontSize: 40),
-                  ),
-                  //Desc & Buttons
-                  content: SizedBox(
-                    width: screenSize.width,
-                    height: 400,
-                    child: Column(
-                      children: [
-                        //Desc & Stats
-                        SizedBox(
-                          height: 300,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                //Desc
-                                Text(
-                                  Language.Translate(
-                                          'items_${itemTranslation}_desc',
-                                          options.language) ??
-                                      'Item Description',
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontSize: 30),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        //Spacer
-                        const SizedBox(height: 30),
-                        //Buttons
-                        FittedBox(
-                          child: Row(
-                            children: [
-                              //Back
-                              SizedBox(
-                                width: 200,
-                                height: 50,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text(
-                                    Language.Translate('response_back',
-                                            options.language) ??
-                                        'No',
-                                    style: TextStyle(
-                                        color: Theme.of(context).primaryColor,
-                                        fontSize: 30),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
             return FittedBox(
               child: AlertDialog(
                 shape: const RoundedRectangleBorder(
@@ -474,14 +377,16 @@ class _GameplayInventoryState extends State<GameplayInventory>
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Title
                 title: Text(
-                  '${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${verifyTier(itemName)}',
+                  '${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${settings.itemTier(itemName, addPlus: true)}',
                   style: TextStyle(
                       color: Theme.of(context).primaryColor, fontSize: 40),
                 ),
                 //Desc & Buttons
                 content: SizedBox(
                   width: screenSize.width,
-                  height: Items.list[itemName]['equip'] != 'none' ? 450 : 400,
+                  height: gameplay.playerInventory[itemName]['equip'] != 'none'
+                      ? 450
+                      : 400,
                   child: Column(
                     children: [
                       //Desc & Stats
@@ -501,46 +406,36 @@ class _GameplayInventoryState extends State<GameplayInventory>
                                     color: Theme.of(context).primaryColor,
                                     fontSize: 30),
                               ),
-                              const SizedBox(height: 10),
-                              //Weapon Widget
-                              Items.list[itemName]['equip'] == '1weapon'
-                                  ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${Language.Translate('response_damage', options.language) ?? 'Sell Price'}: ${Items.list[itemName]['damage']}',
+                              const SizedBox(height: 40),
+                              //Stats Widget
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  //Damage Text
+                                  gameplay.playerInventory[itemName]
+                                              ['baseDamage'] !=
+                                          0
+                                      ? Text(
+                                          '${Language.Translate('response_damage', options.language) ?? 'Sell Price'}: ${gameplay.playerInventory[itemName]['baseDamage']}',
                                           style: TextStyle(
                                               color: Theme.of(context)
                                                   .primaryColor,
                                               fontSize: 30),
-                                        ),
-                                        Text(
-                                          '${Language.Translate('response_sellprice', options.language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
+                                        )
+                                      : const SizedBox(),
+                                  //Sell Text
+                                  gameplay.playerInventory[itemName]['sell'] !=
+                                          0
+                                      ? Text(
+                                          '${Language.Translate('response_sellprice', options.language) ?? 'Sell Price'}: ${gameplay.playerInventory[itemName]['sell']}',
                                           style: TextStyle(
                                               color: Theme.of(context)
                                                   .primaryColor,
                                               fontSize: 30),
-                                        ),
-                                      ],
-                                    )
-                                  : const SizedBox(),
-                              //Misc Widget
-                              Items.list[itemName]['equip'] == 'none'
-                                  ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${Language.Translate('response_sellprice', options.language) ?? 'Sell Price'}: ${Items.list[itemName]['price']}',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
-                                              fontSize: 30),
-                                        ),
-                                      ],
-                                    )
-                                  : const SizedBox(),
+                                        )
+                                      : const SizedBox(),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -552,36 +447,180 @@ class _GameplayInventoryState extends State<GameplayInventory>
                         child: Row(
                           children: [
                             //Equip
-                            Items.list[itemName]['equip'] != 'none'
+                            settings.itemsId[settings.tierCheck(itemName)]
+                                        ['equip'] !=
+                                    'none'
                                 ? SizedBox(
                                     width: 200,
                                     height: 50,
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        //Loading Widget
-                                        MySQL.loadingWidget(
-                                            context: context,
-                                            language: options.language);
-                                        //Removing from inventory
-                                        Provider.of<Gameplay>(context,
-                                                listen: false)
-                                            .removeSpecificItemInventory(
-                                                itemName);
-                                        //Adding in the equipment
-                                        gameplay.changePlayerEquips(
-                                          itemName,
-                                          Items.translateEquipsIndex(
-                                              Items.list[itemName]['equip']),
-                                        );
-                                        //Change the damage
-                                        gameplay.changePlayerDamage(
-                                            Items.list[itemName]['damage']);
-                                        await MySQL.pushUploadCharacters(
-                                            context: context);
-                                        setState(() {
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                        });
+                                        if (settings
+                                                .itemsId[settings.tierCheck(
+                                                    itemName)]['equip']
+                                                .length >
+                                            1) {
+                                          showDialog(
+                                              barrierColor:
+                                                  const Color.fromARGB(
+                                                      167, 0, 0, 0),
+                                              context: context,
+                                              builder: (context) {
+                                                return FittedBox(
+                                                  child: AlertDialog(
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    32.0))),
+                                                    backgroundColor: Theme.of(
+                                                            context)
+                                                        .scaffoldBackgroundColor,
+                                                    //Equip Text
+                                                    title: Text(
+                                                      '${Language.Translate('response_equip', options.language) ?? 'Equip'} ${Language.Translate('items_${settings.tierCheck(itemName)}', options.language) ?? 'Language Error'} ${settings.itemTier(itemName, addPlus: true)}',
+                                                      style: TextStyle(
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .primaryColor),
+                                                    ),
+                                                    content: SizedBox(
+                                                      width: 150,
+                                                      height: 50,
+                                                      child: Center(
+                                                        child: ListView.builder(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          shrinkWrap: true,
+                                                          itemCount: settings
+                                                              .itemsId[
+                                                                  settings.tierCheck(
+                                                                      itemName)]
+                                                                  ['equip']
+                                                              .length,
+                                                          itemBuilder: (context,
+                                                                  index) =>
+                                                              SizedBox(
+                                                            width: 100,
+                                                            height: 50,
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child:
+                                                                  ElevatedButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  final selectedIndex = settings
+                                                                          .itemsId[
+                                                                      settings.tierCheck(
+                                                                          itemName)]['equip'][index];
+                                                                  //Loading Widget
+                                                                  MySQL.loadingWidget(
+                                                                      context:
+                                                                          context,
+                                                                      language:
+                                                                          options
+                                                                              .language);
+                                                                  //Equipped item variable
+                                                                  final equipped =
+                                                                      gameplay.playerInventory[
+                                                                          itemName];
+                                                                  //Add Equip Stats
+                                                                  await http.post(
+                                                                      Uri.http(
+                                                                          MySQL
+                                                                              .url,
+                                                                          '/changeEquip'),
+                                                                      headers: MySQL
+                                                                          .headers,
+                                                                      body:
+                                                                          jsonEncode({
+                                                                        'id': options
+                                                                            .id,
+                                                                        'token':
+                                                                            options.token,
+                                                                        'equipped':
+                                                                            equipped,
+                                                                        'inventory':
+                                                                            gameplay.playerInventory,
+                                                                        'equips':
+                                                                            gameplay.playerEquips,
+                                                                        'selectedCharacter':
+                                                                            gameplay.selectedCharacter,
+                                                                        'index':
+                                                                            selectedIndex,
+                                                                      }));
+                                                                  // ignore: use_build_context_synchronously
+                                                                  await MySQL
+                                                                      .returnPlayerStats(
+                                                                          context);
+                                                                  setState(() {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    FittedBox(
+                                                                  child: Text(
+                                                                    Language.Translate(
+                                                                            'response_equipmentIndex_${settings.itemsId[settings.tierCheck(itemName)]['equip'][index]}',
+                                                                            options.language) ??
+                                                                        'Language Error',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            99),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              });
+                                        } else {
+                                          final selectedIndex = settings
+                                                      .itemsId[
+                                                  settings.tierCheck(itemName)]
+                                              ['equip'][0];
+                                          //Loading Widget
+                                          MySQL.loadingWidget(
+                                              context: context,
+                                              language: options.language);
+                                          //Equipped item variable
+                                          final equipped = gameplay
+                                              .playerInventory[itemName];
+                                          //Add Equip Stats
+                                          await http.post(
+                                              Uri.http(
+                                                  MySQL.url, '/changeEquip'),
+                                              headers: MySQL.headers,
+                                              body: jsonEncode({
+                                                'id': options.id,
+                                                'token': options.token,
+                                                'equipped': equipped,
+                                                'inventory':
+                                                    gameplay.playerInventory,
+                                                'equips': gameplay.playerEquips,
+                                                'selectedCharacter':
+                                                    gameplay.selectedCharacter,
+                                                'index': selectedIndex,
+                                              }));
+                                          // ignore: use_build_context_synchronously
+                                          await MySQL.returnPlayerStats(
+                                              context);
+                                          setState(() {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          });
+                                        }
                                       },
                                       child: Text(
                                         Language.Translate('response_equip',
@@ -596,7 +635,9 @@ class _GameplayInventoryState extends State<GameplayInventory>
                                   )
                                 : const SizedBox(),
                             //Spacer
-                            Items.list[itemName]['equip'] != 'none'
+                            settings.itemsId[settings.tierCheck(itemName)]
+                                        ['equip'] !=
+                                    'none'
                                 ? const SizedBox(width: 50)
                                 : const SizedBox(),
                             //Back
@@ -621,9 +662,11 @@ class _GameplayInventoryState extends State<GameplayInventory>
                         ),
                       ),
                       //Compare
-                      Items.list[itemName]['equip'] != 'none'
-                          ? gameplay.playerEquips[Items.translateEquipsIndex(
-                                      Items.list[itemName]['equip'])] !=
+                      settings.itemsId[settings.tierCheck(itemName)]['equip'] !=
+                              'none'
+                          ? gameplay.playerEquips[settings
+                                          .itemsId[settings.tierCheck(itemName)]
+                                      ['equip'][0]] !=
                                   'none'
                               //Enabled Button
                               ? Padding(
@@ -678,6 +721,14 @@ class _GameplayInventoryState extends State<GameplayInventory>
               ),
             );
           });
+    }
+
+    //Return equipment name by equip index
+    String returnEquipName(index) {
+      if (gameplay.playerEquips[index] == 'none') {
+        return '';
+      }
+      return gameplay.playerEquips[index]['name'];
     }
 
     return Scaffold(
@@ -976,8 +1027,7 @@ class _GameplayInventoryState extends State<GameplayInventory>
                                         ),
                                       ),
                                       //Tier
-                                      Items.returnTier(
-                                                  gameplay.playerEquips[9]) ==
+                                      settings.itemTier(returnEquipName(9)) ==
                                               '0'
                                           ? const SizedBox()
                                           : Align(
@@ -988,8 +1038,8 @@ class _GameplayInventoryState extends State<GameplayInventory>
                                                 child: Stack(
                                                   children: [
                                                     Text(
-                                                      Items.returnTier(gameplay
-                                                          .playerEquips[9]),
+                                                      settings.itemTier(
+                                                          returnEquipName(9)),
                                                       style: TextStyle(
                                                         fontSize: 20,
                                                         fontFamily:
@@ -1007,8 +1057,8 @@ class _GameplayInventoryState extends State<GameplayInventory>
                                                       ),
                                                     ),
                                                     Text(
-                                                      Items.returnTier(gameplay
-                                                          .playerEquips[9]),
+                                                      settings.itemTier(
+                                                          returnEquipName(9)),
                                                       style: const TextStyle(
                                                         fontSize: 20,
                                                         letterSpacing: 5,
@@ -1032,17 +1082,79 @@ class _GameplayInventoryState extends State<GameplayInventory>
                               const SizedBox(width: 30),
                               //Weapon 2
                               Container(
-                                padding: const EdgeInsets.all(15),
+                                padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                                 height: 150,
                                 width: 150,
-                                child: Image.asset(showItem(
-                                    index: 10,
-                                    defaultImage:
-                                        'assets/images/interface/equip2.png')),
+                                child: TextButton(
+                                  onPressed: () =>
+                                      gameplay.playerEquips[10] != 'none'
+                                          ? unequipItem(
+                                              gameplay.playerEquips[10], 10)
+                                          : null,
+                                  child: Stack(
+                                    children: [
+                                      //Image
+                                      SizedBox(
+                                        height: 150,
+                                        width: 150,
+                                        child: Image.asset(
+                                          showItem(
+                                              index: 10,
+                                              defaultImage:
+                                                  'assets/images/interface/equip2.png'),
+                                        ),
+                                      ),
+                                      //Tier
+                                      settings.itemTier(returnEquipName(10)) ==
+                                              '0'
+                                          ? const SizedBox()
+                                          : Align(
+                                              alignment: Alignment.topRight,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 3.0, left: 55.0),
+                                                child: Stack(
+                                                  children: [
+                                                    Text(
+                                                      settings.itemTier(
+                                                          returnEquipName(10)),
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        fontFamily:
+                                                            'PressStart',
+                                                        letterSpacing: 5,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        foreground: Paint()
+                                                          ..style =
+                                                              PaintingStyle
+                                                                  .stroke
+                                                          ..strokeWidth = 1
+                                                          ..color =
+                                                              Colors.white,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      settings.itemTier(
+                                                          returnEquipName(10)),
+                                                      style: const TextStyle(
+                                                        fontSize: 20,
+                                                        letterSpacing: 5,
+                                                        fontFamily:
+                                                            'PressStart',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                    ],
+                                  ),
+                                ),
                               ),
                               //Spacer
                               const SizedBox(width: 20),

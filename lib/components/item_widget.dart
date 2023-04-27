@@ -1,6 +1,6 @@
-import 'package:flublade_project/data/gameplay/items.dart';
-
+import 'package:flublade_project/data/global.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ItemWidget extends StatelessWidget {
   const ItemWidget(
@@ -10,8 +10,9 @@ class ItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final itemColor = Items.returnRarity(itemName);
-    final itemTier = Items.returnTier(itemName);
+    const itemColor = Colors.grey;
+    final settings = Provider.of<Settings>(context, listen: false);
+    final itemTier = settings.itemTier(itemName);
 
     return FittedBox(
       child: Container(
@@ -33,7 +34,7 @@ class ItemWidget extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Image.asset(
-                        Items.list[itemName]['image'],
+                        settings.lootImage(itemName),
                         fit: BoxFit.fill,
                       ),
                     )),

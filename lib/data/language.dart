@@ -43,6 +43,17 @@ class Language {
     'response_magics': 'Magics',
     'response_skills': 'Skills',
     'response_passives': 'Passives',
+    'response_equipmentIndex_0': 'Head',
+    'response_equipmentIndex_1': 'Left Shoulders',
+    'response_equipmentIndex_2': 'Right Shoulders',
+    'response_equipmentIndex_3': 'Necklace',
+    'response_equipmentIndex_4': 'Left Hand',
+    'response_equipmentIndex_5': 'Right Hand',
+    'response_equipmentIndex_6': 'Chest',
+    'response_equipmentIndex_7': 'Legs',
+    'response_equipmentIndex_8': 'Boots',
+    'response_equipmentIndex_9': 'Left Weapon',
+    'response_equipmentIndex_10': 'Right Weapon',
     //Authentication
     'authentication_username': 'Username',
     'authentication_password': 'Password',
@@ -75,7 +86,7 @@ class Language {
     //Options
     'options_language': 'Change Language',
     'options_fasttext': 'Change Text Speed',
-    'options_fasttext_small': 'Small',
+    'options_fasttext_small': 'Low',
     'options_fasttext_medium': 'Medium',
     'options_fasttext_high': 'High',
     //Characters
@@ -150,13 +161,16 @@ class Language {
     'battle_loot_exit': 'Exit',
     'battle_loot_selected': 'Selected',
     'battle_loot_experience': 'Experience:',
-    'battle_log_enemyAttack1': 'You received',
-    'battle_log_enemyAttack2': 'damage from',
-    'battle_log_playerAttack1': 'You did',
-    'battle_log_playerAttack2': 'damage to',
-    'battle_log_enemyDead': 'You killed',
-    'battle_log_playerHealed1': 'You healed',
-    'battle_log_playerHealed2': 'life',
+    'battle_log_enemyAttack1': 'You received ',
+    'battle_log_enemyAttack2': ' damage from ',
+    'battle_log_playerAttack1': 'You did ',
+    'battle_log_playerAttack2': ' damage to ',
+    'battle_log_enemyDead': 'You killed ',
+    'battle_log_playerHealed1': 'You healed ',
+    'battle_log_playerHealed2': ' life',
+    'battle_log_loseHealthByPlayerSkill': 'You lost ',
+    'battle_log_loseHealthByPlayerSkill2': ' life, by ',
+    'battle_log_playerDead': 'Game Over',
     //Level Texts
     'levelup_armor': 'Armor earned:',
     'levelup_strength': 'Strength earned:',
@@ -167,8 +181,8 @@ class Language {
     'items_gold': 'Gold',
     'items_gold_desc':
         'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
-    'items_woodsword': 'Wooden Sword',
-    'items_woodsword_desc':
+    'items_wooden_sword': 'Wooden Sword',
+    'items_wooden_sword_desc':
         'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
     'items_thread': 'Thread',
     'items_thread_desc':
@@ -182,9 +196,11 @@ class Language {
     'magics_type_fire': 'Fire',
     'magics_type_physical': 'Physical',
     'magics_basicAttack': 'Basic Attack',
-    'magics_basicAttack_desc': 'Ataca o inimigo com sua arma, causando dano de ataque total',
+    'magics_basicAttack_desc':
+        'Attacks the enemy with your weapon, dealing the total attack damage',
     'magics_furiousAttack': 'Furious Attack',
-    'magics_furiousAttack_desc': 'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
+    'magics_furiousAttack_desc':
+        'Attacks the enemy with furious, consuming 10% of your maximum health and dealing an additional 100% of your total attack damage',
   };
   //
   //
@@ -227,6 +243,17 @@ class Language {
     'response_magics': 'Magias',
     'response_skills': 'Habilidades',
     'response_passives': 'Passivas',
+    'response_equipmentIndex_0': 'Cabeça',
+    'response_equipmentIndex_1': 'Ombreiras Esquerda',
+    'response_equipmentIndex_2': 'Ombreiras Direita',
+    'response_equipmentIndex_3': 'Amuleto',
+    'response_equipmentIndex_4': 'Mão Esquerda',
+    'response_equipmentIndex_5': 'Mão Direita',
+    'response_equipmentIndex_6': 'Peitoral',
+    'response_equipmentIndex_7': 'Pernas',
+    'response_equipmentIndex_8': 'Pés',
+    'response_equipmentIndex_9': 'Arma Esquerda',
+    'response_equipmentIndex_10': 'Arma Direita',
     //Authentication
     'authentication_username': 'Usuário',
     'authentication_password': 'Senha',
@@ -332,13 +359,16 @@ class Language {
     'battle_loot_exit': 'Sair',
     'battle_loot_selected': 'Selecionado',
     'battle_loot_experience': 'Expêriencia:',
-    'battle_log_playerAttack1': 'Você causou',
-    'battle_log_playerAttack2': 'dano em',
-    'battle_log_enemyAttack1': 'Você recebeu',
-    'battle_log_enemyAttack2': 'dano de',
-    'battle_log_enemyDead': 'Você matou',
-    'battle_log_playerHealed1': 'Você curou',
-    'battle_log_playerHealed2': 'vida',
+    'battle_log_playerAttack1': 'Você causou ',
+    'battle_log_playerAttack2': ' dano em ',
+    'battle_log_enemyAttack1': 'Você recebeu ',
+    'battle_log_enemyAttack2': ' dano de ',
+    'battle_log_enemyDead': 'Você matou ',
+    'battle_log_playerHealed1': 'Você curou ',
+    'battle_log_playerHealed2': ' vida',
+    'battle_log_loseHealthByPlayerSkill': 'Você perdeu ',
+    'battle_log_loseHealthByPlayerSkill2':
+        ' de vida, por causa da habilidade: ',
     //Level Texts
     'levelup_armor': 'Armadura ganha:',
     'levelup_strength': 'Força ganha:',
@@ -349,8 +379,8 @@ class Language {
     'items_gold': 'Ouro',
     'items_gold_desc':
         'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
-    'items_woodsword': 'Espada de Madeira',
-    'items_woodsword_desc':
+    'items_wooden_sword': 'Espada de Madeira',
+    'items_wooden_sword_desc':
         'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
     'items_thread': 'Linha',
     'items_thread_desc':
@@ -364,8 +394,10 @@ class Language {
     'magics_type_fire': 'Fogo',
     'magics_type_physical': 'Fisíco',
     'magics_basicAttack': 'Ataque Básico',
-    'magics_basicAttack_desc': 'Ataca o inimigo com sua arma, causando dano de ataque total',
+    'magics_basicAttack_desc':
+        'Ataca o inimigo com sua arma, causando dano de ataque total',
     'magics_furiousAttack': 'Ataque Furioso',
-    'magics_furiousAttack_desc': 'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
+    'magics_furiousAttack_desc':
+        'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
   };
 }

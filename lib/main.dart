@@ -98,6 +98,16 @@ class _FlubladeProjectState extends State<FlubladeProject> {
               errorMsgContext: 'Failed to connect to the Servers',
               context: context);
         }
+        //Null Check
+        if (result == null) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pushReplacementNamed('/authenticationpage');
+          GlobalFunctions.errorDialog(
+              errorMsgTitle: 'authentication_register_problem_connection',
+              errorMsgContext: 'Failed to connect to the Servers',
+              context: context);
+          return;
+        }
         result = jsonDecode(result.body);
         if (result['message'] == 'Success') {
           //Reload infos

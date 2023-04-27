@@ -491,8 +491,6 @@ class MySQL {
         value: double.parse(selectedCharacter['intelligence'].toString()),
         stats: 'intelligence');
     gameplay.changeStats(
-        value: int.parse(selectedCharacter['luck'].toString()), stats: 'luck');
-    gameplay.changeStats(
         value: selectedCharacter['inventory'], stats: 'inventory');
     gameplay.changeStats(value: selectedCharacter['equips'], stats: 'equips');
     gameplay.changeStats(value: selectedCharacter['buffs'], stats: 'buffs');
@@ -508,33 +506,18 @@ class MySQLGameplay {
   static Future returnGameplayStats(context) async {
     final settings = Provider.of<Settings>(context, listen: false);
     dynamic result;
-    //Receive Base Atributes
+    //Receive All Stats
     result = await http.post(
       Uri.http(MySQL.url, '/gameplayStats'),
       headers: MySQL.headers,
       body: jsonEncode({
-        'baseAtributes': true,
+        'all': true,
       }),
     );
     settings.changeBaseAtributes(jsonDecode(result.body)['baseAtributes']);
-    //Receive Level Caps
-    result = await http.post(
-      Uri.http(MySQL.url, '/gameplayStats'),
-      headers: MySQL.headers,
-      body: jsonEncode({
-        'levelCaps': true,
-      }),
-    );
     settings.changeLevelCaps(jsonDecode(result.body)['levelCaps']);
-    //Receive Skills Info
-    result = await http.post(
-      Uri.http(MySQL.url, '/gameplayStats'),
-      headers: MySQL.headers,
-      body: jsonEncode({
-        'skillsId': true,
-      }),
-    );
     settings.changeSkillsId(jsonDecode(result.body)['skillsId']);
+    settings.changeItemsId(jsonDecode(result.body)['itemsId']);
   }
 
   //Return Level
