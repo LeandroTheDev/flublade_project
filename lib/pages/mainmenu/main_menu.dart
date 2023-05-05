@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -82,7 +84,6 @@ class _MainMenuState extends State<MainMenu> {
                                       const Duration(milliseconds: 50));
                                   //Refresh
                                   await MySQL.pushCharacters(context: context);
-                                  // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(
                                       context, '/characterselection');
                                   Future.delayed(
@@ -113,7 +114,6 @@ class _MainMenuState extends State<MainMenu> {
                                   });
                                   //Refresh
                                   await MySQL.pushCharacters(context: context);
-                                  // ignore: use_build_context_synchronously
                                   Navigator.pushNamed(
                                       context, '/charactersmenu');
                                   Future.delayed(

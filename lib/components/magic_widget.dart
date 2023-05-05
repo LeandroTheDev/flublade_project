@@ -3,12 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MagicWidget extends StatelessWidget {
-  const MagicWidget({this.skillIndex = '', super.key});
-  final String skillIndex;
+  const MagicWidget({required this.name, this.isPassive = false, super.key});
+  final String name;
+  final bool isPassive;
 
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    //Returns type
+    String typeFunction() {
+      if (isPassive) {
+        return 'none';
+      } else {
+        return gameplay.playerSkills[name]['type'];
+      }
+    }
 
     return FittedBox(
       child: SizedBox(
@@ -21,10 +30,10 @@ class MagicWidget extends StatelessWidget {
                 width: 100,
                 height: 100,
                 child: Image.asset(
-                  gameplay.playerSkills[skillIndex]['image'],
+                  isPassive ? gameplay.playerBuffs[name]['image'] : gameplay.playerSkills[name]['image'],
                   fit: BoxFit.contain,
                 )),
-            gameplay.playerSkills[skillIndex]['type'] == 'none'
+            typeFunction() == 'none'
                 ? const SizedBox()
                 : Align(
                     alignment: Alignment.topRight,
@@ -35,7 +44,7 @@ class MagicWidget extends StatelessWidget {
                               width: 30,
                               height: 30,
                               child: Image.asset(
-                                'assets/skills/${gameplay.playerSkills[skillIndex]['type']}Indicator.png',
+                                'assets/skills/${gameplay.playerSkills[name]['type']}Indicator.png',
                                 fit: BoxFit.contain,
                               )),
                     ),

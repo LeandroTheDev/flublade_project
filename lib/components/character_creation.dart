@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
 
 import 'package:flublade_project/data/global.dart';
@@ -123,7 +124,6 @@ class _CharacterCreationState extends State<CharacterCreation> {
                                 'class': characterClass,
                               }));
                         } catch (error) {
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                           //Connection Error
                           GlobalFunctions.errorDialog(
@@ -137,7 +137,6 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         result = jsonDecode(result.body);
                         //Empty Text
                         if (result['message'] == 'Empty') {
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                           GlobalFunctions.errorDialog(
                               errorMsgTitle: 'characters_create_error_empty',
@@ -148,7 +147,6 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         }
                         //Too big Text
                         if (result['message'] == 'Too big') {
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                           GlobalFunctions.errorDialog(
                               errorMsgTitle:
@@ -161,14 +159,10 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         //Success
                         if (result['message'] == 'Success') {
                           gameplay.changeCharacters(result['characters']);
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                         } else {
-                          // ignore: use_build_context_synchronously
                           Navigator.pop(context);
                           //Connection Error
                           GlobalFunctions.errorDialog(

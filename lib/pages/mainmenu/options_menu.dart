@@ -29,13 +29,11 @@ class _OptionsMenuState extends State<OptionsMenu> {
           builder: (context) {
             return FittedBox(
               child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Language Text
                 title: Text(
-                  Language.Translate('options_fasttext', options.language) ??
-                      'Text Speed',
+                  Language.Translate('options_fasttext', options.language) ?? 'Text Speed',
                   style: TextStyle(color: Theme.of(context).primaryColor),
                 ),
                 content: SizedBox(
@@ -44,6 +42,20 @@ class _OptionsMenuState extends State<OptionsMenu> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        //Very Small
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              options.changeTextSpeed(1500);
+                              SaveDatas.setTextSpeed(options.textSpeed);
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              Language.Translate('options_fasttext_verySmall', options.language) ?? 'Very Small',
+                            ),
+                          ),
+                        ),
                         //Small
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -54,9 +66,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              Language.Translate('options_fasttext_small',
-                                      options.language) ??
-                                  'Small',
+                              Language.Translate('options_fasttext_small', options.language) ?? 'Small',
                             ),
                           ),
                         ),
@@ -70,9 +80,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              Language.Translate('options_fasttext_medium',
-                                      options.language) ??
-                                  'Medium',
+                              Language.Translate('options_fasttext_medium', options.language) ?? 'Medium',
                             ),
                           ),
                         ),
@@ -86,9 +94,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                               Navigator.pop(context);
                             },
                             child: Text(
-                              Language.Translate('options_fasttext_high',
-                                      options.language) ??
-                                  'High',
+                              Language.Translate('options_fasttext_high', options.language) ?? 'High',
                             ),
                           ),
                         ),
@@ -135,9 +141,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                         padding: const EdgeInsets.all(20),
                         height: screenSize.height * 0.2,
                         width: screenSize.width * 0.8,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Theme.of(context).colorScheme.secondary),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                         child: FittedBox(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,15 +149,11 @@ class _OptionsMenuState extends State<OptionsMenu> {
                               //Icon and Text
                               Row(
                                 children: [
-                                  Icon(Icons.language,
-                                      color: Theme.of(context).primaryColor),
+                                  Icon(Icons.language, color: Theme.of(context).primaryColor),
                                   const SizedBox(width: 5),
                                   Text(
-                                    Language.Translate('options_language',
-                                            options.language) ??
-                                        'Change Language',
-                                    style: TextStyle(
-                                        color: Theme.of(context).primaryColor),
+                                    Language.Translate('options_language', options.language) ?? 'Change Language',
+                                    style: TextStyle(color: Theme.of(context).primaryColor),
                                   ),
                                 ],
                               ),
@@ -178,9 +178,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                         padding: const EdgeInsets.all(20),
                         height: screenSize.height * 0.2,
                         width: screenSize.width * 0.8,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Theme.of(context).colorScheme.secondary),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                         child: FittedBox(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,15 +186,11 @@ class _OptionsMenuState extends State<OptionsMenu> {
                               //Icon and Text
                               Row(
                                 children: [
-                                  Icon(Icons.text_fields,
-                                      color: Theme.of(context).primaryColor),
+                                  Icon(Icons.text_fields, color: Theme.of(context).primaryColor),
                                   const SizedBox(width: 5),
                                   Text(
-                                    Language.Translate('options_fasttext',
-                                            options.language) ??
-                                        'Change Language',
-                                    style: TextStyle(
-                                        color: Theme.of(context).primaryColor),
+                                    Language.Translate('options_fasttext', options.language) ?? 'Change Language',
+                                    style: TextStyle(color: Theme.of(context).primaryColor),
                                   ),
                                 ],
                               ),

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flublade_project/data/global.dart';
@@ -179,16 +181,13 @@ class CharacterSelection extends StatelessWidget {
                                                 context: context);
                                         //Check if connection success
                                         if (result != false) {
-                                          // ignore: use_build_context_synchronously
                                           Provider.of<Gameplay>(context,
                                                   listen: false)
                                               .changeSelectedCharacter(index);
-                                          // ignore: use_build_context_synchronously
                                           await MySQL.returnPlayerStats(
                                               context);
-                                          // ignore: use_build_context_synchronously
-                                          await MySQLGameplay.returnGameplayStats(context);
-                                          // ignore: use_build_context_synchronously
+                                          await MySQLGameplay
+                                              .returnGameplayStats(context);
                                           Navigator.of(context)
                                               .pushNamedAndRemoveUntil(
                                                   '/ingame',

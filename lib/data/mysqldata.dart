@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -14,7 +16,7 @@ import 'package:http/http.dart' as http;
 
 class MySQL {
   //Backend Connection
-  static const ip = 'localhost';
+  static const ip = '192.168.0.6';
   static const ports = 8080;
   static const url = '$ip:$ports';
   static const headers = {
@@ -33,8 +35,7 @@ class MySQL {
   );
 
   //Loading
-  static void loadingWidget(
-      {required BuildContext context, required String language}) {
+  static void loadingWidget({required BuildContext context, required String language}) {
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -42,22 +43,16 @@ class MySQL {
           return WillPopScope(
             onWillPop: () async => false,
             child: AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               //Language Text
               title: Text(
-                Language.Translate(
-                        'authentication_register_loading', language) ??
-                    'Loading',
+                Language.Translate('authentication_register_loading', language) ?? 'Loading',
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               content: const Padding(
                 padding: EdgeInsets.all(50.0),
-                child: SizedBox(
-                    width: 100,
-                    height: 100,
-                    child: CircularProgressIndicator()),
+                child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()),
               ),
             ),
           );
@@ -80,30 +75,21 @@ class MySQL {
         result = await http.post(
           Uri.http(url, '/updateLanguage'),
           headers: headers,
-          body: jsonEncode(
-              {"id": options.id, "language": language, "token": options.token}),
+          body: jsonEncode({"id": options.id, "language": language, "token": options.token}),
         );
       } catch (error) {
-        GlobalFunctions.errorDialog(
-            errorMsgTitle: 'authentication_register_problem_connection',
-            errorMsgContext: 'Failed to connect to the Servers',
-            context: context);
+        GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
         return;
       }
       if (jsonDecode(result.body)['message'] == 'Invalid Login') {
         Navigator.pushNamed(context, '/authenticationpage');
-        GlobalFunctions.errorDialog(
-            errorMsgTitle: 'authentication_invalidlogin',
-            errorMsgContext: 'Invalid Session',
-            context: context,
-            popUntil: '/authenticationpage');
+        GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
         return;
       }
       //Pop the Dialog
       Navigator.pop(context);
       Navigator.pop(context);
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (BuildContext context) => widget));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
     }
 
     showDialog(
@@ -112,14 +98,11 @@ class MySQL {
         builder: (context) {
           return FittedBox(
             child: AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               //Language Text
               title: Text(
-                Language.Translate(
-                        'authentication_language', options.language) ??
-                    'Language',
+                Language.Translate('authentication_language', options.language) ?? 'Language',
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               content: SizedBox(
@@ -169,14 +152,7 @@ class MySQL {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode({
-            'id': options.id,
-            'token': options.token,
-            'selectedCharacter': gameplay.selectedCharacter,
-            'onlyInventory': true
-          }));
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -193,17 +169,14 @@ class MySQL {
   }
 
   //Push and Upload Characters
-  static Future<String> pushUploadCharacters(
-      {required BuildContext context}) async {
+  static Future<String> pushUploadCharacters({required BuildContext context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     dynamic charactersdb;
 
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -217,35 +190,26 @@ class MySQL {
     //Updates
     if (true) {
       //Update Inventory
-      charactersdb['character${gameplay.selectedCharacter}']['inventory'] =
-          gameplay.playerInventory;
+      charactersdb['character${gameplay.selectedCharacter}']['inventory'] = gameplay.playerInventory;
       //Update Equips
-      charactersdb['character${gameplay.selectedCharacter}']['equips'] =
-          gameplay.playerEquips;
+      charactersdb['character${gameplay.selectedCharacter}']['equips'] = gameplay.playerEquips;
       //Update Level
-      charactersdb['character${gameplay.selectedCharacter}']['level'] =
-          gameplay.playerLevel;
+      charactersdb['character${gameplay.selectedCharacter}']['level'] = gameplay.playerLevel;
       //Update XP
-      charactersdb['character${gameplay.selectedCharacter}']['xp'] =
-          gameplay.playerXP;
+      charactersdb['character${gameplay.selectedCharacter}']['xp'] = gameplay.playerXP;
       //Update Skillpoints
-      charactersdb['character${gameplay.selectedCharacter}']['skillpoint'] =
-          gameplay.playerSkillpoint;
+      charactersdb['character${gameplay.selectedCharacter}']['skillpoint'] = gameplay.playerSkillpoint;
       //Update Strength
-      charactersdb['character${gameplay.selectedCharacter}']['strength'] =
-          gameplay.playerStrength;
+      charactersdb['character${gameplay.selectedCharacter}']['strength'] = gameplay.playerStrength;
       //Update Agility
-      charactersdb['character${gameplay.selectedCharacter}']['agility'] =
-          gameplay.playerIntelligence;
+      charactersdb['character${gameplay.selectedCharacter}']['agility'] = gameplay.playerIntelligence;
       //Update Intelligence
-      charactersdb['character${gameplay.selectedCharacter}']['intelligence'] =
-          gameplay.playerIntelligence;
+      charactersdb['character${gameplay.selectedCharacter}']['intelligence'] = gameplay.playerIntelligence;
     }
     //Transform into String
     charactersdb = jsonEncode(charactersdb);
     //Upload to database
-    final result =
-        await updateCharacters(characters: charactersdb, context: context);
+    final result = await updateCharacters(characters: charactersdb, context: context);
     //Error Treatment
     if (true) {
       if (result == 'Invalid Login') {
@@ -265,26 +229,17 @@ class MySQL {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
     } catch (error) {
       //Connection Error
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_register_problem_connection',
-          errorMsgContext: 'Failed to connect to the Servers',
-          context: context);
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
       return 'Connection Error';
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
     if (charactersdb['message'] == 'Invalid Login') {
       Navigator.pushNamed(context, '/authenticationpage');
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_invalidlogin',
-          errorMsgContext: 'Invalid Session',
-          context: context,
-          popUntil: '/authenticationpage');
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
       return 'Invalid Login';
     }
     gameplay.changeCharacters(charactersdb['characters']);
@@ -292,8 +247,7 @@ class MySQL {
   }
 
   //Update Characters
-  static updateCharacters(
-      {String characters = '', context, bool isLevelUp = false}) async {
+  static updateCharacters({String characters = '', context, bool isLevelUp = false}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     dynamic charactersdb = jsonDecode(characters);
@@ -310,26 +264,11 @@ class MySQL {
               'isLevelUp': true,
             }));
         //Change Stats
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])[
-                'character${gameplay.selectedCharacter}']['strength'],
-            stats: 'strength');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])[
-                'character${gameplay.selectedCharacter}']['agility'],
-            stats: 'agility');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])[
-                'character${gameplay.selectedCharacter}']['intelligence'],
-            stats: 'intelligence');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])[
-                'character${gameplay.selectedCharacter}']['armor'],
-            stats: 'armor');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])[
-                'character${gameplay.selectedCharacter}']['skillpoint'],
-            stats: 'skillpoint');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['strength'], stats: 'strength');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['agility'], stats: 'agility');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['intelligence'], stats: 'intelligence');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['armor'], stats: 'armor');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['skillpoint'], stats: 'skillpoint');
       } else {
         //Connection
         result = await http.post(Uri.http(url, '/updateCharacters'),
@@ -338,8 +277,7 @@ class MySQL {
               'id': options.id,
               'token': options.token,
               'selectedCharacter': gameplay.selectedCharacter,
-              'name': charactersdb['character${gameplay.selectedCharacter}']
-                  ['name'],
+              'name': charactersdb['character${gameplay.selectedCharacter}']['name'],
               'life': gameplay.playerLife,
               'mana': gameplay.playerMana,
               'armor': gameplay.playerArmor,
@@ -353,8 +291,7 @@ class MySQL {
               'inventory': gameplay.playerInventory,
               'buffs': gameplay.playerBuffs,
               'equips': gameplay.playerEquips,
-              'location': charactersdb['character${gameplay.selectedCharacter}']
-                  ['location'],
+              'location': charactersdb['character${gameplay.selectedCharacter}']['location'],
             }));
       }
       //Token Check
@@ -375,28 +312,17 @@ class MySQL {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/removeCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode(
-              {'id': options.id, 'token': options.token, 'index': index}));
+      charactersdb = await http.post(Uri.http(url, '/removeCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
     } catch (error) {
       //Connection Error
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_register_problem_connection',
-          errorMsgContext: 'Failed to connect to the Servers',
-          context: context,
-          popUntil: '/charactercreation');
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/charactercreation');
       return;
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
     if (charactersdb['message'] == 'Invalid Login') {
       Navigator.pushNamed(context, '/authenticationpage');
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_invalidlogin',
-          errorMsgContext: 'Invalid Session',
-          context: context,
-          popUntil: '/authenticationpage');
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
       return;
     }
     //Success
@@ -412,30 +338,18 @@ class MySQL {
     final Map characters = jsonDecode(gameplay.characters);
     //Return Class
     if (returned == 'class') {
-      final String characterClass =
-          characters['character${gameplay.selectedCharacter}']['class'];
+      final String characterClass = characters['character${gameplay.selectedCharacter}']['class'];
       return characterClass;
     }
     //Return Player Location
     if (returned == 'location') {
       final Map characters = jsonDecode(gameplay.characters);
       //World Name
-      final String location =
-          characters['character${gameplay.selectedCharacter}']['location']
-              .substring(
-                  0,
-                  characters['character${gameplay.selectedCharacter}']
-                              ['location']
-                          .length -
-                      3);
+      final String location = characters['character${gameplay.selectedCharacter}']['location'].substring(0, characters['character${gameplay.selectedCharacter}']['location'].length - 3);
       //World ID
       gameplay.changeWorldId(
         int.parse(
-          characters['character${gameplay.selectedCharacter}']['location']
-              .substring(characters['character${gameplay.selectedCharacter}']
-                          ['location']
-                      .length -
-                  3),
+          characters['character${gameplay.selectedCharacter}']['location'].substring(characters['character${gameplay.selectedCharacter}']['location'].length - 3),
         ),
       );
       return location;
@@ -450,9 +364,7 @@ class MySQL {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -464,39 +376,21 @@ class MySQL {
     charactersdb = jsonDecode(charactersdb.body);
     charactersdb = jsonDecode(charactersdb['characters']);
     //Pickup Selected Character
-    final selectedCharacter =
-        charactersdb['character${gameplay.selectedCharacter}'];
+    final selectedCharacter = charactersdb['character${gameplay.selectedCharacter}'];
     //Return Stats
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['life'].toString()),
-        stats: 'life');
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['mana'].toString()),
-        stats: 'mana');
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['armor'].toString()),
-        stats: 'armor');
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['xp'].toString()), stats: 'xp');
-    gameplay.changeStats(
-        value: int.parse(selectedCharacter['level'].toString()),
-        stats: 'level');
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['strength'].toString()),
-        stats: 'strength');
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['agility'].toString()),
-        stats: 'agility');
-    gameplay.changeStats(
-        value: double.parse(selectedCharacter['intelligence'].toString()),
-        stats: 'intelligence');
-    gameplay.changeStats(
-        value: selectedCharacter['inventory'], stats: 'inventory');
+    gameplay.changeStats(value: double.parse(selectedCharacter['life'].toString()), stats: 'life');
+    gameplay.changeStats(value: double.parse(selectedCharacter['mana'].toString()), stats: 'mana');
+    gameplay.changeStats(value: double.parse(selectedCharacter['armor'].toString()), stats: 'armor');
+    gameplay.changeStats(value: double.parse(selectedCharacter['xp'].toString()), stats: 'xp');
+    gameplay.changeStats(value: int.parse(selectedCharacter['level'].toString()), stats: 'level');
+    gameplay.changeStats(value: double.parse(selectedCharacter['strength'].toString()), stats: 'strength');
+    gameplay.changeStats(value: double.parse(selectedCharacter['agility'].toString()), stats: 'agility');
+    gameplay.changeStats(value: double.parse(selectedCharacter['intelligence'].toString()), stats: 'intelligence');
+    gameplay.changeStats(value: selectedCharacter['inventory'], stats: 'inventory');
     gameplay.changeStats(value: selectedCharacter['equips'], stats: 'equips');
     gameplay.changeStats(value: selectedCharacter['buffs'], stats: 'buffs');
     gameplay.changeStats(value: selectedCharacter['xp'], stats: 'xp');
-    gameplay.changeStats(
-        value: selectedCharacter['skillpoint'], stats: 'skillpoint');
+    gameplay.changeStats(value: selectedCharacter['skillpoint'], stats: 'skillpoint');
     gameplay.changeStats(value: selectedCharacter['skills'], stats: 'skills');
   }
 }
@@ -521,8 +415,7 @@ class MySQLGameplay {
   }
 
   //Return Level
-  static Future<List<dynamic>> returnLevel(
-      {required BuildContext context, required String level}) async {
+  static Future<List<dynamic>> returnLevel({required BuildContext context, required String level}) async {
     final connection = await MySQL.database;
     List results = [];
     List<List<double>> listLevel = [];
@@ -530,8 +423,7 @@ class MySQLGameplay {
     //Push Tiles
     while (true) {
       //Receive from database
-      dynamic leveldb = await connection
-          .query('select list$a from world where name = ?', [level]);
+      dynamic leveldb = await connection.query('select list$a from world where name = ?', [level]);
       leveldb = leveldb.toString().replaceFirst('(Fields: {list$a: ', '');
       leveldb = leveldb.substring(0, leveldb.length - 2);
       //Verify if is empty
@@ -550,12 +442,10 @@ class MySQLGameplay {
     results.add(listLevel);
 
     //Returning the NPCs
-    // ignore: use_build_context_synchronously
     List<GameComponent> npc = await returnNPCs(context, level);
     results.add(npc);
 
     //Returning the Enemys
-    // ignore: use_build_context_synchronously
     List<Enemy> enemy = await returnEnemys(context, level);
     results.add(enemy);
 
@@ -563,11 +453,9 @@ class MySQLGameplay {
   }
 
   //Return NPCs
-  static Future<List<GameComponent>> returnNPCs(
-      BuildContext context, String level) async {
+  static Future<List<GameComponent>> returnNPCs(BuildContext context, String level) async {
     final connection = await MySQL.database;
-    dynamic npcdb =
-        await connection.query('select npc from world where name = ?', [level]);
+    dynamic npcdb = await connection.query('select npc from world where name = ?', [level]);
     npcdb = npcdb.toString().replaceFirst('(Fields: {npc: ', '');
     npcdb = npcdb.substring(0, npcdb.length - 2);
     List<GameComponent> npc = [];
@@ -576,19 +464,13 @@ class MySQLGameplay {
       npcdb = jsonDecode(npcdb);
       double positionx = double.parse(npcdb['npc0']['positionx']);
       double positiony = double.parse(npcdb['npc0']['positiony']);
-      npc.add(parseNPC(
-          npcname: npcdb['npc0']['name'],
-          position: Vector2(positionx, positiony),
-          talk: npcdb['npc0']['talk']));
+      npc.add(parseNPC(npcname: npcdb['npc0']['name'], position: Vector2(positionx, positiony), talk: npcdb['npc0']['talk']));
       int i = 1;
       while (true) {
         if (npcdb['npc$i'] != null) {
           positionx = double.parse(npcdb['npc$i']['positionx']);
           positiony = double.parse(npcdb['npc$i']['positiony']);
-          npc.add(parseNPC(
-              npcname: npcdb['npc$i']['name'],
-              position: Vector2(positionx, positiony),
-              talk: npcdb['npc$i']['talk']));
+          npc.add(parseNPC(npcname: npcdb['npc$i']['name'], position: Vector2(positionx, positiony), talk: npcdb['npc$i']['talk']));
         }
         i++;
         break;
@@ -598,11 +480,9 @@ class MySQLGameplay {
   }
 
   //Return Enemys
-  static Future<List<Enemy>> returnEnemys(
-      BuildContext context, String level) async {
+  static Future<List<Enemy>> returnEnemys(BuildContext context, String level) async {
     final connection = await MySQL.database;
-    dynamic enemysdb = await connection
-        .query('select enemy from world where name = ?', [level]);
+    dynamic enemysdb = await connection.query('select enemy from world where name = ?', [level]);
     enemysdb = enemysdb.toString().replaceFirst('(Fields: {enemy: ', '');
     enemysdb = enemysdb.substring(0, enemysdb.length - 2);
     List<Enemy> enemy = [];
@@ -617,63 +497,77 @@ class MySQLGameplay {
       double xp;
       double positionx;
       double positiony;
-      //Transforming in MAP
-      enemysdb = jsonDecode(enemysdb);
-      name = enemysdb['enemy0']['name'].toString();
-      life = double.parse(enemysdb['enemy0']['life'].toString());
-      mana = double.parse(enemysdb['enemy0']['mana'].toString());
-      damage = double.parse(enemysdb['enemy0']['damage'].toString());
-      armor = double.parse(enemysdb['enemy0']['armor'].toString());
-      level = int.parse(enemysdb['enemy0']['level'].toString());
-      xp = double.parse(enemysdb['enemy0']['xp'].toString());
-      positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
-      positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
-      //Adding the first enemy
-      enemy.add(parseEnemy(
-        enemyname: name,
-        position: Vector2(positionx, positiony),
-        life: life,
-        mana: mana,
-        damage: damage,
-        armor: armor,
-        level: level,
-        xp: xp,
-      ));
-      int i = 1;
-      while (true) {
-        if (enemysdb['enemy$i'] != null) {
-          name = enemysdb['enemy$i']['name'].toString();
-          life = double.parse(enemysdb['enemy$i']['life'].toString());
-          mana = double.parse(enemysdb['enemy$i']['mana'].toString());
-          damage = double.parse(enemysdb['enemy$i']['damage'].toString());
-          armor = double.parse(enemysdb['enemy$i']['armor'].toString());
-          level = int.parse(enemysdb['enemy$i']['level'].toString());
-          xp = double.parse(enemysdb['enemy$i']['xp'].toString());
-          positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
-          positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
-          enemy.add(parseEnemy(
-              enemyname: name,
-              position: Vector2(positionx, positiony),
-              life: life,
-              mana: mana,
-              damage: damage,
-              armor: armor,
-              level: level,
-              xp: xp));
-        } else {
-          break;
+      List buffs;
+      List skills;
+      try {
+        //Transforming in MAP
+        enemysdb = jsonDecode(enemysdb);
+        name = enemysdb['enemy0']['name'].toString();
+        life = double.parse(enemysdb['enemy0']['life'].toString());
+        mana = double.parse(enemysdb['enemy0']['mana'].toString());
+        damage = double.parse(enemysdb['enemy0']['damage'].toString());
+        armor = double.parse(enemysdb['enemy0']['armor'].toString());
+        level = int.parse(enemysdb['enemy0']['level'].toString());
+        xp = double.parse(enemysdb['enemy0']['xp'].toString());
+        positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
+        positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
+        buffs = enemysdb['enemy0']['buffs'];
+        skills = enemysdb['enemy0']['skills'];
+        //Adding the first enemy
+        enemy.add(parseEnemy(
+          enemyname: name,
+          position: Vector2(positionx, positiony),
+          life: life,
+          mana: mana,
+          damage: damage,
+          armor: armor,
+          level: level,
+          xp: xp,
+          buffs: buffs,
+          skills: skills,
+        ));
+        int i = 1;
+        while (true) {
+          if (enemysdb['enemy$i'] != null) {
+            name = enemysdb['enemy$i']['name'].toString();
+            life = double.parse(enemysdb['enemy$i']['life'].toString());
+            mana = double.parse(enemysdb['enemy$i']['mana'].toString());
+            damage = double.parse(enemysdb['enemy$i']['damage'].toString());
+            armor = double.parse(enemysdb['enemy$i']['armor'].toString());
+            level = int.parse(enemysdb['enemy$i']['level'].toString());
+            xp = double.parse(enemysdb['enemy$i']['xp'].toString());
+            positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
+            positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
+            buffs = enemysdb['enemy$i']['buffs'];
+            skills = enemysdb['enemy$i']['skills'];
+            enemy.add(
+              parseEnemy(
+                enemyname: name,
+                position: Vector2(positionx, positiony),
+                life: life,
+                mana: mana,
+                damage: damage,
+                armor: armor,
+                level: level,
+                xp: xp,
+                buffs: buffs,
+                skills: skills,
+              ),
+            );
+          } else {
+            break;
+          }
+          i++;
         }
-        i++;
+      } catch (error) {
+        print(error);
       }
     }
     return enemy;
   }
 
   //Parse NPCs
-  static SimpleNpc parseNPC(
-      {required String npcname,
-      required Vector2 position,
-      required String talk}) {
+  static SimpleNpc parseNPC({required String npcname, required Vector2 position, required String talk}) {
     switch (npcname) {
       case "wizard":
         return NPCWizard(position, talk);
@@ -691,27 +585,35 @@ class MySQLGameplay {
     required double armor,
     required int level,
     required double xp,
+    required List buffs,
+    required List skills,
   }) {
     switch (enemyname) {
       case "smallspider":
         return EnemySmallSpider(
-            name: enemyname,
-            life: life,
-            mana: mana,
-            damage: damage,
-            armor: armor,
-            level: level,
-            xp: xp,
-            position: position);
+          name: enemyname,
+          life: life,
+          mana: mana,
+          damage: damage,
+          armor: armor,
+          level: level,
+          xp: xp,
+          position: position,
+          buffs: buffs,
+          skills: skills,
+        );
     }
     return EnemySmallSpider(
-        name: 'smallspider',
-        life: 100,
-        mana: 100,
-        damage: 1,
-        armor: 0,
-        level: 0,
-        xp: 0,
-        position: position);
+      name: 'smallspider',
+      life: 100,
+      mana: 100,
+      damage: 1,
+      armor: 0,
+      level: 0,
+      xp: 0,
+      position: position,
+      buffs: buffs,
+      skills: skills,
+    );
   }
 }

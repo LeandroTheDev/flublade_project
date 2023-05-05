@@ -13,6 +13,8 @@ class EnemySmallSpider extends SimpleEnemy {
   late double enemyArmor;
   late int enemyLevel;
   late double enemyXP;
+  late List enemyBuffs;
+  late List enemySkills;
   EnemySmallSpider({
     required Vector2 position,
     required String name,
@@ -22,6 +24,8 @@ class EnemySmallSpider extends SimpleEnemy {
     required double armor,
     required int level,
     required double xp,
+    required List buffs,
+    required List skills,
   }) : super(
           position: position,
           size: Vector2(32, 32),
@@ -166,10 +170,13 @@ class EnemySmallSpider extends SimpleEnemy {
     enemyArmor = armor;
     enemyLevel = level;
     enemyXP = xp;
+    enemyBuffs = buffs;
+    enemySkills = skills;
   }
 
   @override
   void update(double dt) {
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     seeAndMoveToPlayer(
         radiusVision:
             Provider.of<Gameplay>(context, listen: false).enemysMove ? 100 : 0,
@@ -178,29 +185,25 @@ class EnemySmallSpider extends SimpleEnemy {
           //Start seeing
           if (!stopLoading) {
             //Freeze Other Enemys
-            Provider.of<Gameplay>(context, listen: false)
-                .changeEnemyMove(false);
+            gameplay.changeEnemyMove(false);
             //Add Enemy Stats
-            Provider.of<Gameplay>(context, listen: false)
-                .changeEnemyName(enemyName);
-            Provider.of<Gameplay>(context, listen: false)
-                .changeStats(value: enemyLife, stats: 'elife');
-            Provider.of<Gameplay>(context, listen: false)
-                .changeStats(value: enemyMana, stats: 'emana');
-            Provider.of<Gameplay>(context, listen: false)
-                .changeStats(value: enemyDamage, stats: 'edamage');
-            Provider.of<Gameplay>(context, listen: false)
-                .changeStats(value: enemyArmor, stats: 'earmor');
-            Provider.of<Gameplay>(context, listen: false)
-                .changeStats(value: enemyLevel, stats: 'elevel');
-            Provider.of<Gameplay>(context, listen: false)
-                .changeStats(value: enemyXP, stats: 'exp');
+            gameplay.changeEnemyName(enemyName);
+            gameplay.changeStats(value: enemyLife, stats: 'elife');
+            gameplay.changeStats(value: enemyMana, stats: 'emana');
+            gameplay.changeStats(value: enemyDamage, stats: 'edamage');
+            gameplay.changeStats(value: enemyArmor, stats: 'earmor');
+            gameplay.changeStats(value: enemyLevel, stats: 'elevel');
+            gameplay.changeStats(value: enemyXP, stats: 'exp');
+            gameplay.changeStats(value: enemyBuffs, stats: 'ebuffs');
+            gameplay.changeStats(value: enemySkills, stats: 'eskills');
             //Push to battle scene
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => BattleScene(
                         backContext: gameRef.context,
+                        enemyMaxLife: gameplay.enemyLife,
+                        enemyMaxMana: gameplay.enemyMana,
                       )),
             );
             stopLoading = true;

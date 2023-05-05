@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flublade_project/data/global.dart';
@@ -26,6 +28,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
     final accountCreateUrl = Uri.http(MySQL.url, '/createAcc');
@@ -176,7 +179,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             }));
                                         //No connection
                                       } catch (error) {
-                                        // ignore: use_build_context_synchronously
                                         Navigator.pop(context);
                                         GlobalFunctions.errorDialog(
                                             errorMsgTitle:
@@ -192,7 +194,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         if (jsonDecode(
                                                 result.body)["message"] ==
                                             'Too small or too big username') {
-                                          // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
                                             errorMsgTitle:
@@ -207,7 +208,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         if (jsonDecode(
                                                 result.body)["message"] ==
                                             'Too small password or too big password') {
-                                          // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
                                             errorMsgTitle:
@@ -222,7 +222,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         if (jsonDecode(
                                                 result.body)["message"] ==
                                             'Username already exists') {
-                                          // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
                                             errorMsgTitle:
@@ -237,7 +236,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         if (jsonDecode(
                                                 result.body)["message"] ==
                                             'Unkown error') {
-                                          // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
                                             errorMsgTitle:
@@ -252,7 +250,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         if (jsonDecode(
                                                 result.body)["message"] ==
                                             'Success') {
-                                          // ignore: use_build_context_synchronously
                                           Navigator.pop(context);
                                           //Show Result Dialog
                                           showDialog(
@@ -570,13 +567,12 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   result['token']);
                                               SaveDatas.setRemember(
                                                   options.remember);
+                                              SaveDatas.setId(options.id);
                                               //Push Characters
                                               String characters =
                                                   await MySQL.pushCharacters(
                                                       context: context);
-                                              // ignore: use_build_context_synchronously
-                                              Provider.of<Gameplay>(context,
-                                                      listen: false)
+                                              gameplay
                                                   .changeCharacters(characters);
                                               SaveDatas.setCharacters(
                                                   characters);
@@ -593,14 +589,12 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               String characters =
                                                   await MySQL.pushCharacters(
                                                       context: context);
-                                              // ignore: use_build_context_synchronously
                                               Provider.of<Gameplay>(context,
                                                       listen: false)
                                                   .changeCharacters(characters);
                                             }
                                             settings.changeIsLoading(
                                                 value: false);
-                                            // ignore: use_build_context_synchronously
                                             Navigator.pushReplacementNamed(
                                                 context, '/mainmenu');
                                           }

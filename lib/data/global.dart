@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flublade_project/components/character_creation.dart';
@@ -166,24 +168,16 @@ class SaveDatas {
   static const _keyTextSpeed = 700;
 
   //Load Datas
-  static Future init() async =>
-      _preferences = await SharedPreferences.getInstance();
+  static Future init() async => _preferences = await SharedPreferences.getInstance();
 
   //Set Datas
-  static Future setUsername(String username) async =>
-      await _preferences.setString(_keyUsername, username);
-  static Future setToken(String token) async =>
-      await _preferences.setString(_keyToken, token);
-  static Future setId(int id) async =>
-      await _preferences.setInt(_keyId.toString(), id);
-  static Future setRemember(bool remember) async =>
-      await _preferences.setBool(_keyRemember.toString(), remember);
-  static Future setLanguage(String language) async =>
-      await _preferences.setString(_keyLanguage, language);
-  static Future setCharacters(String characters) async =>
-      await _preferences.setString(_keyCharacters, characters);
-  static Future setTextSpeed(int textSpeed) async =>
-      await _preferences.setInt(_keyTextSpeed.toString(), textSpeed);
+  static Future setUsername(String username) async => await _preferences.setString(_keyUsername, username);
+  static Future setToken(String token) async => await _preferences.setString(_keyToken, token);
+  static Future setId(int id) async => await _preferences.setInt(_keyId.toString(), id);
+  static Future setRemember(bool remember) async => await _preferences.setBool(_keyRemember.toString(), remember);
+  static Future setLanguage(String language) async => await _preferences.setString(_keyLanguage, language);
+  static Future setCharacters(String characters) async => await _preferences.setString(_keyCharacters, characters);
+  static Future setTextSpeed(int textSpeed) async => await _preferences.setInt(_keyTextSpeed.toString(), textSpeed);
 
   //Get Datas
   static String? getUsername() => _preferences.getString(_keyUsername);
@@ -221,17 +215,14 @@ class GlobalFunctions {
         context: context,
         builder: (context) {
           return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             title: Text(
-              Language.Translate(errorMsgTitle, options.language) ??
-                  'Are you sure?',
+              Language.Translate(errorMsgTitle, options.language) ?? 'Are you sure?',
               style: TextStyle(color: Theme.of(context).primaryColor),
             ),
             content: Text(
-              Language.Translate(errorMsgContext, options.language) ??
-                  'MsgContext',
+              Language.Translate(errorMsgContext, options.language) ?? 'MsgContext',
               style: TextStyle(color: Theme.of(context).primaryColor),
             ),
             actions: [
@@ -243,12 +234,8 @@ class GlobalFunctions {
                   options.changeRemember(value: false);
                   options.changeId(0);
                   SaveDatas.setRemember(false);
-                  Provider.of<Gameplay>(context, listen: false)
-                      .changeCharacters('{}');
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => const AuthenticationPage()),
-                      (Route<dynamic> route) => false);
+                  Provider.of<Gameplay>(context, listen: false).changeCharacters('{}');
+                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const AuthenticationPage()), (Route<dynamic> route) => false);
                 },
                 child: Text(
                   Language.Translate('response_yes', options.language) ?? 'Yes',
@@ -286,12 +273,10 @@ class GlobalFunctions {
             child: WillPopScope(
               onWillPop: () async => false,
               child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 title: Text(
-                  Language.Translate('battle_loot', options.language) ??
-                      'Language Error',
+                  Language.Translate('battle_loot', options.language) ?? 'Language Error',
                   style: TextStyle(color: Theme.of(context).primaryColor),
                 ),
                 //Loot Items
@@ -305,8 +290,7 @@ class GlobalFunctions {
                           padding: const EdgeInsets.all(8.0),
                           child: GridView.builder(
                             physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
                             ),
                             shrinkWrap: true,
@@ -323,8 +307,7 @@ class GlobalFunctions {
                           padding: const EdgeInsets.only(top: 15.0),
                           child: Text(
                             '${Language.Translate('battle_loot_experience', options.language) ?? 'Language Error'} $xp',
-                            style: TextStyle(
-                                color: Theme.of(context).primaryColor),
+                            style: TextStyle(color: Theme.of(context).primaryColor),
                           ),
                         ),
                       ],
@@ -335,83 +318,51 @@ class GlobalFunctions {
                   //Take All
                   ElevatedButton(
                     onPressed: () async {
-                      MySQL.loadingWidget(
-                          context: context, language: options.language);
+                      MySQL.loadingWidget(context: context, language: options.language);
                       //Earn Xp
-                      gameplay.changeStats(
-                          value: gameplay.playerXP + xp, stats: 'xp');
+                      gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                       //Add items
                       gameplay.addInventoryItem(loots);
                       //Level Update
                       bool levelUpDialog = false;
                       //XP Add
                       while (true) {
-                        if (gameplay.playerXP >=
-                            settings
-                                .levelCaps[gameplay.playerLevel.toString()]!) {
+                        if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
                           //Removing the xp difference
-                          gameplay.changeStats(
-                              value: gameplay.playerXP -
-                                  settings.levelCaps[
-                                      gameplay.playerLevel.toString()]!,
-                              stats: 'xp');
+                          gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
                           //Increasing the level
-                          gameplay.changeStats(
-                              value: gameplay.playerLevel + 1, stats: 'level');
+                          gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
                           levelUpDialog = true;
                           //Update Level Stats
-                          await MySQL.updateCharacters(
-                              context: context,
-                              characters: gameplay.characters,
-                              isLevelUp: true);
+                          await MySQL.updateCharacters(context: context, characters: gameplay.characters, isLevelUp: true);
                           //Update All Stats
-                          await MySQL.updateCharacters(
-                              context: context,
-                              characters: gameplay.characters);
+                          await MySQL.updateCharacters(context: context, characters: gameplay.characters);
                         } else {
                           break;
                         }
                       }
-                      final result =
-                          await MySQL.pushUploadCharacters(context: context);
-                      // ignore: use_build_context_synchronously
+                      final result = await MySQL.pushUploadCharacters(context: context);
                       Navigator.pop(context);
-                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
-                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                       //Error Treatment
                       if (true) {
                         //Connection
                         if (result == 'Connection Error') {
-                          // ignore: use_build_context_synchronously
                           Navigator.pushNamed(context, '/authenticationpage');
-                          GlobalFunctions.errorDialog(
-                              errorMsgTitle:
-                                  'authentication_register_problem_connection',
-                              errorMsgContext:
-                                  'Failed to connect to the Servers',
-                              context: context,
-                              popUntil: '/authenticationpage');
+                          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
                           return;
                         }
                         //Invalid Login
                         if (result == 'Invalid Login') {
-                          // ignore: use_build_context_synchronously
                           Navigator.pushNamed(context, '/authenticationpage');
-                          GlobalFunctions.errorDialog(
-                              errorMsgTitle: 'authentication_invalidlogin',
-                              errorMsgContext: 'Invalid Session',
-                              context: context,
-                              popUntil: '/authenticationpage');
+                          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
                           return;
                         }
                       }
                       //Level up dialog
                       if (levelUpDialog == false) {
-                        // ignore: use_build_context_synchronously
-                        Provider.of<Gameplay>(context, listen: false)
-                            .changeEnemyMove(true);
+                        Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                       } else {
                         //Level up Dialog
                         showDialog(
@@ -422,24 +373,17 @@ class GlobalFunctions {
                                 onWillPop: () async => false,
                                 child: FittedBox(
                                   child: AlertDialog(
-                                    shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(32.0))),
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                                     backgroundColor: Colors.transparent,
                                     content: Stack(
                                       children: [
                                         //Conffeti Level Up
                                         Container(
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(30)),
+                                          decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
                                           width: 280,
                                           height: 220,
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
+                                            borderRadius: BorderRadius.circular(30),
                                             child: Image.asset(
                                               'assets/images/interface/levelUp.gif',
                                               fit: BoxFit.cover,
@@ -448,59 +392,36 @@ class GlobalFunctions {
                                         ),
                                         //Level Up Interface
                                         Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             //Level Up Text
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.all(20.0),
+                                              padding: const EdgeInsets.all(20.0),
                                               child: Text(
-                                                Language.Translate(
-                                                        'response_levelup',
-                                                        options.language) ??
-                                                    'Level UP',
-                                                style: TextStyle(
-                                                    fontFamily: 'PressStart',
-                                                    fontSize: 15,
-                                                    color: Theme.of(context)
-                                                        .primaryColor),
+                                                Language.Translate('response_levelup', options.language) ?? 'Level UP',
+                                                style: TextStyle(fontFamily: 'PressStart', fontSize: 15, color: Theme.of(context).primaryColor),
                                               ),
                                             ),
                                             //Level Number
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.all(30.0),
+                                              padding: const EdgeInsets.all(30.0),
                                               child: Center(
                                                 child: Text(
-                                                  gameplay.playerLevel
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize: 40,
-                                                      fontFamily: 'PressStart',
-                                                      color: Theme.of(context)
-                                                          .primaryColor),
+                                                  gameplay.playerLevel.toString(),
+                                                  style: TextStyle(fontSize: 40, fontFamily: 'PressStart', color: Theme.of(context).primaryColor),
                                                 ),
                                               ),
                                             ),
                                             //Ok button
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.all(20.0),
+                                              padding: const EdgeInsets.all(20.0),
                                               child: ElevatedButton(
                                                 onPressed: () {
                                                   Navigator.pop(context);
-                                                  Provider.of<Gameplay>(context,
-                                                          listen: false)
-                                                      .changeEnemyMove(true);
+                                                  Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                                                 },
                                                 child: Center(
-                                                  child: Text(
-                                                      Language.Translate(
-                                                              'response_ok',
-                                                              options
-                                                                  .language) ??
-                                                          'Ok'),
+                                                  child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
                                                 ),
                                               ),
                                             ),
@@ -516,8 +437,7 @@ class GlobalFunctions {
                     },
                     //Text
                     child: Text(
-                      Language.Translate('battle_loot_all', options.language) ??
-                          'Take All',
+                      Language.Translate('battle_loot_all', options.language) ?? 'Take All',
                     ),
                   ),
                   //Exit
@@ -526,138 +446,82 @@ class GlobalFunctions {
                       bool levelUpDialog = false;
                       if (gameplay.playerInventorySelected.isNotEmpty) {
                         //Loading
-                        MySQL.loadingWidget(
-                            context: context, language: options.language);
+                        MySQL.loadingWidget(context: context, language: options.language);
                         //Earn Xp
-                        gameplay.changeStats(
-                            value: gameplay.playerXP + xp, stats: 'xp');
+                        gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                         //Add Items
-                        gameplay
-                            .addInventoryItem(gameplay.playerInventorySelected);
+                        gameplay.addInventoryItem(gameplay.playerInventorySelected);
                         //XP Add
                         while (true) {
-                          if (gameplay.playerXP >=
-                              settings.levelCaps[
-                                  gameplay.playerLevel.toString()]!) {
+                          if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
                             //Removing the xp difference
-                            gameplay.changeStats(
-                                value: gameplay.playerXP -
-                                    settings.levelCaps[
-                                        gameplay.playerLevel.toString()]!,
-                                stats: 'xp');
+                            gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
                             //Increasing the level
-                            gameplay.changeStats(
-                                value: gameplay.playerLevel + 1,
-                                stats: 'level');
+                            gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
                             levelUpDialog = true;
                           } else {
                             break;
                           }
                         }
                         //Update Database
-                        final result =
-                            await MySQL.pushUploadCharacters(context: context);
+                        final result = await MySQL.pushUploadCharacters(context: context);
                         //Error Treatment
                         if (true) {
                           //Connection
                           if (result == 'Connection Error') {
-                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(
-                                errorMsgTitle:
-                                    'authentication_register_problem_connection',
-                                errorMsgContext:
-                                    'Failed to connect to the Servers',
-                                context: context,
-                                popUntil: '/authenticationpage');
+                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
                             return;
                           }
                           //Invalid Login
                           if (result == 'Invalid Login') {
-                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(
-                                errorMsgTitle: 'authentication_invalidlogin',
-                                errorMsgContext: 'Invalid Session',
-                                context: context,
-                                popUntil: '/authenticationpage');
+                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
                             return;
                           }
                         }
-                        // ignore: use_build_context_synchronously
                         Navigator.pop(context);
                       } else {
                         //Earn Xp
-                        gameplay.changeStats(
-                            value: gameplay.playerXP + xp, stats: 'xp');
+                        gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                         //XP Add
                         while (true) {
-                          if (gameplay.playerXP >=
-                              settings.levelCaps[
-                                  gameplay.playerLevel.toString()]!) {
+                          if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
                             //Removing the xp difference
-                            gameplay.changeStats(
-                                value: gameplay.playerXP -
-                                    settings.levelCaps[
-                                        gameplay.playerLevel.toString()]!,
-                                stats: 'xp');
+                            gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
                             //Increasing the level
-                            gameplay.changeStats(
-                                value: gameplay.playerLevel + 1,
-                                stats: 'level');
+                            gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
                             levelUpDialog = true;
                           } else {
                             break;
                           }
                         }
                         //Update Database
-                        final result =
-                            await MySQL.pushUploadCharacters(context: context);
+                        final result = await MySQL.pushUploadCharacters(context: context);
                         //Error Treatment
                         if (true) {
                           //Connection
                           if (result == 'Connection Error') {
-                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(
-                                errorMsgTitle:
-                                    'authentication_register_problem_connection',
-                                errorMsgContext:
-                                    'Failed to connect to the Servers',
-                                context: context,
-                                popUntil: '/authenticationpage');
+                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
                             return;
                           }
                           //Invalid Login
                           if (result == 'Invalid Login') {
-                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(
-                                errorMsgTitle: 'authentication_invalidlogin',
-                                errorMsgContext: 'Invalid Session',
-                                context: context,
-                                popUntil: '/authenticationpage');
+                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
                             return;
                           }
                         }
                       }
-                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
-                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                       //Level up dialog
                       if (levelUpDialog == false) {
-                        // ignore: use_build_context_synchronously
-                        Provider.of<Gameplay>(context, listen: false)
-                            .changeEnemyMove(true);
+                        Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                       } else {
-                        final characters = jsonDecode(
-                            // ignore: use_build_context_synchronously
-                            Provider.of<Gameplay>(context, listen: false)
-                                .characters);
-                        final characterClass =
-                            characters['character${gameplay.selectedCharacter}']
-                                ['class'];
+                        final characters = jsonDecode(Provider.of<Gameplay>(context, listen: false).characters);
+                        final characterClass = characters['character${gameplay.selectedCharacter}']['class'];
                         //Level up Dialog
                         showDialog(
                             barrierColor: const Color.fromARGB(167, 0, 0, 0),
@@ -667,75 +531,52 @@ class GlobalFunctions {
                                 onWillPop: () async => false,
                                 child: FittedBox(
                                   child: AlertDialog(
-                                      shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(32.0))),
-                                      backgroundColor: Theme.of(context)
-                                          .scaffoldBackgroundColor,
+                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                       title: Text(
-                                        Language.Translate('response_levelup',
-                                                options.language) ??
-                                            'Level UP',
-                                        style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor),
+                                        Language.Translate('response_levelup', options.language) ?? 'Level UP',
+                                        style: TextStyle(color: Theme.of(context).primaryColor),
                                       ),
                                       content: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           //Armor Text
                                           Text(
                                             '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${settings.baseAtributes[characterClass]!['armorLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
                                           const SizedBox(height: 4),
                                           //Strength Text
                                           Text(
                                             '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${settings.baseAtributes[characterClass]!['strengthLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
                                           const SizedBox(height: 4),
                                           //Agility Text
                                           Text(
                                             '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${settings.baseAtributes[characterClass]!['agilityLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
                                           const SizedBox(height: 4),
                                           //Intelligence Text
                                           Text(
                                             '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${settings.baseAtributes[characterClass]!['intelligenceLevel']}',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
                                           //Skillpoints TExt
                                           const SizedBox(height: 4),
                                           Text(
                                             '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor),
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
                                           const SizedBox(height: 20),
                                           ElevatedButton(
                                             onPressed: () {
                                               Navigator.pop(context);
-                                              Provider.of<Gameplay>(context,
-                                                      listen: false)
-                                                  .changeEnemyMove(true);
+                                              Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                                             },
                                             child: Center(
-                                              child: Text(Language.Translate(
-                                                      'response_ok',
-                                                      options.language) ??
-                                                  'Ok'),
+                                              child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
                                             ),
                                           ),
                                         ],
@@ -747,9 +588,7 @@ class GlobalFunctions {
                     },
                     //Text
                     child: Text(
-                      Language.Translate(
-                              'battle_loot_exit', options.language) ??
-                          'Take All',
+                      Language.Translate('battle_loot_exit', options.language) ?? 'Take All',
                     ),
                   ),
                 ],
@@ -774,26 +613,25 @@ class GlobalFunctions {
           return WillPopScope(
             onWillPop: () async => false,
             child: AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Language Text
+              //Sad face
               title: Text(
                 ':(',
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
+              //Error information
               content: Text(
-                Language.Translate(errorMsgTitle, options.language) ??
-                    errorMsgContext,
+                Language.Translate(errorMsgTitle, options.language) ?? errorMsgContext,
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
+              //Ok Button
               actions: [
                 Center(
                     child: ElevatedButton(
                   onPressed: () {
                     if (popUntil != null) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          popUntil, (Route<dynamic> route) => false);
+                      Navigator.of(context).pushNamedAndRemoveUntil(popUntil, (Route<dynamic> route) => false);
                     } else {
                       Navigator.pop(context);
                     }
@@ -814,13 +652,11 @@ class GlobalFunctions {
         builder: (context) {
           return FittedBox(
             child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Language Text
                 title: Text(
-                  Language.Translate('pausemenu_pause', options.language) ??
-                      'Pause',
+                  Language.Translate('pausemenu_pause', options.language) ?? 'Pause',
                   style: TextStyle(color: Theme.of(context).primaryColor),
                 ),
                 content: Column(
@@ -832,9 +668,7 @@ class GlobalFunctions {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text(Language.Translate(
-                                'pausemenu_continue', options.language) ??
-                            'Continue'),
+                        child: Text(Language.Translate('pausemenu_continue', options.language) ?? 'Continue'),
                       ),
                     ),
                     //Options
@@ -844,9 +678,7 @@ class GlobalFunctions {
                         onPressed: () {
                           Navigator.pushNamed(context, '/optionsmenu');
                         },
-                        child: Text(Language.Translate(
-                                'pausemenu_options', options.language) ??
-                            'Options'),
+                        child: Text(Language.Translate('pausemenu_options', options.language) ?? 'Options'),
                       ),
                     ),
                     //Disconnect
@@ -854,12 +686,9 @@ class GlobalFunctions {
                       padding: const EdgeInsets.all(15.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              '/mainmenu', (Route route) => false);
+                          Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },
-                        child: Text(Language.Translate(
-                                'pausemenu_disconnect', options.language) ??
-                            'Disconnect'),
+                        child: Text(Language.Translate('pausemenu_disconnect', options.language) ?? 'Disconnect'),
                       ),
                     ),
                   ],
@@ -923,7 +752,7 @@ class Gameplay with ChangeNotifier {
   bool _enemysMove = true;
   String _selectedTalk = '';
   int _worldId = 0;
-  final List<String> _battleLog = [];
+  List<String> _battleLog = [];
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
@@ -950,6 +779,8 @@ class Gameplay with ChangeNotifier {
   int _enemyLevel = 0;
   double _enemyDamage = 0;
   double _enemyXP = 0;
+  List _enemyBuffs = [];
+  List _enemySkills = [];
 
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
@@ -982,6 +813,8 @@ class Gameplay with ChangeNotifier {
   int get enemyLevel => _enemyLevel;
   double get enemyDamage => _enemyDamage;
   double get enemyXP => _enemyXP;
+  List get enemyBuffs => _enemyBuffs;
+  List get enemySkills => _enemySkills;
 
   //Change Selected Skill
   void changePlayerSelectedSkill(value) {
@@ -1006,15 +839,13 @@ class Gameplay with ChangeNotifier {
       //If already have quantity
       if (playerInventory[removedItem]['quantity'] > 1) {
         //Remove 1 quantity
-        playerInventory[removedItem]['quantity'] =
-            playerInventory[removedItem]['quantity'] - 1;
+        playerInventory[removedItem]['quantity'] = playerInventory[removedItem]['quantity'] - 1;
       } else {
         playerInventory.remove(removedItem);
       }
     }
 
-    final equip = settings.translateEquipsIndex(
-        settings.itemsId[settings.tierCheck(itemName)]['equip']);
+    final equip = settings.translateEquipsIndex(settings.itemsId[settings.tierCheck(itemName)]['equip']);
     if (_playerEquips[equip[0]] != 'none') {
       addSpecificItemInventory(_playerEquips[equip[0]]);
       removingFunction(itemName);
@@ -1034,8 +865,7 @@ class Gameplay with ChangeNotifier {
     try {
       if (playerInventory[item['name']]['quantity'] >= 1) {
         //Add 1 quantity
-        playerInventory[item['name']]['quantity'] =
-            playerInventory[item['name']]['quantity'] + 1;
+        playerInventory[item['name']]['quantity'] = playerInventory[item['name']]['quantity'] + 1;
       }
       //Add to the inventory if doesnt exist
     } catch (error) {
@@ -1068,11 +898,15 @@ class Gameplay with ChangeNotifier {
       if (!value['log$i'].toString().contains('_')) {
         result = '$result${value['log$i'].toString()}';
       } else {
-        result =
-            '$result${Language.Translate(value['log$i'], options.language) ?? 'Language Error'}';
+        result = '$result${Language.Translate(value['log$i'], options.language) ?? 'Language Error'}';
       }
     }
     _battleLog.add(result);
+    notifyListeners();
+  }
+
+  void resetBattleLog() {
+    _battleLog = [];
     notifyListeners();
   }
 
@@ -1194,6 +1028,14 @@ class Gameplay with ChangeNotifier {
       _enemyXP = value;
       notifyListeners();
       return;
+    } else if (stats == 'ebuffs') {
+      _enemyBuffs = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'eskills') {
+      _enemySkills = value;
+      notifyListeners();
+      return;
     }
   }
 
@@ -1213,21 +1055,13 @@ class Gameplay with ChangeNotifier {
           i++;
           jumpClear = true;
         }
-        //Inventory Scan
-        for (int a = 0; a <= _playerInventory.length - 1; a++) {
-          //Doesnt Exist in inventory
-          if (_playerInventory[items[i]['name']] == null) {
-            _playerInventory[items[i]['name']] = items[i];
-            //Stop Loop
-            break;
-            //Exist in inventory
-          } else {
-            final calculation = _playerInventory[items[i]['name']]['quantity'] +
-                items[i]['quantity'];
-            _playerInventory[items[i]['name']]['quantity'] = calculation;
-            //Stop Loop
-            break;
-          }
+        //Doesnt Exist in inventory
+        if (_playerInventory[items[i]['name']] == null) {
+          _playerInventory[items[i]['name']] = items[i];
+          //Exist in inventory
+        } else {
+          final calculation = _playerInventory[items[i]['name']]['quantity'] + items[i]['quantity'];
+          _playerInventory[items[i]['name']]['quantity'] = calculation;
         }
       } catch (_) {}
     }
@@ -1281,8 +1115,7 @@ class Gameplay with ChangeNotifier {
                               child: SizedBox(
                                 width: 17.5,
                                 height: 26,
-                                child:
-                                    Image.asset('assets/images/npc/wizard.png'),
+                                child: Image.asset('assets/images/npc/wizard.png'),
                               )),
                         ],
                       )),
@@ -1302,12 +1135,8 @@ class Gameplay with ChangeNotifier {
                             height: screenSize.height * 0.05,
                             child: SingleChildScrollView(
                               child: Text(
-                                Language.Translate(gameplay.selectedTalk,
-                                        options.language) ??
-                                    'Language Error',
-                                style: TextStyle(
-                                    fontSize: 5,
-                                    color: Theme.of(context).primaryColor),
+                                Language.Translate(gameplay.selectedTalk, options.language) ?? 'Language Error',
+                                style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
                               ),
                             ),
                           ),

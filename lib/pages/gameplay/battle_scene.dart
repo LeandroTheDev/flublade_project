@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:flublade_project/data/global.dart';
@@ -10,7 +12,14 @@ import '../../data/mysqldata.dart';
 
 class BattleScene extends StatefulWidget {
   final BuildContext backContext;
-  const BattleScene({required this.backContext, super.key});
+  final double enemyMaxLife;
+  final double enemyMaxMana;
+  const BattleScene({
+    super.key,
+    required this.backContext,
+    required this.enemyMaxLife,
+    required this.enemyMaxMana,
+  });
 
   @override
   State<BattleScene> createState() => _BattleSceneState();
@@ -24,9 +33,7 @@ class _BattleSceneState extends State<BattleScene> {
   void initState() {
     super.initState();
     //Start battle in last log
-    Future.delayed(const Duration(milliseconds: 1)).then((value) =>
-        _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 1), curve: Curves.linear));
+    Future.delayed(const Duration(milliseconds: 1)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 1), curve: Curves.linear));
   }
 
   @override
@@ -74,8 +81,7 @@ class _BattleSceneState extends State<BattleScene> {
                                 height: 500,
                                 child: Text(
                                   '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${gameplay.playerLife}',
-                                  style: const TextStyle(
-                                      fontFamily: 'PressStart', fontSize: 500),
+                                  style: const TextStyle(fontFamily: 'PressStart', fontSize: 500),
                                 ),
                               ),
                             ],
@@ -106,8 +112,7 @@ class _BattleSceneState extends State<BattleScene> {
                                 height: 500,
                                 child: Text(
                                   '${Language.Translate('battle_mana', options.language) ?? 'Mana'}: ${gameplay.playerMana}',
-                                  style: const TextStyle(
-                                      fontFamily: 'PressStart', fontSize: 500),
+                                  style: const TextStyle(fontFamily: 'PressStart', fontSize: 500),
                                 ),
                               ),
                             ],
@@ -126,8 +131,7 @@ class _BattleSceneState extends State<BattleScene> {
                 SizedBox(
                   width: screenSize.width,
                   height: screenSize.height * 0.45,
-                  child: Image.asset('assets/locations/prologue/paradise.png',
-                      fit: BoxFit.cover),
+                  child: Image.asset('assets/locations/prologue/paradise.png', fit: BoxFit.cover),
                 ),
                 //Enemy image
                 SizedBox(
@@ -174,9 +178,7 @@ class _BattleSceneState extends State<BattleScene> {
                                   //Text
                                   Text(
                                     gameplay.enemyLevel.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 500,
-                                        fontFamily: 'PressStart'),
+                                    style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
                                   ),
                                 ],
                               ),
@@ -197,14 +199,12 @@ class _BattleSceneState extends State<BattleScene> {
                       children: [
                         FittedBox(
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 500.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 500.0),
                             child: Row(
                               children: [
                                 //ELife Image
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 200.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 200.0),
                                   child: SizedBox(
                                     width: 1000,
                                     height: 1000,
@@ -246,8 +246,7 @@ class _BattleSceneState extends State<BattleScene> {
                                 ),
                                 //EMana Image
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 200.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 200.0),
                                   child: SizedBox(
                                     width: 1000,
                                     height: 1000,
@@ -316,95 +315,65 @@ class _BattleSceneState extends State<BattleScene> {
                                       isFighting = true;
                                     });
                                     //Attack Enemy
-                                    dynamic result = await http.post(
-                                        Uri.http(MySQL.url, 'attackEnemy'),
+                                    dynamic result = await http.post(Uri.http(MySQL.url, 'attackEnemy'),
                                         headers: MySQL.headers,
                                         body: jsonEncode({
                                           'enemyLife': gameplay.enemyLife,
-                                          'enemyArmor': gameplay.enemyArmor,
                                           'enemyMana': gameplay.enemyMana,
+                                          'enemyMaxLife': widget.enemyMaxLife,
+                                          'enemyMaxMana': widget.enemyMaxMana,
+                                          'enemyArmor': gameplay.enemyArmor,
                                           'enemyDamage': gameplay.enemyDamage,
                                           'enemyXP': gameplay.enemyXP,
                                           'enemyLevel': gameplay.enemyLevel,
-                                          'playerSkill':
-                                              gameplay.playerSelectedSkill,
-                                          'selectedCharacter':
-                                              gameplay.selectedCharacter,
+                                          'enemyBuffs': gameplay.enemyBuffs,
+                                          'enemySkills': gameplay.enemySkills,
+                                          'playerSkill': gameplay.playerSelectedSkill,
+                                          'selectedCharacter': gameplay.selectedCharacter,
                                           'enemyName': gameplay.enemyName,
                                           'id': options.id,
                                           'token': options.token,
                                         }));
                                     result = jsonDecode(result.body);
                                     //Continue Battle
-                                    for (int i = 0;
-                                        i < result['battleLog'].length;
-                                        i++) {
-                                      // ignore: use_build_context_synchronously
-                                      gameplay.addBattleLog(
-                                          result['battleLog'][i], context);
+                                    for (int i = 0; i < result['battleLog'].length; i++) {
+                                      gameplay.addBattleLog(result['battleLog'][i], context);
                                       //Animation
-                                      Future.delayed(
-                                              const Duration(milliseconds: 10))
-                                          .then((value) => //Animation
-                                              _scrollController.animateTo(
-                                                  _scrollController
-                                                      .position.maxScrollExtent,
-                                                  duration: const Duration(
-                                                      milliseconds: 300),
-                                                  curve: Curves.easeOut));
-                                      await Future.delayed(Duration(
-                                          milliseconds: options.textSpeed));
+                                      Future.delayed(const Duration(milliseconds: 100)).then((value) => //Animation
+                                          _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+                                      await Future.delayed(Duration(milliseconds: options.textSpeed));
                                     }
                                     //Update Enemy
                                     if (true) {
-                                      gameplay.changeStats(
-                                          value: result['enemyLife'],
-                                          stats: 'elife');
-                                      gameplay.changeStats(
-                                          value: result['enemyMana'],
-                                          stats: 'emana');
-                                      gameplay.changeStats(
-                                          value: result['enemyArmor'],
-                                          stats: 'earmor');
+                                      gameplay.changeStats(value: result['enemyLife'], stats: 'elife');
+                                      gameplay.changeStats(value: result['enemyMana'], stats: 'emana');
+                                      gameplay.changeStats(value: result['enemyArmor'], stats: 'earmor');
                                     }
                                     //Player Dead
                                     if (result['message'] == 'Player Dead') {
-                                      gameplay.changeStats(
-                                          value: 0.0, stats: 'life');
-                                      await Future.delayed(
-                                          const Duration(seconds: 1));
-                                      // ignore: use_build_context_synchronously
+                                      gameplay.changeStats(value: 0.0, stats: 'life');
+                                      await Future.delayed(const Duration(seconds: 1));
                                       Navigator.pop(context);
-                                      // ignore: use_build_context_synchronously
                                       Navigator.pop(context);
-                                      // ignore: use_build_context_synchronously
                                       Navigator.pushNamed(context, '/mainmenu');
                                       gameplay.changeEnemyMove(true);
+                                      gameplay.resetBattleLog();
                                     }
-                                    // ignore: use_build_context_synchronously
                                     await MySQL.returnPlayerStats(context);
                                     //Enemy Dead
                                     if (result['message'] == 'Enemy Dead') {
-                                      GlobalFunctions.lootDialog(
-                                          context: context,
-                                          loots: result['loots'],
-                                          xp: result['earnedXP']);
+                                      GlobalFunctions.lootDialog(context: context, loots: result['loots'], xp: result['earnedXP']);
+                                      gameplay.resetBattleLog();
                                     }
                                     setState(() {
                                       isFighting = false;
                                     });
                                   },
-                                  child: Text(Language.Translate(
-                                          'magics_${gameplay.playerSelectedSkill}',
-                                          options.language) ??
-                                      'Attack'),
+                                  child: Text(Language.Translate('magics_${gameplay.playerSelectedSkill}', options.language) ?? 'Attack'),
                                 )
                               : ElevatedButton(
                                   onPressed: null,
-                                  child: Text(Language.Translate(
-                                          'magics_${gameplay.playerSelectedSkill}',
-                                          options.language) ??
-                                      'Attack'),
+                                  child: Text(Language.Translate('magics_${gameplay.playerSelectedSkill}', options.language) ?? 'Attack'),
                                 ),
                           const SizedBox(width: 20),
                           //Defence Button
@@ -413,15 +382,11 @@ class _BattleSceneState extends State<BattleScene> {
                                   onPressed: () {
                                     isFighting = true;
                                   },
-                                  child: Text(Language.Translate(
-                                          'battle_defence', options.language) ??
-                                      'Defence'),
+                                  child: Text(Language.Translate('battle_defence', options.language) ?? 'Defence'),
                                 )
                               : ElevatedButton(
                                   onPressed: null,
-                                  child: Text(Language.Translate(
-                                          'battle_defence', options.language) ??
-                                      'Defence'),
+                                  child: Text(Language.Translate('battle_defence', options.language) ?? 'Defence'),
                                 ),
                         ],
                       ),
@@ -458,9 +423,7 @@ class _BattleSceneState extends State<BattleScene> {
                           //Battle Log
                           Container(
                             padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Theme.of(context).colorScheme.secondary),
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                             width: screenSize.width * 0.6,
                             height: screenSize.height * 0.1,
                             child: FittedBox(
@@ -474,8 +437,7 @@ class _BattleSceneState extends State<BattleScene> {
                                     itemBuilder: (context, index) {
                                       return Text(
                                         gameplay.battleLog[index],
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 18),
+                                        style: const TextStyle(color: Colors.white, fontSize: 18),
                                       );
                                     }),
                               ),
@@ -484,8 +446,7 @@ class _BattleSceneState extends State<BattleScene> {
                           //Magics
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/magics')
-                                  .then((value) => setState(() {}));
+                              Navigator.pushNamed(context, '/magics').then((value) => setState(() {}));
                             },
                             child: Container(
                               width: screenSize.width * 0.2,

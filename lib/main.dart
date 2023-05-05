@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
 
 import 'package:flublade_project/data/global.dart';
@@ -91,21 +92,12 @@ class _FlubladeProjectState extends State<FlubladeProject> {
                 'token': options.token,
               }));
         } catch (error) {
-          // ignore: use_build_context_synchronously
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
           GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_register_problem_connection',
-              errorMsgContext: 'Failed to connect to the Servers',
-              context: context);
-        }
-        //Null Check
-        if (result == null) {
-          // ignore: use_build_context_synchronously
-          Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_register_problem_connection',
-              errorMsgContext: 'Failed to connect to the Servers',
-              context: context);
+            errorMsgTitle: 'authentication_register_problem_connection',
+            errorMsgContext: 'Failed to connect to the Servers',
+            context: context,
+          );
           return;
         }
         result = jsonDecode(result.body);
@@ -122,25 +114,15 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           SaveDatas.setLanguage(options.language);
           SaveDatas.setToken(options.token);
           SaveDatas.setCharacters(gameplay.characters);
-          // ignore: use_build_context_synchronously
           Navigator.pushReplacementNamed(context, '/mainmenu');
         } else if (result['message'] == 'Invalid Login') {
-          // ignore: use_build_context_synchronously
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_invalidlogin',
-              errorMsgContext: 'Invalid Session',
-              context: context);
+          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context);
         } else {
-          // ignore: use_build_context_synchronously
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_register_problem_connection',
-              errorMsgContext: 'Failed to connect to the Servers',
-              context: context);
+          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
         }
       } else {
-        // ignore: use_build_context_synchronously
         Navigator.of(context).pushReplacementNamed('/authenticationpage');
       }
     });

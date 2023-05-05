@@ -23,8 +23,7 @@ class Language {
     'response_remove': 'Remove',
     'response_ok': 'Ok',
     'response_incorrect': 'Incorrect',
-    'response_error':
-        'Ops, There was a problem with your processing, try again later',
+    'response_error': 'Ops, There was a problem with your processing, try again later',
     'response_loading': 'Loading Please Wait...',
     'response_equip': 'Equip',
     'response_damage': 'Damage',
@@ -66,13 +65,10 @@ class Language {
     'authentication_register_username': 'Username',
     'authentication_register_password': 'Password',
     'authentication_register_create': 'Create',
-    'authentication_register_problem_username':
-        'Username needs to have 3 or more Caracters and less than 20 Caracters',
+    'authentication_register_problem_username': 'Username needs to have 3 or more Caracters and less than 20 Caracters',
     'authentication_register_problem_existusername': 'Username already exist',
-    'authentication_register_problem_password':
-        'Password needs to have 3 or more Caracters',
-    'authentication_register_problem_connection':
-        'Failed to connect to the Servers',
+    'authentication_register_problem_password': 'Password needs to have 3 or more Caracters',
+    'authentication_register_problem_connection': 'Failed to connect to the Servers',
     'authentication_register_loading': 'Loading...',
     'authentication_register_sucess': 'Sucess',
     'authentication_register_sucess_account': 'Account Created',
@@ -86,6 +82,7 @@ class Language {
     //Options
     'options_language': 'Change Language',
     'options_fasttext': 'Change Text Speed',
+    'options_fasttext_verySmall': 'Very Low',
     'options_fasttext_small': 'Low',
     'options_fasttext_medium': 'Medium',
     'options_fasttext_high': 'High',
@@ -97,36 +94,21 @@ class Language {
     'characters_create_location': 'Location',
     'characters_create_info': 'Info',
     'characters_create_name': 'Character Name',
-    'characters_create_error':
-        'Ops, there\'s was a problem creating your character try again later',
-    'characters_create_error_namelimit':
-        'Character name cannot be longer than 10 characters',
-    'characters_create_error_empty':
-        'You need to make a name to your character',
-    'characters_class_archer_info':
-        'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
-    'characters_class_assassin_info':
-        'Assassin\nSilent, barely audible, fragile, high ease of stealing, high dodge chance, high damage if caught off guard.',
-    'characters_class_bard_info':
-        'Bard\nDoesn\'t know how to be silent, bad at stealing, robust, good at cheering up, healer, manages to tame easily, raises the spirits of the group and himself, can manage.',
-    'characters_class_beastmaster_info':
-        'Beast Master\nFriend of Nature, animals do not attack him, can be tamed very easily, very fragile, tamed animals have 10% additional stats.',
-    'characters_class_berserk_info':
-        'Berserk\nEnemy of all, can\'t be silent, can\'t use elemental magic, the less health the more damage and regeneration, can\'t tame, difficulty creating friendships, extremely robust.',
-    'characters_class_druid_info':
-        'Druid\nFriend of Nature, can transform into an animal from each biome, great healer, fragile if not transformed, can\'t dodge in human form or use healing spells, can easily tame, high health regeneration .',
-    'characters_class_mage_info':
-        'Mage\nHigh mana and regeneration, elemental spells deal 10% more damage, difficult to create friendships, extremely fragile.',
-    'characters_class_paladin_info':
-        'Paladin\nExtremely robust, shield spells are 10% more effective, incoming heals are 10% stronger, great healer, excellent at making friends, easy to tame.',
-    'characters_class_priest_info':
-        'Priest\nExcellent healer, excellent at making friends, 5% of damage dealt heals you and 1% to allies, reduces damage taken from dark spells by 50%, damage from light spells is 10% more effective extremely fragile.',
-    'characters_class_trickmagician_info':
-        'Trick Magician\nPolymorph spells cost no mana, extremely silent, immune to persuasion, great at making friends, fragile.',
-    'characters_class_weaponsmith_info':
-        'Weaponsmith\nForged weapons are 10% more effective, great at making friends, robust, can create wards, chance to forge with enchantment.',
-    'characters_class_witch_info':
-        'Witch\nDamage with dark spells 10% more effective, 10% of damage dealt is converted to life, extremely fragile, can charm enemies, excellent at making friends, takes 10% more damage from light spells.',
+    'characters_create_error': 'Ops, there\'s was a problem creating your character try again later',
+    'characters_create_error_namelimit': 'Character name cannot be longer than 10 characters',
+    'characters_create_error_empty': 'You need to make a name to your character',
+    'characters_class_archer_info': 'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
+    'characters_class_assassin_info': 'Assassin\nSilent, barely audible, fragile, high ease of stealing, high dodge chance, high damage if caught off guard.',
+    'characters_class_bard_info': 'Bard\nDoesn\'t know how to be silent, bad at stealing, robust, good at cheering up, healer, manages to tame easily, raises the spirits of the group and himself, can manage.',
+    'characters_class_beastmaster_info': 'Beast Master\nFriend of Nature, animals do not attack him, can be tamed very easily, very fragile, tamed animals have 10% additional stats.',
+    'characters_class_berserk_info': 'Berserk\nEnemy of all, can\'t be silent, can\'t use elemental magic, the less health the more damage and regeneration, can\'t tame, difficulty creating friendships, extremely robust.',
+    'characters_class_druid_info': 'Druid\nFriend of Nature, can transform into an animal from each biome, great healer, fragile if not transformed, can\'t dodge in human form or use healing spells, can easily tame, high health regeneration .',
+    'characters_class_mage_info': 'Mage\nHigh mana and regeneration, elemental spells deal 10% more damage, difficult to create friendships, extremely fragile.',
+    'characters_class_paladin_info': 'Paladin\nExtremely robust, shield spells are 10% more effective, incoming heals are 10% stronger, great healer, excellent at making friends, easy to tame.',
+    'characters_class_priest_info': 'Priest\nExcellent healer, excellent at making friends, 5% of damage dealt heals you and 1% to allies, reduces damage taken from dark spells by 50%, damage from light spells is 10% more effective extremely fragile.',
+    'characters_class_trickmagician_info': 'Trick Magician\nPolymorph spells cost no mana, extremely silent, immune to persuasion, great at making friends, fragile.',
+    'characters_class_weaponsmith_info': 'Weaponsmith\nForged weapons are 10% more effective, great at making friends, robust, can create wards, chance to forge with enchantment.',
+    'characters_class_witch_info': 'Witch\nDamage with dark spells 10% more effective, 10% of damage dealt is converted to life, extremely fragile, can charm enemies, excellent at making friends, takes 10% more damage from light spells.',
     'characters_class_archer': 'Archer',
     'characters_class_assassin': 'Assassin',
     'characters_class_bard': 'Bard',
@@ -168,9 +150,15 @@ class Language {
     'battle_log_enemyDead': 'You killed ',
     'battle_log_playerHealed1': 'You healed ',
     'battle_log_playerHealed2': ' life',
+    'battle_log_enemyHealed1': ' healed ',
+    'battle_log_enemyHealed2': ' because of ',
     'battle_log_loseHealthByPlayerSkill': 'You lost ',
     'battle_log_loseHealthByPlayerSkill2': ' life, by ',
     'battle_log_playerDead': 'Game Over',
+    'battle_log_enemyDebuffed1': ' applied ',
+    'battle_log_enemyDebuffed2': ' to you',
+    'battle_log_playerDebuffReceived1': 'You took ',
+    'battle_log_playerDebuffReceived2': ' Damage from ',
     //Level Texts
     'levelup_armor': 'Armor earned:',
     'levelup_strength': 'Strength earned:',
@@ -179,28 +167,37 @@ class Language {
     'levelup_skillpoints': 'Skillpoints earned:',
     //Items Name
     'items_gold': 'Gold',
-    'items_gold_desc':
-        'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
+    'items_gold_desc': 'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
     'items_wooden_sword': 'Wooden Sword',
-    'items_wooden_sword_desc':
-        'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
+    'items_wooden_sword_desc': 'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
     'items_thread': 'Thread',
-    'items_thread_desc':
-        'Made from twisted fibers of linen, cotton, silk, synthetics, etc., used in sewing, embroidery, lace, fabrication',
+    'items_thread_desc': 'Made from twisted fibers of linen, cotton, silk, synthetics, etc., used in sewing, embroidery, lace, fabrication',
     'items_cloth': 'Cloth',
-    'items_cloth_desc':
-        'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
+    'items_cloth_desc': 'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
     //Enemy Names
     'enemy_smallspider': 'Small Spider',
     //Magics Names
     'magics_type_fire': 'Fire',
     'magics_type_physical': 'Physical',
     'magics_basicAttack': 'Basic Attack',
-    'magics_basicAttack_desc':
-        'Attacks the enemy with your weapon, dealing the total attack damage',
+    'magics_basicAttack_desc': 'Attacks the enemy with your weapon, dealing the total attack damage',
     'magics_furiousAttack': 'Furious Attack',
-    'magics_furiousAttack_desc':
-        'Attacks the enemy with furious, consuming 10% of your maximum health and dealing an additional 100% of your total attack damage',
+    'magics_furiousAttack_desc': 'Attacks the enemy with furious, consuming 10% of your maximum health and dealing an additional 100% of your total attack damage',
+    'magics_poisonous': 'Poisonous',
+    'magics_poisonous_desc': 'Poisons the enemy',
+    //Passives Names
+    'magics_healthTurbo': 'Turbo Health',
+    'magics_healthTurbo_desc': '',
+    'magics_damageTurbo': 'Turbo Damage',
+    'magics_damageTurbo_desc': '',
+    'magics_magicalBlock': 'Magic Block',
+    'magics_magicalBlock_desc': '',
+    'magics_petsBlock': 'Pets Block',
+    'magics_petsBlock_desc': '',
+    'magics_noisy': 'Noisy',
+    'magics_noisy_desc': '',
+    'magics_poisoned': 'Poisoned',
+    'magics_poisoned_desc': '',
   };
   //
   //
@@ -223,8 +220,7 @@ class Language {
     'response_remove': 'Remover',
     'response_ok': 'Ok',
     'response_incorrect': 'Incorreto',
-    'response_error':
-        'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
+    'response_error': 'Ops, Aconteceu um problema com seu processamento, tente novamente mais tarde',
     'response_loading': 'Carregando Por Favor Espere...',
     'response_equip': 'Equipar',
     'response_damage': 'Dano',
@@ -266,13 +262,10 @@ class Language {
     'authentication_register_username': 'Seu Usuário',
     'authentication_register_password': 'Sua Senha',
     'authentication_register_create': 'Criar',
-    'authentication_register_problem_username':
-        'Usuário precisa ter mais de 3 letras e menos que 20 letras',
+    'authentication_register_problem_username': 'Usuário precisa ter mais de 3 letras e menos que 20 letras',
     'authentication_register_problem_existusername': 'Usuário já existe',
-    'authentication_register_problem_password':
-        'Senha precisa ter 3 ou mais dígitos e menos que 100 dígitos',
-    'authentication_register_problem_connection':
-        'Falha ao connectar no Servidor',
+    'authentication_register_problem_password': 'Senha precisa ter 3 ou mais dígitos e menos que 100 dígitos',
+    'authentication_register_problem_connection': 'Falha ao connectar no Servidor',
     'authentication_register_loading': 'Carregando...',
     'authentication_register_sucess': 'Sucesso',
     'authentication_register_sucess_account': 'Conta Criada',
@@ -286,6 +279,7 @@ class Language {
     //Options
     'options_language': 'Trocar Linguagem',
     'options_fasttext': 'Trocar Velocidade do Texto',
+    'options_fasttext_verySmall': 'Muito Baixo',
     'options_fasttext_small': 'Baixo',
     'options_fasttext_medium': 'Médio',
     'options_fasttext_high': 'Alto',
@@ -297,34 +291,20 @@ class Language {
     'characters_create_location': 'Local',
     'characters_create_info': 'Info ',
     'characters_create_name': 'Nome do Personagem',
-    'characters_create_error':
-        'Ops, tivemos um problema ao criar seu personagem tente novamente mais tarde',
-    'characters_create_error_namelimit':
-        'Nome do personagem não pode ter mais de 10 caracteres',
-    'characters_class_archer_info':
-        'Arqueiro\nVeloz e ágil, boa pontaria, menos chance de errar, frágil, maior chance de esquiva, pequena facilidade em roubos.',
-    'characters_class_assassin_info':
-        'Assassino\nSilencioso, quase não da pra ouvir, frágil, facilidade alta em roubos, chances altas de esquiva, danos altos se pego desprevinido.',
-    'characters_class_bard_info':
-        'Bardo\nNão sabe ser silencioso, péssimo em roubos, robusto, bom para alegrar, curandeiro, consegue domesticar com facilidade, aumenta o astral do grupo e de si mesmo, consegue se virar.',
-    'characters_class_beastmaster_info':
-        'Domador de Fera\nAmigo da Natureza, animais não o atacam, consegue domesticar com muita facilidade, muito frágil, animais domesticados tem 10% de status adicionais.',
-    'characters_class_berserk_info':
-        'Berserk\nInimigo de todos, não consegue ser silencioso, não consegue usar magias elementais, quanto menos vida mais dano e regeneração, não pode domesticar, dificuldade em criar amizades, extremamente robusto.',
-    'characters_class_druid_info':
-        'Druida\nAmigo da Natureza, pode se transformar em um animal de cada bioma, ótimo curandeiro, frágil se não transformado, não consegue esquivar na forma humana nem usar magias de cura, pode domesticar com facilidade, regeneração alta de vida.',
-    'characters_class_mage_info':
-        'Mago\nMana e regeneração altas, magias elementais dão 10% mais de dano, dificuldade em criar amizades, extremamente frágil.',
-    'characters_class_paladin_info':
-        'Paladino\nExtremamente robusto, magias de escudo são 10% mais eficazes, curas recebidas são 10% mais fortes, ótimo curandeiro, excelente em fazer amizades, facilidade em domesticar.',
-    'characters_class_priest_info':
-        'Sacerdote\nExcelente curandeiro, excelente em fazer amizades, 5% do dano causado cura você e 1% para aliados, reduz 50% do dano recebido de magias escuras, dano de magias da luz são 10% mais eficazes extremamente frágil.',
-    'characters_class_trickmagician_info':
-        'Mágico\nMagias de polimorfe não custam mana, extremamente silencioso, imune a persuação, ótimo em fazer amizades, frágil.',
-    'characters_class_weaponsmith_info':
-        'Armeiro\nArmas forjadas são 10% mais eficazes, ótimo em fazer amizades, robusto, consegue criar sentinelas, chance de forjar com encantamento.',
-    'characters_class_witch_info':
-        'Bruxa\nDanos com magias escuras 10% mais eficazes, 10% do dano causado é convertido em vida, extremamente frágil, consegue encantar inimigos, excelente em fazer amizades, recebe 10% mais de dano em magias da luz.',
+    'characters_create_error': 'Ops, tivemos um problema ao criar seu personagem tente novamente mais tarde',
+    'characters_create_error_namelimit': 'Nome do personagem não pode ter mais de 10 caracteres',
+    'characters_class_archer_info': 'Arqueiro\nVeloz e ágil, boa pontaria, menos chance de errar, frágil, maior chance de esquiva, pequena facilidade em roubos.',
+    'characters_class_assassin_info': 'Assassino\nSilencioso, quase não da pra ouvir, frágil, facilidade alta em roubos, chances altas de esquiva, danos altos se pego desprevinido.',
+    'characters_class_bard_info': 'Bardo\nNão sabe ser silencioso, péssimo em roubos, robusto, bom para alegrar, curandeiro, consegue domesticar com facilidade, aumenta o astral do grupo e de si mesmo, consegue se virar.',
+    'characters_class_beastmaster_info': 'Domador de Fera\nAmigo da Natureza, animais não o atacam, consegue domesticar com muita facilidade, muito frágil, animais domesticados tem 10% de status adicionais.',
+    'characters_class_berserk_info': 'Berserk\nInimigo de todos, não consegue ser silencioso, não consegue usar magias elementais, quanto menos vida mais dano e regeneração, não pode domesticar, dificuldade em criar amizades, extremamente robusto.',
+    'characters_class_druid_info': 'Druida\nAmigo da Natureza, pode se transformar em um animal de cada bioma, ótimo curandeiro, frágil se não transformado, não consegue esquivar na forma humana nem usar magias de cura, pode domesticar com facilidade, regeneração alta de vida.',
+    'characters_class_mage_info': 'Mago\nMana e regeneração altas, magias elementais dão 10% mais de dano, dificuldade em criar amizades, extremamente frágil.',
+    'characters_class_paladin_info': 'Paladino\nExtremamente robusto, magias de escudo são 10% mais eficazes, curas recebidas são 10% mais fortes, ótimo curandeiro, excelente em fazer amizades, facilidade em domesticar.',
+    'characters_class_priest_info': 'Sacerdote\nExcelente curandeiro, excelente em fazer amizades, 5% do dano causado cura você e 1% para aliados, reduz 50% do dano recebido de magias escuras, dano de magias da luz são 10% mais eficazes extremamente frágil.',
+    'characters_class_trickmagician_info': 'Mágico\nMagias de polimorfe não custam mana, extremamente silencioso, imune a persuação, ótimo em fazer amizades, frágil.',
+    'characters_class_weaponsmith_info': 'Armeiro\nArmas forjadas são 10% mais eficazes, ótimo em fazer amizades, robusto, consegue criar sentinelas, chance de forjar com encantamento.',
+    'characters_class_witch_info': 'Bruxa\nDanos com magias escuras 10% mais eficazes, 10% do dano causado é convertido em vida, extremamente frágil, consegue encantar inimigos, excelente em fazer amizades, recebe 10% mais de dano em magias da luz.',
     'characters_class_archer': 'Arqueiro',
     'characters_class_assassin': 'Assassino',
     'characters_class_bard': 'Bardo',
@@ -366,9 +346,15 @@ class Language {
     'battle_log_enemyDead': 'Você matou ',
     'battle_log_playerHealed1': 'Você curou ',
     'battle_log_playerHealed2': ' vida',
+    'battle_log_enemyHealed1': ' Curou ',
+    'battle_log_enemyHealed2': ' por causa ',
     'battle_log_loseHealthByPlayerSkill': 'Você perdeu ',
-    'battle_log_loseHealthByPlayerSkill2':
-        ' de vida, por causa da habilidade: ',
+    'battle_log_loseHealthByPlayerSkill2': ' de vida, por causa da habilidade: ',
+    'battle_log_playerDead': 'Game Over',
+    'battle_log_enemyDebuffed1': ' aplicou ',
+    'battle_log_enemyDebuffed2': ' em você',
+    'battle_log_playerDebuffReceived1': 'Você recebeu ',
+    'battle_log_playerDebuffReceived2': ' de Dano por causa ',
     //Level Texts
     'levelup_armor': 'Armadura ganha:',
     'levelup_strength': 'Força ganha:',
@@ -377,27 +363,36 @@ class Language {
     'levelup_skillpoints': 'Pontos de Habilidade ganha:',
     //Items Names
     'items_gold': 'Ouro',
-    'items_gold_desc':
-        'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
+    'items_gold_desc': 'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
     'items_wooden_sword': 'Espada de Madeira',
-    'items_wooden_sword_desc':
-        'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
+    'items_wooden_sword_desc': 'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
     'items_thread': 'Linha',
-    'items_thread_desc':
-        'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
+    'items_thread_desc': 'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
     'items_cloth': 'Pano',
-    'items_cloth_desc':
-        'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
+    'items_cloth_desc': 'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
     //Enemy Names
     'enemy_smallspider': 'Aranha Pequena',
     //Magics Names
     'magics_type_fire': 'Fogo',
     'magics_type_physical': 'Fisíco',
     'magics_basicAttack': 'Ataque Básico',
-    'magics_basicAttack_desc':
-        'Ataca o inimigo com sua arma, causando dano de ataque total',
+    'magics_basicAttack_desc': 'Ataca o inimigo com sua arma, causando dano de ataque total',
     'magics_furiousAttack': 'Ataque Furioso',
-    'magics_furiousAttack_desc':
-        'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
+    'magics_furiousAttack_desc': 'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
+    'magics_poisonous': 'Veneno',
+    'magics_poisonous_desc': 'Envenena o inimigo',
+    //Passives Names
+    'magics_healthTurbo': 'Turbo de Vida',
+    'magics_healthTurbo_desc': '',
+    'magics_damageTurbo': 'Turbo de Dano',
+    'magics_damageTurbo_desc': '',
+    'magics_magicalBlock': 'Bloqueio de Magia',
+    'magics_magicalBlock_desc': '',
+    'magics_petsBlock': 'Bloqueio de Pets',
+    'magics_petsBlock_desc': '',
+    'magics_noisy': 'Barulhento',
+    'magics_noisy_desc': '',
+    'magics_poisoned': 'Envenenado',
+    'magics_poisoned_desc': '',
   };
 }
