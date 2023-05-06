@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
+import 'package:flublade_project/components/magic_widget.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -18,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bonfire/bonfire.dart';
+import 'package:http/http.dart' as http;
 
 import '../pages/gameplay/magics.dart';
 
@@ -696,6 +698,203 @@ class GlobalFunctions {
           );
         });
   }
+
+  //Show Player Stats Dialogs
+  static playerStats(context) async {
+    final settings = Provider.of<Settings>(context, listen: false);
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    dynamic result = await http.post(
+      Uri.http(MySQL.url, '/playerStats'),
+      headers: MySQL.headers,
+      body: jsonEncode({"id": options.id, "token": options.token, "selectedCharacter": gameplay.selectedCharacter}),
+    );
+    result = jsonDecode(result.body);
+    final playerDamage = result['playerDamage'];
+    final playerMaxLife = result['playerMaxLife'];
+    final playerMaxMana = result['playerMaxMana'];
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return FittedBox(
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              title: Text(
+                Language.Translate('response_stats', options.language) ?? 'Stats',
+                style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 40),
+              ),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //Life
+                  Text(
+                    '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${Provider.of<Gameplay>(context, listen: false).playerLife.toStringAsFixed(2)} / $playerMaxLife',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Mana
+                  Text(
+                    '${Language.Translate('battle_mana', options.language) ?? 'Mana'}: ${Provider.of<Gameplay>(context, listen: false).playerMana} / $playerMaxMana',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Strength
+                  Text(
+                    '${Language.Translate('response_strength', options.language) ?? 'Strength'}: ${Provider.of<Gameplay>(context, listen: false).playerStrength}',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Agility
+                  Text(
+                    '${Language.Translate('response_agility', options.language) ?? 'Agility'}: ${Provider.of<Gameplay>(context, listen: false).playerAgility}',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Intelligence
+                  Text(
+                    '${Language.Translate('response_intelligence', options.language) ?? 'Intelligence'}: ${Provider.of<Gameplay>(context, listen: false).playerIntelligence}',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Armor
+                  Text(
+                    '${Language.Translate('response_armor', options.language) ?? 'Armor'}: ${Provider.of<Gameplay>(context, listen: false).playerArmor}',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Damage
+                  Text(
+                    '${Language.Translate('response_damage', options.language) ?? 'Damage'}: $playerDamage',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Level
+                  Text(
+                    '${Language.Translate('characters_create_level', options.language) ?? 'Level'}: ${Provider.of<Gameplay>(context, listen: false).playerLevel}',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Experience
+                  Text(
+                    '${Language.Translate('battle_loot_experience', options.language) ?? 'Experience'} ${Provider.of<Gameplay>(context, listen: false).playerXP.toStringAsFixed(2)} / ${settings.levelCaps[Provider.of<Gameplay>(context, listen: false).playerLevel.toString()]!.toStringAsFixed(2)}',
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                  ),
+                  //Debuffs
+                  gameplay.playerDebuffs.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: null,
+                              child: Text(
+                                Language.Translate('response_debuffs', options.language) ?? 'Debuffs',
+                                style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final screenSize = MediaQuery.of(context).size;
+                                showModalBottomSheet<void>(
+                                    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(50.0),
+                                      ),
+                                    ),
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (context) {
+                                      return SizedBox(
+                                        height: screenSize.height * 0.65,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                //Debuffs Text
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  height: screenSize.height * 0.1,
+                                                  child: FittedBox(
+                                                    child: Text(
+                                                      Language.Translate('response_debuffs', options.language) ?? 'Debuffs',
+                                                      style: TextStyle(color: Theme.of(context).primaryColor),
+                                                    ),
+                                                  ),
+                                                ),
+                                                //Grid Passives
+                                                GridView.builder(
+                                                  physics: const NeverScrollableScrollPhysics(),
+                                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                                                  shrinkWrap: true,
+                                                  itemCount: gameplay.playerDebuffs.length,
+                                                  itemBuilder: (context, index) {
+                                                    return TextButton(
+                                                        onPressed: () {
+                                                          showDialog(
+                                                              context: context,
+                                                              builder: (context) => FittedBox(
+                                                                    child: AlertDialog(
+                                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                                                      title: Text(
+                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}', options.language) ?? 'Language Error',
+                                                                        style: TextStyle(color: Theme.of(context).primaryColor),
+                                                                      ),
+                                                                      content: SizedBox(
+                                                                        width: 300,
+                                                                        height: 200,
+                                                                        child: Column(
+                                                                          children: [
+                                                                            //Description
+                                                                            SizedBox(
+                                                                              height: 150,
+                                                                              child: SingleChildScrollView(
+                                                                                child: Column(
+                                                                                  children: [
+                                                                                    Text(
+                                                                                      Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}_desc', options.language) ?? 'Language Error',
+                                                                                      style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            const Spacer(),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ));
+                                                        },
+                                                        child: MagicWidget(
+                                                          name: gameplay.playerDebuffs[index]['name'],
+                                                          isDebuffs: true,
+                                                          debuffIndex: index,
+                                                        ));
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
+                              child: Text(
+                                Language.Translate('response_debuffs', options.language) ?? 'Debuffs',
+                                style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 30),
+                              ),
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
 }
 
 class Gameplay with ChangeNotifier {
@@ -763,11 +962,11 @@ class Gameplay with ChangeNotifier {
   double _playerAgility = 0;
   double _playerIntelligence = 0;
   int _playerLuck = 0;
-  double _playerDamage = 0;
   Map _playerInventory = {};
   List _playerInventorySelected = [];
   List _playerEquips = [];
   Map _playerBuffs = {};
+  List _playerDebuffs = [];
   int _playerSkillpoint = 0;
   Map _playerSkills = {};
   String _playerSelectedSkill = 'basicAttack';
@@ -777,9 +976,13 @@ class Gameplay with ChangeNotifier {
   double _enemyMana = 0;
   double _enemyArmor = 0;
   int _enemyLevel = 0;
+  double _enemyStrength = 0;
+  double _enemyAgility = 0;
+  double _enemyIntelligence = 0;
   double _enemyDamage = 0;
   double _enemyXP = 0;
   List _enemyBuffs = [];
+  List _enemyDebuffs = [];
   List _enemySkills = [];
 
   bool get isTalkable => _isTalkable;
@@ -797,7 +1000,6 @@ class Gameplay with ChangeNotifier {
   double get playerAgility => _playerAgility;
   double get playerIntelligence => _playerIntelligence;
   int get playerLuck => _playerLuck;
-  double get playerDamage => _playerDamage;
   Map get playerInventory => _playerInventory;
   List get playerInventorySelected => _playerInventorySelected;
   List get playerEquips => _playerEquips;
@@ -805,16 +1007,21 @@ class Gameplay with ChangeNotifier {
   int get playerSkillpoint => _playerSkillpoint;
   Map get playerSkills => _playerSkills;
   String get playerSelectedSkill => _playerSelectedSkill;
+  List get playerDebuffs => _playerDebuffs;
 
   String get enemyName => _enemyName;
   double get enemyLife => _enemyLife;
   double get enemyMana => _enemyMana;
   double get enemyArmor => _enemyArmor;
   int get enemyLevel => _enemyLevel;
+  double get enemyStrength => _enemyStrength;
+  double get enemyAgility => _enemyAgility;
+  double get enemyIntelligence => _enemyIntelligence;
   double get enemyDamage => _enemyDamage;
   double get enemyXP => _enemyXP;
   List get enemyBuffs => _enemyBuffs;
   List get enemySkills => _enemySkills;
+  List get enemyDebuffs => _enemyDebuffs;
 
   //Change Selected Skill
   void changePlayerSelectedSkill(value) {
@@ -871,11 +1078,6 @@ class Gameplay with ChangeNotifier {
     } catch (error) {
       _playerInventory[item['name']] = item;
     }
-  }
-
-  //Change Player Base Damage
-  void changePlayerDamage(value) {
-    _playerDamage = value;
   }
 
   //Change the talk text
@@ -963,10 +1165,6 @@ class Gameplay with ChangeNotifier {
       _playerLuck = value;
       notifyListeners();
       return;
-    } else if (stats == 'damage') {
-      _playerDamage = value;
-      notifyListeners();
-      return;
     } else if (stats == 'inventory') {
       try {
         _playerInventory = value;
@@ -1002,6 +1200,9 @@ class Gameplay with ChangeNotifier {
         _playerSkills = value;
       }
       notifyListeners();
+    } else if (stats == 'debuffs') {
+      _playerDebuffs = value;
+      notifyListeners();
     }
     //Enemy Stats
     if (stats == 'elife') {
@@ -1034,6 +1235,22 @@ class Gameplay with ChangeNotifier {
       return;
     } else if (stats == 'eskills') {
       _enemySkills = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'estrength') {
+      _enemyStrength = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'eagility') {
+      _enemyAgility = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'eintelligence') {
+      _enemyIntelligence = value;
+      notifyListeners();
+      return;
+    } else if (stats == 'edebuffs') {
+      _enemyDebuffs = value;
       notifyListeners();
       return;
     }

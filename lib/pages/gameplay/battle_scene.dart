@@ -380,13 +380,13 @@ class _BattleSceneState extends State<BattleScene> {
                           !isFighting
                               ? ElevatedButton(
                                   onPressed: () {
-                                    isFighting = true;
+                                    GlobalFunctions.playerStats(context);
                                   },
-                                  child: Text(Language.Translate('battle_defence', options.language) ?? 'Defence'),
+                                  child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
                                 )
                               : ElevatedButton(
                                   onPressed: null,
-                                  child: Text(Language.Translate('battle_defence', options.language) ?? 'Defence'),
+                                  child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
                                 ),
                         ],
                       ),

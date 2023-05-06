@@ -44,18 +44,11 @@ class _MainMenuState extends State<MainMenu> {
                     child: Stack(children: [
                       Text(
                         'FLUBLADE',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'PressStart',
-                            fontSize: 500,
-                            color: Theme.of(context).primaryColor),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
                       ),
                       Text(
                         'FLUBLADE',
-                        style: TextStyle(
-                            fontFamily: 'PressStart',
-                            fontSize: 500,
-                            color: Theme.of(context).colorScheme.primary),
+                        style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).colorScheme.primary),
                       ),
                     ]),
                   ),
@@ -80,27 +73,18 @@ class _MainMenuState extends State<MainMenu> {
                                   setState(() {
                                     isLoading = true;
                                   });
-                                  await Future.delayed(
-                                      const Duration(milliseconds: 50));
+                                  await Future.delayed(const Duration(milliseconds: 50));
                                   //Refresh
                                   await MySQL.pushCharacters(context: context);
-                                  Navigator.pushNamed(
-                                      context, '/characterselection');
-                                  Future.delayed(
-                                          const Duration(milliseconds: 200))
-                                      .then((value) => setState(() {
-                                            isLoading = false;
-                                          }));
+                                  Navigator.pushNamed(context, '/characterselection');
+                                  Future.delayed(const Duration(milliseconds: 200)).then((value) => setState(() {
+                                        isLoading = false;
+                                      }));
                                 },
                                 child: FittedBox(
                                   child: Text(
-                                    Language.Translate('mainmenu_play',
-                                            options.language) ??
-                                        'Play',
-                                    style: TextStyle(
-                                        fontFamily: 'PressStart',
-                                        fontSize: 500,
-                                        color: Theme.of(context).primaryColor),
+                                    Language.Translate('mainmenu_play', options.language) ?? 'Play',
+                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
                                   ),
                                 ),
                               ),
@@ -114,23 +98,15 @@ class _MainMenuState extends State<MainMenu> {
                                   });
                                   //Refresh
                                   await MySQL.pushCharacters(context: context);
-                                  Navigator.pushNamed(
-                                      context, '/charactersmenu');
-                                  Future.delayed(
-                                          const Duration(milliseconds: 200))
-                                      .then((value) => setState(() {
-                                            isLoading = false;
-                                          }));
+                                  Navigator.pushNamed(context, '/charactersmenu');
+                                  Future.delayed(const Duration(milliseconds: 200)).then((value) => setState(() {
+                                        isLoading = false;
+                                      }));
                                 },
                                 child: FittedBox(
                                   child: Text(
-                                    Language.Translate('mainmenu_characters',
-                                            options.language) ??
-                                        'Characters',
-                                    style: TextStyle(
-                                        fontFamily: 'PressStart',
-                                        fontSize: 500,
-                                        color: Theme.of(context).primaryColor),
+                                    Language.Translate('mainmenu_characters', options.language) ?? 'Characters',
+                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
                                   ),
                                 ),
                               ),
@@ -138,19 +114,12 @@ class _MainMenuState extends State<MainMenu> {
                               //Options
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pushNamed("/optionsmenu")
-                                      .then((value) => setState(() {}));
+                                  Navigator.of(context).pushNamed("/optionsmenu").then((value) => setState(() {}));
                                 },
                                 child: FittedBox(
                                   child: Text(
-                                    Language.Translate('mainmenu_options',
-                                            options.language) ??
-                                        'Options',
-                                    style: TextStyle(
-                                        fontFamily: 'PressStart',
-                                        fontSize: 500,
-                                        color: Theme.of(context).primaryColor),
+                                    Language.Translate('mainmenu_options', options.language) ?? 'Options',
+                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
                                   ),
                                 ),
                               ),
@@ -166,13 +135,8 @@ class _MainMenuState extends State<MainMenu> {
                                 },
                                 child: FittedBox(
                                   child: Text(
-                                    Language.Translate('mainmenu_logout',
-                                            options.language) ??
-                                        'Logout',
-                                    style: TextStyle(
-                                        fontFamily: 'PressStart',
-                                        fontSize: 500,
-                                        color: Theme.of(context).primaryColor),
+                                    Language.Translate('mainmenu_logout', options.language) ?? 'Logout',
+                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
                                   ),
                                 ),
                               ),

@@ -392,6 +392,7 @@ class MySQL {
     gameplay.changeStats(value: selectedCharacter['xp'], stats: 'xp');
     gameplay.changeStats(value: selectedCharacter['skillpoint'], stats: 'skillpoint');
     gameplay.changeStats(value: selectedCharacter['skills'], stats: 'skills');
+    gameplay.changeStats(value: selectedCharacter['debuffs'], stats: 'debuffs');
   }
 }
 
@@ -499,68 +500,64 @@ class MySQLGameplay {
       double positiony;
       List buffs;
       List skills;
-      try {
-        //Transforming in MAP
-        enemysdb = jsonDecode(enemysdb);
-        name = enemysdb['enemy0']['name'].toString();
-        life = double.parse(enemysdb['enemy0']['life'].toString());
-        mana = double.parse(enemysdb['enemy0']['mana'].toString());
-        damage = double.parse(enemysdb['enemy0']['damage'].toString());
-        armor = double.parse(enemysdb['enemy0']['armor'].toString());
-        level = int.parse(enemysdb['enemy0']['level'].toString());
-        xp = double.parse(enemysdb['enemy0']['xp'].toString());
-        positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
-        positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
-        buffs = enemysdb['enemy0']['buffs'];
-        skills = enemysdb['enemy0']['skills'];
-        //Adding the first enemy
-        enemy.add(parseEnemy(
-          enemyname: name,
-          position: Vector2(positionx, positiony),
-          life: life,
-          mana: mana,
-          damage: damage,
-          armor: armor,
-          level: level,
-          xp: xp,
-          buffs: buffs,
-          skills: skills,
-        ));
-        int i = 1;
-        while (true) {
-          if (enemysdb['enemy$i'] != null) {
-            name = enemysdb['enemy$i']['name'].toString();
-            life = double.parse(enemysdb['enemy$i']['life'].toString());
-            mana = double.parse(enemysdb['enemy$i']['mana'].toString());
-            damage = double.parse(enemysdb['enemy$i']['damage'].toString());
-            armor = double.parse(enemysdb['enemy$i']['armor'].toString());
-            level = int.parse(enemysdb['enemy$i']['level'].toString());
-            xp = double.parse(enemysdb['enemy$i']['xp'].toString());
-            positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
-            positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
-            buffs = enemysdb['enemy$i']['buffs'];
-            skills = enemysdb['enemy$i']['skills'];
-            enemy.add(
-              parseEnemy(
-                enemyname: name,
-                position: Vector2(positionx, positiony),
-                life: life,
-                mana: mana,
-                damage: damage,
-                armor: armor,
-                level: level,
-                xp: xp,
-                buffs: buffs,
-                skills: skills,
-              ),
-            );
-          } else {
-            break;
-          }
-          i++;
+      //Transforming in MAP
+      enemysdb = jsonDecode(enemysdb);
+      name = enemysdb['enemy0']['name'].toString();
+      life = double.parse(enemysdb['enemy0']['life'].toString());
+      mana = double.parse(enemysdb['enemy0']['mana'].toString());
+      damage = double.parse(enemysdb['enemy0']['damage'].toString());
+      armor = double.parse(enemysdb['enemy0']['armor'].toString());
+      level = int.parse(enemysdb['enemy0']['level'].toString());
+      xp = double.parse(enemysdb['enemy0']['xp'].toString());
+      positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
+      positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
+      buffs = enemysdb['enemy0']['buffs'];
+      skills = enemysdb['enemy0']['skills'];
+      //Adding the first enemy
+      enemy.add(parseEnemy(
+        enemyname: name,
+        position: Vector2(positionx, positiony),
+        life: life,
+        mana: mana,
+        damage: damage,
+        armor: armor,
+        level: level,
+        xp: xp,
+        buffs: buffs,
+        skills: skills,
+      ));
+      int i = 1;
+      while (true) {
+        if (enemysdb['enemy$i'] != null) {
+          name = enemysdb['enemy$i']['name'].toString();
+          life = double.parse(enemysdb['enemy$i']['life'].toString());
+          mana = double.parse(enemysdb['enemy$i']['mana'].toString());
+          damage = double.parse(enemysdb['enemy$i']['damage'].toString());
+          armor = double.parse(enemysdb['enemy$i']['armor'].toString());
+          level = int.parse(enemysdb['enemy$i']['level'].toString());
+          xp = double.parse(enemysdb['enemy$i']['xp'].toString());
+          positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
+          positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
+          buffs = enemysdb['enemy$i']['buffs'];
+          skills = enemysdb['enemy$i']['skills'];
+          enemy.add(
+            parseEnemy(
+              enemyname: name,
+              position: Vector2(positionx, positiony),
+              life: life,
+              mana: mana,
+              damage: damage,
+              armor: armor,
+              level: level,
+              xp: xp,
+              buffs: buffs,
+              skills: skills,
+            ),
+          );
+        } else {
+          break;
         }
-      } catch (error) {
-        print(error);
+        i++;
       }
     }
     return enemy;

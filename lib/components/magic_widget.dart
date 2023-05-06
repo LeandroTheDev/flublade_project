@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MagicWidget extends StatelessWidget {
-  const MagicWidget({required this.name, this.isPassive = false, super.key});
+  const MagicWidget({required this.name, this.isPassive = false, this.isDebuffs = false, this.debuffIndex = 0, super.key});
   final String name;
   final bool isPassive;
+  final bool isDebuffs;
+  final int debuffIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +16,21 @@ class MagicWidget extends StatelessWidget {
     String typeFunction() {
       if (isPassive) {
         return 'none';
+      } else if (isDebuffs) {
+        return 'none';
       } else {
         return gameplay.playerSkills[name]['type'];
+      }
+    }
+
+    //Returns image
+    String returnImage() {
+      if (isPassive) {
+        return gameplay.playerBuffs[name]['image'];
+      } else if (isDebuffs) {
+        return gameplay.playerDebuffs[0]['image'];
+      } else {
+        return gameplay.playerSkills[name]['image'];
       }
     }
 
@@ -30,9 +45,10 @@ class MagicWidget extends StatelessWidget {
                 width: 100,
                 height: 100,
                 child: Image.asset(
-                  isPassive ? gameplay.playerBuffs[name]['image'] : gameplay.playerSkills[name]['image'],
+                  returnImage(),
                   fit: BoxFit.contain,
                 )),
+            //Damage Type
             typeFunction() == 'none'
                 ? const SizedBox()
                 : Align(
@@ -49,6 +65,68 @@ class MagicWidget extends StatelessWidget {
                               )),
                     ),
                   ),
+            //Stack Size & Rounds
+            isDebuffs
+                ? Align(
+                    alignment: Alignment.center,
+                    child: FittedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          children: [
+                            //Stack
+                            gameplay.playerDebuffs[debuffIndex]['stack'] <= 1
+                                ? const SizedBox()
+                                : Stack(
+                                    children: [
+                                      Text(
+                                        '${gameplay.playerDebuffs[debuffIndex]['stack'].toString()}x',
+                                        style: TextStyle(
+                                          fontSize: 90,
+                                          fontFamily: 'PressStart',
+                                          fontWeight: FontWeight.bold,
+                                          foreground: Paint()
+                                            ..style = PaintingStyle.stroke
+                                            ..strokeWidth = 3
+                                            ..color = Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${gameplay.playerDebuffs[debuffIndex]['stack'].toString()}x',
+                                        style: const TextStyle(fontFamily: 'PressStart', fontSize: 90),
+                                      ),
+                                    ],
+                                  ),
+                            //Rounds
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Stack(
+                                children: [
+                                  Text(
+                                    gameplay.playerDebuffs[debuffIndex]['rounds'].toString(),
+                                    style: TextStyle(
+                                      fontSize: 60,
+                                      fontFamily: 'PressStart',
+                                      fontWeight: FontWeight.bold,
+                                      foreground: Paint()
+                                        ..style = PaintingStyle.stroke
+                                        ..strokeWidth = 3
+                                        ..color = Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    gameplay.playerDebuffs[debuffIndex]['rounds'].toString(),
+                                    style: const TextStyle(fontFamily: 'PressStart', fontSize: 60),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
           ],
         ),
       ),

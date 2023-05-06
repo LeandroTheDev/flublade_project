@@ -101,7 +101,7 @@ class Magics extends StatelessWidget {
                   ));
             },
           ),
-          //Passives
+          //Passives Text
           SizedBox(
             width: double.infinity,
             height: screenSize.height * 0.1,
