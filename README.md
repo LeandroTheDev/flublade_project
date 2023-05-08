@@ -6,7 +6,6 @@ This is a MMORPG turn based game, it uses the MYSQL database to work, the idea i
 
 > System
 - provider: ^6.0.5
-- mysql1: ^0.20.0
 - shared_preferences: ^2.0.17
 - http: ^0.13.5
 > Engine

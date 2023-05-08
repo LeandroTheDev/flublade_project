@@ -26,6 +26,9 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => Gameplay(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => MySQL(),
+        ),
       ],
       child: const FluBlade(),
     ),
@@ -68,8 +71,11 @@ class _FlubladeProjectState extends State<FlubladeProject> {
   void initState() {
     super.initState();
     final options = Provider.of<Options>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Load Datas
+    mysql.changeServerAddress(SaveDatas.getServerAddress() ?? '0.0.0.0:8080');
+    mysql.changeServerName(SaveDatas.getServerName() ?? 'FLUBLADE');
     options.changeUsername(SaveDatas.getUsername() ?? '');
     options.changeToken(SaveDatas.getToken() ?? '');
     options.changeId(SaveDatas.getId() ?? 0);
@@ -85,7 +91,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
         dynamic result;
         try {
           //Credentials Check
-          result = await http.post(Uri.http(MySQL.url, '/loginRemember'),
+          result = await http.post(Uri.http(mysql.serverAddress, '/loginRemember'),
               headers: MySQL.headers,
               body: jsonEncode({
                 'id': options.id,

@@ -24,6 +24,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   TextEditingController password = TextEditingController();
   TextEditingController registerUsername = TextEditingController();
   TextEditingController registerPassword = TextEditingController();
+  TextEditingController serverAddress = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +32,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
-    final accountCreateUrl = Uri.http(MySQL.url, '/createAcc');
-    final accountLoginUrl = Uri.http(MySQL.url, '/login');
+    final mysql = Provider.of<MySQL>(context, listen: false);
 
     //Register Modal
     registerModal() {
@@ -62,13 +62,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: FittedBox(
                             child: Text(
-                              Language.Translate('authentication_register_text',
-                                      options.language) ??
-                                  'Create Account',
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold),
+                              Language.Translate('authentication_register_text', options.language) ?? 'Create Account',
+                              style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 40, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -76,12 +71,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                       //Username Text
                       FittedBox(
                         child: Text(
-                          Language.Translate('authentication_register_username',
-                                  options.language) ??
-                              'Your Username',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 25),
+                          Language.Translate('authentication_register_username', options.language) ?? 'Your Username',
+                          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 25),
                         ),
                       ),
                       //Username Input
@@ -113,12 +104,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                       //Password Text
                       FittedBox(
                         child: Text(
-                          Language.Translate('authentication_register_password',
-                                  options.language) ??
-                              'Your Password',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 25),
+                          Language.Translate('authentication_register_password', options.language) ?? 'Your Password',
+                          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 25),
                         ),
                       ),
                       //Password Input
@@ -142,9 +129,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                             alignment: Alignment.topLeft,
                             width: screenSize.width * 0.95,
                             height: 45,
-                            child: TextFormField(
-                                obscureText: true,
-                                controller: registerPassword),
+                            child: TextFormField(obscureText: true, controller: registerPassword),
                           ),
                         ],
                       ),
@@ -163,138 +148,85 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                   child: ElevatedButton(
                                     onPressed: () async {
                                       //Loading Widget
-                                      MySQL.loadingWidget(
-                                          context: context,
-                                          language: options.language);
+                                      MySQL.loadingWidget(context: context, language: options.language);
                                       late final http.Response result;
                                       try {
                                         //Backend Work
-                                        result = await http.post(
-                                            accountCreateUrl,
-                                            headers: MySQL.headers,
-                                            body: jsonEncode({
-                                              "username": registerUsername.text,
-                                              "password": registerPassword.text,
-                                              "language": options.language
-                                            }));
+                                        result = await http.post(Uri.http(mysql.serverAddress, '/createAcc'), headers: MySQL.headers, body: jsonEncode({"username": registerUsername.text, "password": registerPassword.text, "language": options.language}));
                                         //No connection
                                       } catch (error) {
                                         Navigator.pop(context);
-                                        GlobalFunctions.errorDialog(
-                                            errorMsgTitle:
-                                                'authentication_register_problem_connection',
-                                            errorMsgContext:
-                                                'Failed to connect to the Servers',
-                                            context: context);
+                                        GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
                                         return;
                                       }
                                       //Account Rules Check
                                       if (true) {
                                         //Too small username or password
-                                        if (jsonDecode(
-                                                result.body)["message"] ==
-                                            'Too small or too big username') {
+                                        if (jsonDecode(result.body)["message"] == 'Too small or too big username') {
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
-                                            errorMsgTitle:
-                                                'authentication_register_problem_username',
-                                            errorMsgContext:
-                                                'Username needs to have 3 or more Caracters',
+                                            errorMsgTitle: 'authentication_register_problem_username',
+                                            errorMsgContext: 'Username needs to have 3 or more Caracters',
                                             context: context,
                                           );
                                           return;
                                         }
                                         //Too small or too big password
-                                        if (jsonDecode(
-                                                result.body)["message"] ==
-                                            'Too small password or too big password') {
+                                        if (jsonDecode(result.body)["message"] == 'Too small password or too big password') {
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
-                                            errorMsgTitle:
-                                                'authentication_register_problem_password',
-                                            errorMsgContext:
-                                                'Password needs to have 3 or more Caracters',
+                                            errorMsgTitle: 'authentication_register_problem_password',
+                                            errorMsgContext: 'Password needs to have 3 or more Caracters',
                                             context: context,
                                           );
                                           return;
                                         }
                                         //Username already exists
-                                        if (jsonDecode(
-                                                result.body)["message"] ==
-                                            'Username already exists') {
+                                        if (jsonDecode(result.body)["message"] == 'Username already exists') {
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
-                                            errorMsgTitle:
-                                                'authentication_register_problem_existusername',
-                                            errorMsgContext:
-                                                'Username already exist',
+                                            errorMsgTitle: 'authentication_register_problem_existusername',
+                                            errorMsgContext: 'Username already exist',
                                             context: context,
                                           );
                                           return;
                                         }
                                         //Connection Error
-                                        if (jsonDecode(
-                                                result.body)["message"] ==
-                                            'Unkown error') {
+                                        if (jsonDecode(result.body)["message"] == 'Unkown error') {
                                           Navigator.pop(context);
                                           GlobalFunctions.errorDialog(
-                                            errorMsgTitle:
-                                                'authentication_register_problem_connection',
-                                            errorMsgContext:
-                                                'Failed to connect to the Servers',
+                                            errorMsgTitle: 'authentication_register_problem_connection',
+                                            errorMsgContext: 'Failed to connect to the Servers',
                                             context: context,
                                           );
                                           return;
                                         }
                                         //Success
-                                        if (jsonDecode(
-                                                result.body)["message"] ==
-                                            'Success') {
+                                        if (jsonDecode(result.body)["message"] == 'Success') {
                                           Navigator.pop(context);
                                           //Show Result Dialog
                                           showDialog(
-                                              barrierColor:
-                                                  const Color.fromARGB(
-                                                      167, 0, 0, 0),
+                                              barrierColor: const Color.fromARGB(167, 0, 0, 0),
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius.circular(
-                                                                      32.0))),
-                                                  backgroundColor: Theme.of(
-                                                          context)
-                                                      .scaffoldBackgroundColor,
+                                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                   //Sucess Text
                                                   title: Text(
-                                                    Language.Translate(
-                                                            'authentication_register_sucess',
-                                                            options.language) ??
-                                                        'Failed to connect to the Servers',
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .primaryColor),
+                                                    Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
+                                                    style: TextStyle(color: Theme.of(context).primaryColor),
                                                   ),
                                                   content: Text(
-                                                    Language.Translate(
-                                                            'authentication_register_sucess_account',
-                                                            options.language) ??
-                                                        'Failed to connect to the Servers',
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .primaryColor),
+                                                    Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
+                                                    style: TextStyle(color: Theme.of(context).primaryColor),
                                                   ),
                                                   actions: [
                                                     Center(
                                                         child: ElevatedButton(
                                                       onPressed: () {
-                                                        registerUsername =
-                                                            TextEditingController();
-                                                        registerPassword =
-                                                            TextEditingController();
+                                                        registerUsername = TextEditingController();
+                                                        registerPassword = TextEditingController();
                                                         Navigator.pop(context);
                                                       },
                                                       child: const Text('Ok'),
@@ -302,20 +234,15 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   ],
                                                 );
                                               }).then((result) {
-                                            registerUsername =
-                                                TextEditingController();
-                                            registerPassword =
-                                                TextEditingController();
+                                            registerUsername = TextEditingController();
+                                            registerPassword = TextEditingController();
                                             Navigator.pop(context);
                                           });
                                         }
                                       }
                                     },
                                     child: Text(
-                                      Language.Translate(
-                                              'authentication_register_create',
-                                              options.language) ??
-                                          'Create',
+                                      Language.Translate('authentication_register_create', options.language) ?? 'Create',
                                       style: const TextStyle(fontSize: 45),
                                     ),
                                   ),
@@ -335,297 +262,391 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
           });
     }
 
+    //Server Edit
+    serverModal() {
+      //Modal Bottom
+      showModalBottomSheet<void>(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(50.0),
+            ),
+          ),
+          isScrollControlled: true,
+          context: context,
+          builder: (context) {
+            return SizedBox(
+              height: screenSize.height * 0.25,
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: FittedBox(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //Server IP Text
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('response_serverAddress', options.language) ?? 'Server IP',
+                              style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 40, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                      //Server INPUT
+                      Stack(
+                        children: [
+                          //Background Box Color and Decoration
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 209, 209, 209),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              width: screenSize.width * 0.95,
+                              height: 40,
+                            ),
+                          ),
+                          //Input
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            alignment: Alignment.topLeft,
+                            width: screenSize.width * 0.95,
+                            height: 45,
+                            child: TextFormField(controller: serverAddress),
+                          ),
+                        ],
+                      ),
+                      //Select Button
+                      FittedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: SizedBox(
+                            width: screenSize.width,
+                            child: Row(
+                              children: [
+                                const Spacer(),
+                                SizedBox(
+                                  height: 30,
+                                  width: 150,
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      dynamic result;
+                                      mysql.changeServerAddress(serverAddress.text);
+                                      MySQL.loadingWidget(context: context, language: options.language);
+                                      //Try connection
+                                      try {
+                                        result = await http.post(Uri.http(mysql.serverAddress, '/gameplayStats'),
+                                            headers: MySQL.headers,
+                                            body: jsonEncode({
+                                              "testConnection": true,
+                                            }));
+                                      } catch (error) {
+                                        Navigator.pop(context);
+                                        GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                        return;
+                                      }
+                                      if (jsonDecode(result.body)['message'] == 'Success') {
+                                        setState(() {
+                                          mysql.changeServerName(jsonDecode(result.body)['serverName']);
+                                          SaveDatas.setServerAddress(serverAddress.text);
+                                          SaveDatas.setServerName(jsonDecode(result.body)['serverName']);
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        });
+                                      } else {
+                                        Navigator.pop(context);
+                                        GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                        return;
+                                      }
+                                    },
+                                    child: FittedBox(
+                                      child: Text(
+                                        Language.Translate('response_connect', options.language) ?? 'Connect',
+                                        style: const TextStyle(fontSize: 45),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          });
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: screenSize.height * 0.2),
             //The white box in the center of the page
-            FittedBox(
-              child: Padding(
-                padding: const EdgeInsets.all(400.0),
-                child: Stack(
-                  children: [
-                    //Background Image
-                    Container(
-                      width: 5600,
-                      height: 5600,
-                      //Decoration of the box (Circular and Color)
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(200),
-                      ),
-                      child: Image.asset('assets/authentication_image.png',
-                          fit: BoxFit.fill,
-                          color: const Color.fromARGB(33, 255, 255, 255),
-                          colorBlendMode: BlendMode.modulate),
-                    ),
-                    //Auth
-                    SizedBox(
-                      width: 5600,
-                      height: 5600,
-                      //Texts and TextForms in the white box
-                      child: Padding(
-                        padding: const EdgeInsets.all(200.0),
-                        child: FittedBox(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              //Welcome Text
-                              const Text(
-                                'FLUBLADE',
-                                style: TextStyle(
-                                    letterSpacing: 4,
-                                    fontWeight: FontWeight.w900),
-                              ),
-                              const SizedBox(height: 20),
-                              //Username Text
-                              Text(Language.Translate('authentication_username',
-                                      options.language) ??
-                                  'Username'),
-                              //Username Input
-                              Stack(
+            SizedBox(
+              height: screenSize.height * 0.6,
+              child: Center(
+                child: FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(400.0),
+                    child: Stack(
+                      children: [
+                        //Background Image
+                        Container(
+                          width: 5600,
+                          height: 5600,
+                          //Decoration of the box (Circular and Color)
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(200),
+                          ),
+                          child: Image.asset('assets/authentication_image.png', fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
+                        ),
+                        //Auth
+                        SizedBox(
+                          width: 5600,
+                          height: 5600,
+                          //Texts and TextForms in the white box
+                          child: Padding(
+                            padding: const EdgeInsets.all(200.0),
+                            child: FittedBox(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  //Background Box Color and Decoration
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            255, 209, 209, 209),
-                                        borderRadius: BorderRadius.circular(8),
+                                  //Welcome Text
+                                  Row(
+                                    children: [
+                                      //Server Name
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        width: 240,
+                                        height: 20,
+                                        child: FittedBox(
+                                          child: Text(
+                                            mysql.serverName,
+                                            style: TextStyle(letterSpacing: 4, fontWeight: FontWeight.w900),
+                                          ),
+                                        ),
                                       ),
-                                      width: 310,
-                                      height: 40,
-                                    ),
-                                  ),
-                                  //Input
-                                  Container(
-                                    padding: const EdgeInsets.all(5),
-                                    alignment: Alignment.topLeft,
-                                    width: 310,
-                                    height: 45,
-                                    child: TextFormField(controller: username),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              //Password Text
-                              Text(Language.Translate('authentication_password',
-                                      options.language) ??
-                                  'Password'),
-                              //Password Input
-                              Stack(
-                                children: [
-                                  //Background Box Color and Decoration
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                            255, 209, 209, 209),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      width: 310,
-                                      height: 40,
-                                    ),
-                                  ),
-                                  //Input
-                                  Container(
-                                    padding: const EdgeInsets.all(5),
-                                    alignment: Alignment.topLeft,
-                                    width: 310,
-                                    height: 45,
-                                    child: TextFormField(controller: password),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              //Remember CheckBox and Language
-                              SizedBox(
-                                width: 310,
-                                child: Row(
-                                  children: [
-                                    //Check Box
-                                    Checkbox(
-                                      fillColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Theme.of(context)
-                                                  .colorScheme
-                                                  .primary),
-                                      value: options.remember,
-                                      onChanged: (checked) =>
-                                          options.changeRemember(),
-                                    ),
-                                    //Remember Text
-                                    Text(
-                                      Language.Translate(
-                                              'authentication_remember',
-                                              options.language) ??
-                                          'Remember',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const Spacer(),
-                                    //Language Button
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          MySQL.changeLanguage(
-                                              context, super.widget);
-                                        },
-                                        child: Text(Language.Translate(
-                                                'authentication_language',
-                                                options.language) ??
-                                            'Language'))
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 15),
-                              //Login Button
-                              settings.isLoading
-                                  ? SizedBox(
-                                      width: 310,
-                                      height: 30,
-                                      child: Row(
-                                        children: const [
-                                          Spacer(),
-                                          //Circular Progress Indicator
-                                          SizedBox(
-                                            width: 20,
-                                            height: 30,
+                                      //Spacer
+                                      const SizedBox(width: 20),
+                                      //Server Change
+                                      SizedBox(
+                                        width: 50,
+                                        height: 20,
+                                        child: FittedBox(
+                                          child: ElevatedButton(
+                                            onPressed: () => serverModal(),
                                             child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 8.0),
-                                              child:
-                                                  CircularProgressIndicator(),
+                                              padding: const EdgeInsets.all(2.0),
+                                              //Server Text
+                                              child: Text(
+                                                Language.Translate('response_servers', options.language) ?? 'Servers',
+                                              ),
                                             ),
                                           ),
-                                          Spacer(),
-                                        ],
-                                      ))
-                                  : Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 100),
-                                      width: 310,
-                                      height: 30,
-                                      child: ElevatedButton(
-                                        onPressed: () async {
-                                          settings.changeIsLoading(value: true);
-                                          dynamic result;
-                                          try {
-                                            //Credentials Check
-                                            result = await http.post(
-                                                accountLoginUrl,
-                                                headers: MySQL.headers,
-                                                body: jsonEncode({
-                                                  "username": username.text,
-                                                  "password": password.text
-                                                }));
-                                          } catch (error) {
-                                            //Connection error
-                                            settings.changeIsLoading(
-                                                value: false);
-                                            GlobalFunctions.errorDialog(
-                                              errorMsgTitle:
-                                                  'authentication_register_problem_connection',
-                                              errorMsgContext:
-                                                  'Failed to connect to the Servers',
-                                              context: context,
-                                            );
-                                            return;
-                                          }
-                                          //Json Decoding
-                                          result = (jsonDecode(result.body));
-                                          //Wrong Credentials
-                                          if (result['message'] ==
-                                              'Wrong Credentials') {
-                                            settings.changeIsLoading(
-                                                value: false);
-                                            GlobalFunctions.errorDialog(
-                                              errorMsgTitle:
-                                                  'authentication_login_notfound',
-                                              errorMsgContext:
-                                                  'Username or password is Invalid',
-                                              context: context,
-                                            );
-                                          }
-                                          //Proceed to connection
-                                          if (result['message'] == 'Success') {
-                                            if (options.remember) {
-                                              //Update Providers
-                                              options.changeId(result['id']);
-                                              options.changeUsername(
-                                                  result['username']);
-                                              options.changeLanguage(
-                                                  result['language']);
-                                              options
-                                                  .changeToken(result['token']);
-                                              //Update Save
-                                              SaveDatas.setUsername(
-                                                  options.username);
-                                              SaveDatas.setToken(
-                                                  result['token']);
-                                              SaveDatas.setRemember(
-                                                  options.remember);
-                                              SaveDatas.setId(options.id);
-                                              //Push Characters
-                                              String characters =
-                                                  await MySQL.pushCharacters(
-                                                      context: context);
-                                              gameplay
-                                                  .changeCharacters(characters);
-                                              SaveDatas.setCharacters(
-                                                  characters);
-                                            } else {
-                                              //Update Providers
-                                              options.changeId(result['id']);
-                                              options.changeUsername(
-                                                  result['username']);
-                                              options.changeLanguage(
-                                                  result['language']);
-                                              options
-                                                  .changeToken(result['token']);
-                                              //Push Characters
-                                              String characters =
-                                                  await MySQL.pushCharacters(
-                                                      context: context);
-                                              Provider.of<Gameplay>(context,
-                                                      listen: false)
-                                                  .changeCharacters(characters);
-                                            }
-                                            settings.changeIsLoading(
-                                                value: false);
-                                            Navigator.pushReplacementNamed(
-                                                context, '/mainmenu');
-                                          }
-                                          settings.changeIsLoading(
-                                              value: false);
-                                        },
-                                        child: Text(Language.Translate(
-                                                'authentication_login',
-                                                options.language) ??
-                                            'Login'),
+                                        ),
                                       ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  //Username Text
+                                  Text(Language.Translate('authentication_username', options.language) ?? 'Username'),
+                                  //Username Input
+                                  Stack(
+                                    children: [
+                                      //Background Box Color and Decoration
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(255, 209, 209, 209),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          width: 310,
+                                          height: 40,
+                                        ),
+                                      ),
+                                      //Input7
+                                      Container(
+                                        padding: const EdgeInsets.all(5),
+                                        alignment: Alignment.topLeft,
+                                        width: 310,
+                                        height: 45,
+                                        child: TextFormField(controller: username),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  //Password Text
+                                  Text(Language.Translate('authentication_password', options.language) ?? 'Password'),
+                                  //Password Input
+                                  Stack(
+                                    children: [
+                                      //Background Box Color and Decoration
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(255, 209, 209, 209),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          width: 310,
+                                          height: 40,
+                                        ),
+                                      ),
+                                      //Input
+                                      Container(
+                                        padding: const EdgeInsets.all(5),
+                                        alignment: Alignment.topLeft,
+                                        width: 310,
+                                        height: 45,
+                                        child: TextFormField(controller: password),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 15),
+                                  //Remember CheckBox and Language
+                                  SizedBox(
+                                    width: 310,
+                                    child: Row(
+                                      children: [
+                                        //Check Box
+                                        Checkbox(
+                                          fillColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.primary),
+                                          value: options.remember,
+                                          onChanged: (checked) => options.changeRemember(),
+                                        ),
+                                        //Remember Text
+                                        Text(
+                                          Language.Translate('authentication_remember', options.language) ?? 'Remember',
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const Spacer(),
+                                        //Language Button
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              MySQL.changeLanguage(context, super.widget);
+                                            },
+                                            child: Text(Language.Translate('authentication_language', options.language) ?? 'Language'))
+                                      ],
                                     ),
-                              //Register
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: TextButton(
-                                  onPressed: () {
-                                    registerModal();
-                                  },
-                                  child: Text(Language.Translate(
-                                          'authentication_register',
-                                          options.language) ??
-                                      'Don\'t have an account?'),
-                                ),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  //Login Button
+                                  settings.isLoading
+                                      ? SizedBox(
+                                          width: 310,
+                                          height: 30,
+                                          child: Row(
+                                            children: const [
+                                              Spacer(),
+                                              //Circular Progress Indicator
+                                              SizedBox(
+                                                width: 20,
+                                                height: 30,
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                                                  child: CircularProgressIndicator(),
+                                                ),
+                                              ),
+                                              Spacer(),
+                                            ],
+                                          ))
+                                      : Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 100),
+                                          width: 310,
+                                          height: 30,
+                                          child: ElevatedButton(
+                                            onPressed: () async {
+                                              settings.changeIsLoading(value: true);
+                                              dynamic result;
+                                              try {
+                                                //Credentials Check
+                                                result = await http.post(Uri.http(mysql.serverAddress, '/login'), headers: MySQL.headers, body: jsonEncode({"username": username.text, "password": password.text}));
+                                              } catch (error) {
+                                                //Connection error
+                                                settings.changeIsLoading(value: false);
+                                                GlobalFunctions.errorDialog(
+                                                  errorMsgTitle: 'authentication_register_problem_connection',
+                                                  errorMsgContext: 'Failed to connect to the Servers',
+                                                  context: context,
+                                                );
+                                                return;
+                                              }
+                                              //Json Decoding
+                                              result = (jsonDecode(result.body));
+                                              //Wrong Credentials
+                                              if (result['message'] == 'Wrong Credentials') {
+                                                settings.changeIsLoading(value: false);
+                                                GlobalFunctions.errorDialog(
+                                                  errorMsgTitle: 'authentication_login_notfound',
+                                                  errorMsgContext: 'Username or password is Invalid',
+                                                  context: context,
+                                                );
+                                              }
+                                              //Proceed to connection
+                                              if (result['message'] == 'Success') {
+                                                if (options.remember) {
+                                                  //Update Providers
+                                                  options.changeId(result['id']);
+                                                  options.changeUsername(result['username']);
+                                                  options.changeLanguage(result['language']);
+                                                  options.changeToken(result['token']);
+                                                  //Update Save
+                                                  SaveDatas.setUsername(options.username);
+                                                  SaveDatas.setToken(result['token']);
+                                                  SaveDatas.setRemember(options.remember);
+                                                  SaveDatas.setId(options.id);
+                                                  //Push Characters
+                                                  String characters = await MySQL.pushCharacters(context: context);
+                                                  gameplay.changeCharacters(characters);
+                                                  SaveDatas.setCharacters(characters);
+                                                } else {
+                                                  //Update Providers
+                                                  options.changeId(result['id']);
+                                                  options.changeUsername(result['username']);
+                                                  options.changeLanguage(result['language']);
+                                                  options.changeToken(result['token']);
+                                                  //Push Characters
+                                                  String characters = await MySQL.pushCharacters(context: context);
+                                                  Provider.of<Gameplay>(context, listen: false).changeCharacters(characters);
+                                                }
+                                                settings.changeIsLoading(value: false);
+                                                Navigator.pushReplacementNamed(context, '/mainmenu');
+                                              }
+                                              settings.changeIsLoading(value: false);
+                                            },
+                                            child: Text(Language.Translate('authentication_login', options.language) ?? 'Login'),
+                                          ),
+                                        ),
+                                  //Register
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: TextButton(
+                                      onPressed: () {
+                                        registerModal();
+                                      },
+                                      child: Text(Language.Translate('authentication_register', options.language) ?? 'Don\'t have an account?'),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

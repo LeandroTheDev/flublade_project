@@ -9,30 +9,32 @@ import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 
 import 'package:flutter/material.dart';
-import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import 'package:bonfire/bonfire.dart';
 import 'package:http/http.dart' as http;
 
-class MySQL {
+class MySQL with ChangeNotifier {
+  String _serverAddress = '0.0.0.0:8080';
+  String _serverName = 'FLUBLADE';
+  String get serverAddress => _serverAddress;
+  String get serverName => _serverName;
+
+  //Change server IP
+  void changeServerAddress(value) {
+    _serverAddress = '$value:8080';
+  }
+
+  //Change server Name
+  void changeServerName(value) {
+    _serverName = value;
+  }
+
   //Backend Connection
-  static const ip = '192.168.0.6';
   static const ports = 8080;
-  static const url = '$ip:$ports';
+  // static const url = '$ip:$ports';
   static const headers = {
     HttpHeaders.contentTypeHeader: 'application/json',
   };
-
-  //Database Connection
-  static final database = MySqlConnection.connect(
-    ConnectionSettings(
-      host: '192.168.0.13',
-      port: 3306,
-      user: 'flubladeGuest',
-      password: 'i@Dhs4e5E%fGz&ngbY2m&AGRCVlskBUrrCnsYFUze&fhxehb#j',
-      db: 'flublade',
-    ),
-  );
 
   //Loading
   static void loadingWidget({required BuildContext context, required String language}) {
@@ -63,6 +65,7 @@ class MySQL {
   static Future<void> changeLanguage(context, widget) async {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     //Upload to MySQL
     uploadData(String language) async {
       loadingWidget(context: context, language: language);
@@ -73,17 +76,20 @@ class MySQL {
       try {
         //Credentials Check
         result = await http.post(
-          Uri.http(url, '/updateLanguage'),
+          Uri.http(mysql._serverAddress, '/updateLanguage'),
           headers: headers,
           body: jsonEncode({"id": options.id, "language": language, "token": options.token}),
         );
       } catch (error) {
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
         GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
         return;
       }
       if (jsonDecode(result.body)['message'] == 'Invalid Login') {
-        Navigator.pushNamed(context, '/authenticationpage');
         GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+        Navigator.pushReplacementNamed(context, '/authenticationpage');
         return;
       }
       //Pop the Dialog
@@ -148,11 +154,12 @@ class MySQL {
   static Future<String> returnPlayerInventory(BuildContext context) async {
     final options = Provider.of<Options>(context);
     final gameplay = Provider.of<Gameplay>(context);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     //Pickup from database
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -172,11 +179,12 @@ class MySQL {
   static Future<String> pushUploadCharacters({required BuildContext context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     dynamic charactersdb;
 
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -226,10 +234,11 @@ class MySQL {
   static Future<dynamic> pushCharacters({required context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
     } catch (error) {
       //Connection Error
       GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
@@ -250,12 +259,13 @@ class MySQL {
   static updateCharacters({String characters = '', context, bool isLevelUp = false}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     dynamic charactersdb = jsonDecode(characters);
     dynamic result;
     try {
       if (isLevelUp) {
         //Connection
-        result = await http.post(Uri.http(url, '/updateCharacters'),
+        result = await http.post(Uri.http(mysql.serverAddress, '/updateCharacters'),
             headers: MySQL.headers,
             body: jsonEncode({
               'id': options.id,
@@ -271,7 +281,7 @@ class MySQL {
         gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['skillpoint'], stats: 'skillpoint');
       } else {
         //Connection
-        result = await http.post(Uri.http(url, '/updateCharacters'),
+        result = await http.post(Uri.http(mysql.serverAddress, '/updateCharacters'),
             headers: MySQL.headers,
             body: jsonEncode({
               'id': options.id,
@@ -309,10 +319,11 @@ class MySQL {
   static Future removeCharacters({required index, required context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/removeCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/removeCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
     } catch (error) {
       //Connection Error
       GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/charactercreation');
@@ -360,11 +371,12 @@ class MySQL {
   static Future returnPlayerStats(context) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     //Receive from database
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(url, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -400,10 +412,11 @@ class MySQLGameplay {
   //Return Server Stats
   static Future returnGameplayStats(context) async {
     final settings = Provider.of<Settings>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     dynamic result;
     //Receive All Stats
     result = await http.post(
-      Uri.http(MySQL.url, '/gameplayStats'),
+      Uri.http(mysql.serverAddress, '/gameplayStats'),
       headers: MySQL.headers,
       body: jsonEncode({
         'all': true,
@@ -417,52 +430,50 @@ class MySQLGameplay {
 
   //Return Level
   static Future<List<dynamic>> returnLevel({required BuildContext context, required String level}) async {
-    final connection = await MySQL.database;
-    List results = [];
-    List<List<double>> listLevel = [];
-    int a = 1;
-    //Push Tiles
-    while (true) {
-      //Receive from database
-      dynamic leveldb = await connection.query('select list$a from world where name = ?', [level]);
-      leveldb = leveldb.toString().replaceFirst('(Fields: {list$a: ', '');
-      leveldb = leveldb.substring(0, leveldb.length - 2);
-      //Verify if is empty
-      if (leveldb == '[]') {
-        break;
+    try {
+      final mysql = Provider.of<MySQL>(context, listen: false);
+      final options = Provider.of<Options>(context, listen: false);
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      List results = [];
+
+      //Returning the Tiles
+      dynamic result = await http.post(Uri.http(mysql.serverAddress, '/pushLevel'),
+          headers: MySQL.headers,
+          body: jsonEncode({
+            'id': options.id,
+            'token': options.token,
+            'selectedCharacter': gameplay.selectedCharacter,
+          }));
+      result = jsonDecode(result.body);
+      //Adding the tiles
+      List<List<double>> level = [];
+      for (int i = 0; i <= result['level'].length - 1; i++) {
+        List<double> levelTile = [];
+        result['level'][i] = json.decode(result['level'][i]).cast<int>().toList();
+        result['level'][i].forEach((int tile) => levelTile.add(double.parse(tile.toString())));
+        level.add(levelTile);
       }
-      List levelIndex = jsonDecode(leveldb);
-      listLevel.add([]);
-      //Push levelIndex and returns to client
-      for (int b = 0; b < levelIndex.length; b++) {
-        listLevel[a - 1].add(double.parse(levelIndex[b].toString()));
-      }
-      a++;
+      results.add(level);
+      //Returning the NPCs
+      List<GameComponent> npc = await returnNPCs(jsonDecode(result['npc']));
+      results.add(npc);
+
+      //Returning the Enemys
+      List<Enemy> enemy = await returnEnemys(jsonDecode(result['enemy']));
+      results.add(enemy);
+
+      return results;
+    } catch (error) {
+      print(error);
+      return [];
     }
-    //Returning the Tiles
-    results.add(listLevel);
-
-    //Returning the NPCs
-    List<GameComponent> npc = await returnNPCs(context, level);
-    results.add(npc);
-
-    //Returning the Enemys
-    List<Enemy> enemy = await returnEnemys(context, level);
-    results.add(enemy);
-
-    return results;
   }
 
   //Return NPCs
-  static Future<List<GameComponent>> returnNPCs(BuildContext context, String level) async {
-    final connection = await MySQL.database;
-    dynamic npcdb = await connection.query('select npc from world where name = ?', [level]);
-    npcdb = npcdb.toString().replaceFirst('(Fields: {npc: ', '');
-    npcdb = npcdb.substring(0, npcdb.length - 2);
+  static Future<List<GameComponent>> returnNPCs(npcdb) async {
     List<GameComponent> npc = [];
     //Add NPCs to the gameplay
-    if (npcdb != '{}') {
-      npcdb = jsonDecode(npcdb);
+    if (npcdb != {}) {
       double positionx = double.parse(npcdb['npc0']['positionx']);
       double positiony = double.parse(npcdb['npc0']['positiony']);
       npc.add(parseNPC(npcname: npcdb['npc0']['name'], position: Vector2(positionx, positiony), talk: npcdb['npc0']['talk']));
@@ -481,14 +492,10 @@ class MySQLGameplay {
   }
 
   //Return Enemys
-  static Future<List<Enemy>> returnEnemys(BuildContext context, String level) async {
-    final connection = await MySQL.database;
-    dynamic enemysdb = await connection.query('select enemy from world where name = ?', [level]);
-    enemysdb = enemysdb.toString().replaceFirst('(Fields: {enemy: ', '');
-    enemysdb = enemysdb.substring(0, enemysdb.length - 2);
+  static Future<List<Enemy>> returnEnemys(enemysdb) async {
     List<Enemy> enemy = [];
     //Add Enemys to the gameplay
-    if (enemysdb != '{}') {
+    if (enemysdb != {}) {
       String name;
       double life;
       double mana;
@@ -501,7 +508,6 @@ class MySQLGameplay {
       List buffs;
       List skills;
       //Transforming in MAP
-      enemysdb = jsonDecode(enemysdb);
       name = enemysdb['enemy0']['name'].toString();
       life = double.parse(enemysdb['enemy0']['life'].toString());
       mana = double.parse(enemysdb['enemy0']['mana'].toString());

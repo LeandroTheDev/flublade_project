@@ -40,6 +40,7 @@ class _BattleSceneState extends State<BattleScene> {
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
     return WillPopScope(
@@ -315,7 +316,7 @@ class _BattleSceneState extends State<BattleScene> {
                                       isFighting = true;
                                     });
                                     //Attack Enemy
-                                    dynamic result = await http.post(Uri.http(MySQL.url, 'attackEnemy'),
+                                    dynamic result = await http.post(Uri.http(mysql.serverAddress, 'attackEnemy'),
                                         headers: MySQL.headers,
                                         body: jsonEncode({
                                           'enemyLife': gameplay.enemyLife,

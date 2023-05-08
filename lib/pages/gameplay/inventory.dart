@@ -26,6 +26,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
     final options = Provider.of<Options>(context);
+    final mysql = Provider.of<MySQL>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
     final settings = Provider.of<Settings>(context, listen: false);
 
@@ -83,7 +84,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                             child: ElevatedButton(
                               onPressed: () async {
                                 MySQL.loadingWidget(context: context, language: Provider.of<Options>(context, listen: false).language);
-                                await http.post(Uri.http(MySQL.url, '/changeEquip'),
+                                await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
                                     headers: MySQL.headers,
                                     body: jsonEncode({
                                       'id': options.id,
@@ -340,7 +341,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                   //Equipped item variable
                                                                   final equipped = gameplay.playerInventory[itemName];
                                                                   //Add Equip Stats
-                                                                  await http.post(Uri.http(MySQL.url, '/changeEquip'),
+                                                                  await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
                                                                       headers: MySQL.headers,
                                                                       body: jsonEncode({
                                                                         'id': options.id,
@@ -380,7 +381,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                           //Equipped item variable
                                           final equipped = gameplay.playerInventory[itemName];
                                           //Add Equip Stats
-                                          await http.post(Uri.http(MySQL.url, '/changeEquip'),
+                                          await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
                                               headers: MySQL.headers,
                                               body: jsonEncode({
                                                 'id': options.id,

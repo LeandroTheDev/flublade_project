@@ -25,6 +25,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final mysql = Provider.of<MySQL>(context, listen: false);
 
     //Change Class Button
     void changeClass(bool value) {
@@ -58,14 +59,11 @@ class _CharacterCreationState extends State<CharacterCreation> {
         builder: (context) {
           return FittedBox(
             child: AlertDialog(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               //Title
               title: Text(
-                Language.Translate(
-                        'characters_create_name', options.language) ??
-                    'Character Name',
+                Language.Translate('characters_create_name', options.language) ?? 'Character Name',
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               //Text and Input
@@ -102,20 +100,16 @@ class _CharacterCreationState extends State<CharacterCreation> {
                     ElevatedButton(
                       onPressed: () async {
                         //Class declaration
-                        String characterClass =
-                            Gameplay.classes[selectedClass].substring(18);
-                        characterClass = characterClass.substring(
-                            0, characterClass.length - 4);
+                        String characterClass = Gameplay.classes[selectedClass].substring(18);
+                        characterClass = characterClass.substring(0, characterClass.length - 4);
                         //Loading Widget
-                        MySQL.loadingWidget(
-                            context: context, language: options.language);
+                        MySQL.loadingWidget(context: context, language: options.language);
                         dynamic result;
                         try {
                           //Load Stats
                           await MySQLGameplay.returnGameplayStats(context);
                           //Server Creation
-                          result = await http.post(
-                              Uri.http(MySQL.url, '/createCharacters'),
+                          result = await http.post(Uri.http(mysql.serverAddress, '/createCharacters'),
                               headers: MySQL.headers,
                               body: jsonEncode({
                                 'id': options.id,
@@ -128,8 +122,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                           //Connection Error
                           GlobalFunctions.errorDialog(
                             errorMsgTitle: 'characters_create_error',
-                            errorMsgContext:
-                                'Ops, there\'s was a problem creating your character try again later',
+                            errorMsgContext: 'Ops, there\'s was a problem creating your character try again later',
                             context: context,
                           );
                           return;
@@ -138,22 +131,13 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         //Empty Text
                         if (result['message'] == 'Empty') {
                           Navigator.pop(context);
-                          GlobalFunctions.errorDialog(
-                              errorMsgTitle: 'characters_create_error_empty',
-                              errorMsgContext:
-                                  'You need to make a name to your character',
-                              context: context);
+                          GlobalFunctions.errorDialog(errorMsgTitle: 'characters_create_error_empty', errorMsgContext: 'You need to make a name to your character', context: context);
                           return;
                         }
                         //Too big Text
                         if (result['message'] == 'Too big') {
                           Navigator.pop(context);
-                          GlobalFunctions.errorDialog(
-                              errorMsgTitle:
-                                  'characters_create_error_namelimit',
-                              errorMsgContext:
-                                  'Character name cannot be longer than 10 characters',
-                              context: context);
+                          GlobalFunctions.errorDialog(errorMsgTitle: 'characters_create_error_namelimit', errorMsgContext: 'Character name cannot be longer than 10 characters', context: context);
                           return;
                         }
                         //Success
@@ -167,17 +151,14 @@ class _CharacterCreationState extends State<CharacterCreation> {
                           //Connection Error
                           GlobalFunctions.errorDialog(
                             errorMsgTitle: 'characters_create_error',
-                            errorMsgContext:
-                                'Ops, there\'s was a problem creating your character try again later',
+                            errorMsgContext: 'Ops, there\'s was a problem creating your character try again later',
                             context: context,
                           );
                           return;
                         }
                       },
                       child: Text(
-                        Language.Translate(
-                                'response_create', options.language) ??
-                            'Language',
+                        Language.Translate('response_create', options.language) ?? 'Language',
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
@@ -186,8 +167,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        Language.Translate('response_back', options.language) ??
-                            'Language',
+                        Language.Translate('response_back', options.language) ?? 'Language',
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
@@ -244,9 +224,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                           padding: const EdgeInsets.only(left: 510.0, top: 500),
                           child: FittedBox(
                             child: Text(
-                              Language.Translate('characters_create_class',
-                                      options.language) ??
-                                  'Class',
+                              Language.Translate('characters_create_class', options.language) ?? 'Class',
                               maxLines: 1,
                               style: const TextStyle(fontFamily: 'PressStart'),
                             ),
@@ -258,13 +236,10 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         width: 2180,
                         height: 580,
                         child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 1810.0, top: 500),
+                          padding: const EdgeInsets.only(left: 1810.0, top: 500),
                           child: FittedBox(
                             child: Text(
-                              Language.Translate('characters_create_info',
-                                      options.language) ??
-                                  'Info',
+                              Language.Translate('characters_create_info', options.language) ?? 'Info',
                               maxLines: 1,
                               style: const TextStyle(fontFamily: 'PressStart'),
                             ),
@@ -293,13 +268,8 @@ class _CharacterCreationState extends State<CharacterCreation> {
                             child: Column(
                               children: [
                                 Text(
-                                  Gameplay.returnClassInfo(
-                                      selectedClass, options.language),
-                                  style: const TextStyle(
-                                      fontFamily: 'Explora',
-                                      fontSize: 200,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 10),
+                                  Gameplay.returnClassInfo(selectedClass, options.language),
+                                  style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
                                 ),
                               ],
                             ),
@@ -322,13 +292,8 @@ class _CharacterCreationState extends State<CharacterCreation> {
                             changeClass(false);
                           },
                           child: Text(
-                            Language.Translate(
-                                    'response_back', options.language) ??
-                                'Back',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'PressStart',
-                                color: Theme.of(context).primaryColor),
+                            Language.Translate('response_back', options.language) ?? 'Back',
+                            style: TextStyle(fontSize: 20, fontFamily: 'PressStart', color: Theme.of(context).primaryColor),
                           ),
                         ),
                         const SizedBox(width: 30),
@@ -338,13 +303,8 @@ class _CharacterCreationState extends State<CharacterCreation> {
                             changeClass(true);
                           },
                           child: Text(
-                            Language.Translate(
-                                    'response_next', options.language) ??
-                                'Next',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'PressStart',
-                                color: Theme.of(context).primaryColor),
+                            Language.Translate('response_next', options.language) ?? 'Next',
+                            style: TextStyle(fontSize: 20, fontFamily: 'PressStart', color: Theme.of(context).primaryColor),
                           ),
                         ),
                       ],
@@ -366,11 +326,8 @@ class _CharacterCreationState extends State<CharacterCreation> {
                               padding: const EdgeInsets.all(8.0),
                               child: FittedBox(
                                 child: Text(
-                                  Language.Translate('response_select',
-                                          options.language) ??
-                                      'Select',
-                                  style: const TextStyle(
-                                      fontSize: 500, fontFamily: 'PressStart'),
+                                  Language.Translate('response_select', options.language) ?? 'Select',
+                                  style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
                                 ),
                               ),
                             ))),
