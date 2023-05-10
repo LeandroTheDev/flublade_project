@@ -11,15 +11,14 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
           position: position,
           size: Vector2(32, 32),
           animation: SimpleDirectionAnimation(
-            idleRight: ClassSpriteSheet.characterClass[
-                '${MySQL.returnInfo(context, returned: 'class')}idle'],
-            runRight: ClassSpriteSheet.characterClass[
-                '${MySQL.returnInfo(context, returned: 'class')}run'],
+            idleRight: ClassSpriteSheet.characterClass['${MySQL.returnInfo(context, returned: 'class')}idle'],
+            runRight: ClassSpriteSheet.characterClass['${MySQL.returnInfo(context, returned: 'class')}run'],
           ),
+          speed: 80,
         ) {
     setupCollision(
       CollisionConfig(
-        collisions: [CollisionArea.rectangle(size: Vector2(32, 32))],
+        collisions: [CollisionArea.circle(radius: 16, align: Vector2(-1, -1))],
       ),
     );
   }
@@ -80,4 +79,3 @@ class ClassSpriteSheet {
     ),
   };
 }
-

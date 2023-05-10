@@ -13,8 +13,8 @@ class InGame extends StatelessWidget {
   Widget build(BuildContext context) {
     //Screen Resolution
     double zoomResolution() {
-      if(MediaQuery.of(context).size.height <= 320) {
-        if(MediaQuery.of(context).size.width <= 240) {
+      if (MediaQuery.of(context).size.height <= 320) {
+        if (MediaQuery.of(context).size.width <= 240) {
           return 0.5;
         } else if (MediaQuery.of(context).size.width >= 480) {
           return 0.7;
@@ -23,21 +23,21 @@ class InGame extends StatelessWidget {
         }
       }
       if (MediaQuery.of(context).size.height <= 854) {
-         if(MediaQuery.of(context).size.width <= 480) {
+        if (MediaQuery.of(context).size.width <= 480) {
           return 1.35;
-         } else {
+        } else {
           return 1.60;
-         }
+        }
       }
-      if(MediaQuery.of(context).size.height <= 1280) {
+      if (MediaQuery.of(context).size.height <= 1280) {
         if (MediaQuery.of(context).size.width <= 720) {
           return 1.9;
         } else {
           return 2.2;
         }
       }
-      if(MediaQuery.of(context).size.height <= 1920){
-        if(MediaQuery.of(context).size.width <= 1080) {
+      if (MediaQuery.of(context).size.height <= 1920) {
+        if (MediaQuery.of(context).size.width <= 1080) {
           return 2.5;
         } else {
           return 2.7;
@@ -46,7 +46,6 @@ class InGame extends StatelessWidget {
         return 3.0;
       }
     }
-
 
     return FutureBuilder(
       //Level Load
@@ -58,7 +57,7 @@ class InGame extends StatelessWidget {
         if (future.hasData) {
           return Scaffold(
             body: BonfireWidget(
-              showCollisionArea: true,
+              // showCollisionArea: true,
               //Camera
               cameraConfig: CameraConfig(
                 moveOnlyMapArea: true,
@@ -81,20 +80,21 @@ class InGame extends StatelessWidget {
               ),
               //Player Call
               player: PlayerClient(
-                Vector2(32, 32),
+                future.data![3],
                 context,
               ),
               //Npcs
               components: future.data![1],
-              //Loots
-              decorations: const [],
               //Enemies
               enemies: future.data![2],
+              //HUD
               overlayBuilderMap: {
                 'pause': (BuildContext context, BonfireGame game) {
                   return const IngameInterface();
                 }
               },
+              //Events
+              decorations: const [],
               initialActiveOverlays: const ['pause'],
             ),
           );

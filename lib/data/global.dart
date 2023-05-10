@@ -657,7 +657,9 @@ class GlobalFunctions {
   }
 
   //Pause Dialog
-  static pauseDialog({required BuildContext context, required options}) {
+  static pauseDialog({required BuildContext context}) {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -698,6 +700,7 @@ class GlobalFunctions {
                       padding: const EdgeInsets.all(15.0),
                       child: ElevatedButton(
                         onPressed: () {
+                          gameplay.changeIsTalkable(false);
                           Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },
                         child: Text(Language.Translate('pausemenu_disconnect', options.language) ?? 'Disconnect'),
@@ -960,7 +963,8 @@ class Gameplay with ChangeNotifier {
   //Ingame Provider
   bool _isTalkable = false;
   bool _enemysMove = true;
-  String _selectedTalk = '';
+  List<String> _selectedTalk = [];
+  String _selectedNPC = 'wizard';
   int _worldId = 0;
   List<String> _battleLog = [];
   double _playerLife = 0;
@@ -999,7 +1003,8 @@ class Gameplay with ChangeNotifier {
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
   int get worldId => _worldId;
-  String get selectedTalk => _selectedTalk;
+  List<String> get selectedTalk => _selectedTalk;
+  String get selectedNPC => _selectedNPC;
   List<String> get battleLog => _battleLog;
   double get playerLife => _playerLife;
   double get playerMana => _playerMana;
@@ -1092,9 +1097,21 @@ class Gameplay with ChangeNotifier {
   }
 
   //Change the talk text
-  void changeIsTalkable(value, text) {
-    _selectedTalk = text;
+  void changeIsTalkable(value, [npc]) {
+    if (!value) {
+      _isTalkable = value;
+      notifyListeners();
+      return;
+    }
     _isTalkable = value;
+    List<String> talk = [];
+    try {
+      npc['talk'].forEach((npc) => talk.add(npc));
+    } catch (error) {
+      talk = [''];
+    }
+    _selectedTalk = talk;
+    _selectedNPC = npc['name'];
     notifyListeners();
   }
 
@@ -1302,10 +1319,11 @@ class Gameplay with ChangeNotifier {
   }
 
   //Show Text Talk Dialog
-  static void showTalkText(context, npcname) {
+  static void showTalkText(context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    int index = 0;
     showModalBottomSheet<void>(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         shape: const RoundedRectangleBorder(
@@ -1316,63 +1334,92 @@ class Gameplay with ChangeNotifier {
         isScrollControlled: true,
         context: context,
         builder: (context) {
-          return SizedBox(
-            width: screenSize.width,
-            height: screenSize.height * 0.30,
-            child: FittedBox(
-              child: Column(
-                children: [
-                  Row(
+          return StatefulBuilder(
+            builder: (context, setState) => GestureDetector(
+              onTap: () {
+                //Change index
+                if (index < gameplay.selectedTalk.length - 1) {
+                  //Update
+                  setState(() {
+                    index++;
+                  });
+                }
+              },
+              child: SizedBox(
+                width: screenSize.width,
+                height: screenSize.height * 0.25,
+                child: FittedBox(
+                  child: Column(
                     children: [
-                      SizedBox(
-                          child: Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(1.5),
-                            child: SizedBox(
-                              width: 30,
-                              height: 40,
-                              child: Image.asset(
-                                'assets/images/interface/profileimage.png',
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: SizedBox(
-                                width: 17.5,
-                                height: 26,
-                                child: Image.asset('assets/images/npc/wizard.png'),
-                              )),
-                        ],
-                      )),
-                      Stack(
+                      Row(
                         children: [
                           SizedBox(
-                            width: 70,
-                            height: screenSize.height * 0.05,
-                            child: Image.asset(
-                              'assets/images/interface/boardtext.png',
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            width: 60,
-                            height: screenSize.height * 0.05,
-                            child: SingleChildScrollView(
-                              child: Text(
-                                Language.Translate(gameplay.selectedTalk, options.language) ?? 'Language Error',
-                                style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
+                              child: Stack(
+                            children: [
+                              //Profile Image
+                              Padding(
+                                padding: const EdgeInsets.all(2.5),
+                                child: SizedBox(
+                                  width: 28,
+                                  height: 38,
+                                  child: Image.asset(
+                                    'assets/images/interface/profileimage.png',
+                                  ),
+                                ),
                               ),
-                            ),
+                              //Npc Image
+                              Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 17.5,
+                                    height: 26,
+                                    child: Image.asset(
+                                      'assets/images/npc/${gameplay.selectedNPC}.png',
+                                      fit: BoxFit.fill,
+                                    ),
+                                  )),
+                            ],
+                          )),
+                          //Board
+                          Stack(
+                            children: [
+                              //Board Image
+                              SizedBox(
+                                width: 70,
+                                height: screenSize.height * 0.05,
+                                child: Image.asset(
+                                  'assets/images/interface/boardtext.png',
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                              //Board Text
+                              Container(
+                                padding: const EdgeInsets.only(top: 5, left: 6),
+                                width: 65,
+                                height: 33,
+                                child: SingleChildScrollView(
+                                  child: Text(
+                                    Language.Translate(gameplay.selectedTalk[index], options.language) ?? 'Language Error',
+                                    style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
+                                  ),
+                                ),
+                              ),
+                              gameplay.selectedTalk.length > 1
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 35.0, left: 58),
+                                      child: Text(
+                                        '${index + 1}/${gameplay.selectedTalk.length}',
+                                        style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                            ],
                           ),
                         ],
-                      ),
+                      )
                     ],
-                  )
-                ],
+                  ),
+                ),
               ),
             ),
           );

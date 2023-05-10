@@ -430,43 +430,40 @@ class MySQLGameplay {
 
   //Return Level
   static Future<List<dynamic>> returnLevel({required BuildContext context, required String level}) async {
-    try {
-      final mysql = Provider.of<MySQL>(context, listen: false);
-      final options = Provider.of<Options>(context, listen: false);
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
-      List results = [];
+    final mysql = Provider.of<MySQL>(context, listen: false);
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    List results = [];
 
-      //Returning the Tiles
-      dynamic result = await http.post(Uri.http(mysql.serverAddress, '/pushLevel'),
-          headers: MySQL.headers,
-          body: jsonEncode({
-            'id': options.id,
-            'token': options.token,
-            'selectedCharacter': gameplay.selectedCharacter,
-          }));
-      result = jsonDecode(result.body);
-      //Adding the tiles
-      List<List<double>> level = [];
-      for (int i = 0; i <= result['level'].length - 1; i++) {
-        List<double> levelTile = [];
-        result['level'][i] = json.decode(result['level'][i]).cast<int>().toList();
-        result['level'][i].forEach((int tile) => levelTile.add(double.parse(tile.toString())));
-        level.add(levelTile);
-      }
-      results.add(level);
-      //Returning the NPCs
-      List<GameComponent> npc = await returnNPCs(jsonDecode(result['npc']));
-      results.add(npc);
-
-      //Returning the Enemys
-      List<Enemy> enemy = await returnEnemys(jsonDecode(result['enemy']));
-      results.add(enemy);
-
-      return results;
-    } catch (error) {
-      print(error);
-      return [];
+    //Returning the Tiles
+    dynamic result = await http.post(Uri.http(mysql.serverAddress, '/pushLevel'),
+        headers: MySQL.headers,
+        body: jsonEncode({
+          'id': options.id,
+          'token': options.token,
+          'selectedCharacter': gameplay.selectedCharacter,
+        }));
+    result = jsonDecode(result.body);
+    //Adding the tiles
+    List<List<double>> level = [];
+    for (int i = 0; i <= result['level'].length - 1; i++) {
+      List<double> levelTile = [];
+      result['level'][i] = json.decode(result['level'][i]).cast<int>().toList();
+      result['level'][i].forEach((int tile) => levelTile.add(double.parse(tile.toString())));
+      level.add(levelTile);
     }
+    results.add(level);
+    //Returning the NPCs
+    List<GameComponent> npc = await returnNPCs(jsonDecode(result['npc']));
+    results.add(npc);
+
+    //Returning the Enemys
+    List<Enemy> enemy = await returnEnemys(jsonDecode(result['enemy']));
+    results.add(enemy);
+
+    //Returning player position
+    results.add(Vector2(double.parse(jsonDecode(result['event'])['player']['positionx']), double.parse(jsonDecode(result['event'])['player']['positiony'])));
+    return results;
   }
 
   //Return NPCs
@@ -476,13 +473,13 @@ class MySQLGameplay {
     if (npcdb != {}) {
       double positionx = double.parse(npcdb['npc0']['positionx']);
       double positiony = double.parse(npcdb['npc0']['positiony']);
-      npc.add(parseNPC(npcname: npcdb['npc0']['name'], position: Vector2(positionx, positiony), talk: npcdb['npc0']['talk']));
+      npc.add(NPC(Vector2(positionx, positiony), npcdb['npc0']));
       int i = 1;
       while (true) {
         if (npcdb['npc$i'] != null) {
           positionx = double.parse(npcdb['npc$i']['positionx']);
           positiony = double.parse(npcdb['npc$i']['positiony']);
-          npc.add(parseNPC(npcname: npcdb['npc$i']['name'], position: Vector2(positionx, positiony), talk: npcdb['npc$i']['talk']));
+          npc.add(NPC(Vector2(positionx, positiony), npcdb['npc$i']));
         }
         i++;
         break;
@@ -520,9 +517,9 @@ class MySQLGameplay {
       buffs = enemysdb['enemy0']['buffs'];
       skills = enemysdb['enemy0']['skills'];
       //Adding the first enemy
-      enemy.add(parseEnemy(
-        enemyname: name,
+      enemy.add(ENEMY(
         position: Vector2(positionx, positiony),
+        name: name,
         life: life,
         mana: mana,
         damage: damage,
@@ -546,20 +543,18 @@ class MySQLGameplay {
           positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
           buffs = enemysdb['enemy$i']['buffs'];
           skills = enemysdb['enemy$i']['skills'];
-          enemy.add(
-            parseEnemy(
-              enemyname: name,
-              position: Vector2(positionx, positiony),
-              life: life,
-              mana: mana,
-              damage: damage,
-              armor: armor,
-              level: level,
-              xp: xp,
-              buffs: buffs,
-              skills: skills,
-            ),
-          );
+          enemy.add(ENEMY(
+            position: Vector2(positionx, positiony),
+            name: name,
+            life: life,
+            mana: mana,
+            damage: damage,
+            armor: armor,
+            level: level,
+            xp: xp,
+            buffs: buffs,
+            skills: skills,
+          ));
         } else {
           break;
         }
@@ -567,56 +562,5 @@ class MySQLGameplay {
       }
     }
     return enemy;
-  }
-
-  //Parse NPCs
-  static SimpleNpc parseNPC({required String npcname, required Vector2 position, required String talk}) {
-    switch (npcname) {
-      case "wizard":
-        return NPCWizard(position, talk);
-    }
-    return NPCWizard(position, talk);
-  }
-
-  //Parse NPCs
-  static Enemy parseEnemy({
-    required String enemyname,
-    required Vector2 position,
-    required double life,
-    required double mana,
-    required double damage,
-    required double armor,
-    required int level,
-    required double xp,
-    required List buffs,
-    required List skills,
-  }) {
-    switch (enemyname) {
-      case "smallspider":
-        return EnemySmallSpider(
-          name: enemyname,
-          life: life,
-          mana: mana,
-          damage: damage,
-          armor: armor,
-          level: level,
-          xp: xp,
-          position: position,
-          buffs: buffs,
-          skills: skills,
-        );
-    }
-    return EnemySmallSpider(
-      name: 'smallspider',
-      life: 100,
-      mana: 100,
-      damage: 1,
-      armor: 0,
-      level: 0,
-      xp: 0,
-      position: position,
-      buffs: buffs,
-      skills: skills,
-    );
   }
 }

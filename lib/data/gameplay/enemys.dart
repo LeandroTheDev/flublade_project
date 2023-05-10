@@ -4,7 +4,7 @@ import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class EnemySmallSpider extends SimpleEnemy {
+class ENEMY extends SimpleEnemy {
   bool stopLoading = false;
   late String enemyName;
   late double enemyLife;
@@ -15,7 +15,7 @@ class EnemySmallSpider extends SimpleEnemy {
   late double enemyXP;
   late List enemyBuffs;
   late List enemySkills;
-  EnemySmallSpider({
+  ENEMY({
     required Vector2 position,
     required String name,
     required double life,
@@ -34,7 +34,7 @@ class EnemySmallSpider extends SimpleEnemy {
           initDirection: Direction.right,
           animation: SimpleDirectionAnimation(
             idleRight: SpriteAnimation.load(
-              "enemys/small_spider_sprite_right.png",
+              "enemys/${name}_sprite_right.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -42,7 +42,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleLeft: SpriteAnimation.load(
-              "enemys/small_spider_sprite_left.png",
+              "enemys/${name}_sprite_left.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -50,7 +50,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleUp: SpriteAnimation.load(
-              "enemys/small_spider_sprite_up.png",
+              "enemys/${name}_sprite_up.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -58,7 +58,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleUpLeft: SpriteAnimation.load(
-              "enemys/small_spider_sprite_up.png",
+              "enemys/${name}_sprite_up.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -66,7 +66,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleUpRight: SpriteAnimation.load(
-              "enemys/small_spider_sprite_up.png",
+              "enemys/${name}_sprite_up.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -74,7 +74,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleDown: SpriteAnimation.load(
-              "enemys/small_spider_sprite_down.png",
+              "enemys/${name}_sprite_down.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -82,7 +82,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleDownLeft: SpriteAnimation.load(
-              "enemys/small_spider_sprite_down.png",
+              "enemys/${name}_sprite_down.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -90,7 +90,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             idleDownRight: SpriteAnimation.load(
-              "enemys/small_spider_sprite_down.png",
+              "enemys/${name}_sprite_down.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -98,7 +98,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runUp: SpriteAnimation.load(
-              "enemys/small_spider_sprite_up.png",
+              "enemys/${name}_sprite_up.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -106,7 +106,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runUpLeft: SpriteAnimation.load(
-              "enemys/small_spider_sprite_up.png",
+              "enemys/${name}_sprite_up.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -114,7 +114,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runUpRight: SpriteAnimation.load(
-              "enemys/small_spider_sprite_up.png",
+              "enemys/${name}_sprite_up.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -122,7 +122,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runDown: SpriteAnimation.load(
-              "enemys/small_spider_sprite_down.png",
+              "enemys/${name}_sprite_down.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -130,7 +130,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runDownLeft: SpriteAnimation.load(
-              "enemys/small_spider_sprite_down.png",
+              "enemys/${name}_sprite_down.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -138,7 +138,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runDownRight: SpriteAnimation.load(
-              "enemys/small_spider_sprite_down.png",
+              "enemys/${name}_sprite_down.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -146,7 +146,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runLeft: SpriteAnimation.load(
-              "enemys/small_spider_sprite_left.png",
+              "enemys/${name}_sprite_left.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -154,7 +154,7 @@ class EnemySmallSpider extends SimpleEnemy {
               ),
             ),
             runRight: SpriteAnimation.load(
-              "enemys/small_spider_sprite_right.png",
+              "enemys/${name}_sprite_right.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
@@ -178,8 +178,7 @@ class EnemySmallSpider extends SimpleEnemy {
   void update(double dt) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     seeAndMoveToPlayer(
-        radiusVision:
-            Provider.of<Gameplay>(context, listen: false).enemysMove ? 100 : 0,
+        radiusVision: Provider.of<Gameplay>(context, listen: false).enemysMove ? 100 : 0,
         margin: 0,
         closePlayer: (_) {
           //Start seeing

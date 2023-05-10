@@ -2,36 +2,37 @@ import 'package:bonfire/bonfire.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:provider/provider.dart';
 
-class NPCWizard extends SimpleNpc with ObjectCollision {
+class NPC extends SimpleNpc with ObjectCollision {
   bool stopLoading = false;
-  late String talk;
-  NPCWizard(Vector2 position, languageText)
-      : super(
+  final npc;
+  NPC(
+    Vector2 position,
+    this.npc,
+  ) : super(
           position: position,
-          size: Vector2(32, 32),
+          size: Vector2(48, 48),
           animation: SimpleDirectionAnimation(
             idleRight: SpriteAnimation.load(
-              "npc/wizard.png",
+              "npc/${npc['name']}.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
-                textureSize: Vector2(16, 16),
+                textureSize: Vector2(256, 256),
               ),
             ),
             runRight: SpriteAnimation.load(
-              "npc/wizard.png",
+              "npc/${npc['name']}.png",
               SpriteAnimationData.sequenced(
                 amount: 1,
                 stepTime: 0.1,
-                textureSize: Vector2(16, 16),
+                textureSize: Vector2(48, 48),
               ),
             ),
           ),
         ) {
-    talk = languageText;
     setupCollision(
       CollisionConfig(
-        collisions: [CollisionArea.circle(radius: 17, align: Vector2(-2.5, 0))],
+        collisions: [CollisionArea.circle(radius: 22, align: Vector2(2.0, 4))],
       ),
     );
   }
@@ -42,8 +43,7 @@ class NPCWizard extends SimpleNpc with ObjectCollision {
         observed: (player) {
           //Start seeing
           if (!stopLoading) {
-            Provider.of<Gameplay>(context, listen: false)
-                .changeIsTalkable(true, talk);
+            Provider.of<Gameplay>(context, listen: false).changeIsTalkable(true, npc);
           }
           stopLoading = true;
         },
@@ -51,8 +51,7 @@ class NPCWizard extends SimpleNpc with ObjectCollision {
         notObserved: () {
           //Stop seeing
           if (stopLoading) {
-            Provider.of<Gameplay>(context, listen: false)
-                .changeIsTalkable(false, talk);
+            Provider.of<Gameplay>(context, listen: false).changeIsTalkable(false, npc);
           }
           stopLoading = false;
         });

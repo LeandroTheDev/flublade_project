@@ -18,6 +18,7 @@ class CharacterCreation extends StatefulWidget {
 
 class _CharacterCreationState extends State<CharacterCreation> {
   int selectedClass = 0;
+  List<int> playableClasses = [4];
   TextEditingController createName = TextEditingController();
 
   @override
@@ -162,6 +163,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                     ),
+
                     const Spacer(),
                     //Back Button
                     ElevatedButton(
@@ -179,6 +181,16 @@ class _CharacterCreationState extends State<CharacterCreation> {
           );
         },
       );
+    }
+
+    //Verifiy if class is playable
+    verifyPlayableClass() {
+      for (int i = 0; i <= playableClasses.length - 1; i++) {
+        if (selectedClass == playableClasses[i]) {
+          return true;
+        }
+      }
+      return false;
     }
 
     return Scaffold(
@@ -312,27 +324,47 @@ class _CharacterCreationState extends State<CharacterCreation> {
                   ),
                 ),
                 //Select Button
-                FittedBox(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                        height: screenSize.height * 0.15,
-                        width: screenSize.width,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              usernameSelect();
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FittedBox(
-                                child: Text(
-                                  Language.Translate('response_select', options.language) ?? 'Select',
-                                  style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
-                                ),
-                              ),
-                            ))),
-                  ),
-                )
+                verifyPlayableClass()
+                    ? FittedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: SizedBox(
+                              height: screenSize.height * 0.15,
+                              width: screenSize.width,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    usernameSelect();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: FittedBox(
+                                      child: Text(
+                                        Language.Translate('response_select', options.language) ?? 'Select',
+                                        style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
+                                      ),
+                                    ),
+                                  ))),
+                        ),
+                      )
+                    : FittedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: SizedBox(
+                              height: screenSize.height * 0.15,
+                              width: screenSize.width,
+                              child: ElevatedButton(
+                                  onPressed: null,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: FittedBox(
+                                      child: Text(
+                                        Language.Translate('response_select', options.language) ?? 'Select',
+                                        style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
+                                      ),
+                                    ),
+                                  ))),
+                        ),
+                      ),
               ],
             ),
           ),

@@ -137,8 +137,8 @@ class Language {
     'pausemenu_disconnect': 'Disconnect',
     //Ingame Texts
     'dialog_npc_wizard_name': 'Wizard',
-    'dialog_npc_wizard_prologue1': 'Hello',
-    'dialog_npc_wizard_prologue2': 'Test',
+    'dialog_npc_wizard_prologue1': 'Hello Adventurer.',
+    'dialog_npc_wizard_prologue2': 'This place is known by the name of heaven, but be careful with spiders, and especially against weber, he is more dangerous than heaven, you will probably find him soon.\nIf you want to leave here of course.',
     //Battle Texts
     'battle_life': 'Life',
     'battle_mana': 'Mana',
@@ -181,7 +181,7 @@ class Language {
     'items_cloth': 'Cloth',
     'items_cloth_desc': 'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
     //Enemy Names
-    'enemy_smallspider': 'Small Spider',
+    'enemy_small_spider': 'Small Spider',
     //Magics Names
     'magics_type_fire': 'Fire',
     'magics_type_physical': 'Physical',
@@ -339,8 +339,8 @@ class Language {
     'pausemenu_disconnect': 'Desconectar',
     //Ingame Texts
     'dialog_npc_wizard_name': 'Mago',
-    'dialog_npc_wizard_prologue1': 'Olá',
-    'dialog_npc_wizard_prologue2': 'Test',
+    'dialog_npc_wizard_prologue1': 'Olá aventureiro.',
+    'dialog_npc_wizard_prologue2': 'Este lugar é conhecido pelo nome de heaven, mas tome cuidado com as aranhas, e principalmente contra o weber, ele é maior perigo de heaven, você provavelmente irá encontra-lo em breve.\nSe você quiser sair daqui é claro.',
     //Battle Texts
     'battle_life': 'Vida',
     'battle_mana': 'Mana',
@@ -383,7 +383,7 @@ class Language {
     'items_cloth': 'Pano',
     'items_cloth_desc': 'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
     //Enemy Names
-    'enemy_smallspider': 'Aranha Pequena',
+    'enemy_small_spider': 'Aranha Pequena',
     //Magics Names
     'magics_type_fire': 'Fogo',
     'magics_type_physical': 'Fisíco',

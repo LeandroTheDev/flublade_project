@@ -12,7 +12,6 @@ class IngameInterface extends StatefulWidget {
 class _IngameInterfaceState extends State<IngameInterface> {
   @override
   Widget build(BuildContext context) {
-    final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context);
     final settings = Provider.of<Settings>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
@@ -62,17 +61,10 @@ class _IngameInterfaceState extends State<IngameInterface> {
                             child: Stack(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                               child: Container(
-                                decoration:
-                                    const BoxDecoration(color: Colors.purple),
-                                width: ((gameplay.playerXP /
-                                            settings.levelCaps[gameplay
-                                                .playerLevel
-                                                .toString()]) *
-                                        100) *
-                                    5.74,
+                                decoration: const BoxDecoration(color: Colors.purple),
+                                width: ((gameplay.playerXP / settings.levelCaps[gameplay.playerLevel.toString()]) * 100) * 5.74,
                                 height: 90,
                               ),
                             ),
@@ -90,8 +82,7 @@ class _IngameInterfaceState extends State<IngameInterface> {
                       //Pause Button
                       TextButton(
                         onPressed: () {
-                          GlobalFunctions.pauseDialog(
-                              context: context, options: options);
+                          GlobalFunctions.pauseDialog(context: context);
                         },
                         child: Container(
                           width: screenSize.width * 0.2,
@@ -123,19 +114,17 @@ class _IngameInterfaceState extends State<IngameInterface> {
                             padding: const EdgeInsets.symmetric(vertical: 25),
                             child: TextButton(
                               onPressed: () {
-                                Gameplay.showTalkText(context, 'test');
+                                Gameplay.showTalkText(context);
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(15),
                                 width: 100,
                                 height: 100,
                                 decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.secondary,
                                   borderRadius: BorderRadius.circular(100),
                                 ),
-                                child: const FittedBox(
-                                    child: Icon(Icons.comment_outlined)),
+                                child: const FittedBox(child: Icon(Icons.comment_outlined)),
                               ),
                             ),
                           ),
