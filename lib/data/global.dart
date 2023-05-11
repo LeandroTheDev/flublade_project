@@ -268,11 +268,7 @@ class GlobalFunctions {
   }
 
   //Loot Dialog
-  static void lootDialog({
-    required BuildContext context,
-    required List loots,
-    required xp,
-  }) {
+  static void lootDialog({required BuildContext context, required List loots, required xp, required levelUpDialog}) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context, listen: false);
@@ -331,47 +327,13 @@ class GlobalFunctions {
                   ElevatedButton(
                     onPressed: () async {
                       MySQL.loadingWidget(context: context, language: options.language);
-                      //Earn Xp
-                      gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                       //Add items
                       gameplay.addInventoryItem(loots);
-                      //Level Update
-                      bool levelUpDialog = false;
-                      //XP Add
-                      while (true) {
-                        if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
-                          //Removing the xp difference
-                          gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
-                          //Increasing the level
-                          gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
-                          levelUpDialog = true;
-                          //Update Level Stats
-                          await MySQL.updateCharacters(context: context, characters: gameplay.characters, isLevelUp: true);
-                          //Update All Stats
-                          await MySQL.updateCharacters(context: context, characters: gameplay.characters);
-                        } else {
-                          break;
-                        }
-                      }
-                      final result = await MySQL.pushUploadCharacters(context: context);
+                      //Update All Stats
+                      await MySQL.updateCharacters(context: context, characters: gameplay.characters);
                       Navigator.pop(context);
                       Navigator.pop(context);
                       Navigator.pop(context);
-                      //Error Treatment
-                      if (true) {
-                        //Connection
-                        if (result == 'Connection Error') {
-                          Navigator.pushNamed(context, '/authenticationpage');
-                          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
-                          return;
-                        }
-                        //Invalid Login
-                        if (result == 'Invalid Login') {
-                          Navigator.pushNamed(context, '/authenticationpage');
-                          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-                          return;
-                        }
-                      }
                       //Level up dialog
                       if (levelUpDialog == false) {
                         Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
@@ -456,75 +418,15 @@ class GlobalFunctions {
                   ElevatedButton(
                     onPressed: () async {
                       bool levelUpDialog = false;
+                      //Add items
                       if (gameplay.playerInventorySelected.isNotEmpty) {
                         //Loading
                         MySQL.loadingWidget(context: context, language: options.language);
-                        //Earn Xp
-                        gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                         //Add Items
                         gameplay.addInventoryItem(gameplay.playerInventorySelected);
-                        //XP Add
-                        while (true) {
-                          if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
-                            //Removing the xp difference
-                            gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
-                            //Increasing the level
-                            gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
-                            levelUpDialog = true;
-                          } else {
-                            break;
-                          }
-                        }
-                        //Update Database
-                        final result = await MySQL.pushUploadCharacters(context: context);
-                        //Error Treatment
-                        if (true) {
-                          //Connection
-                          if (result == 'Connection Error') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                          //Invalid Login
-                          if (result == 'Invalid Login') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                        }
+                        //Update All Stats
+                        await MySQL.updateCharacters(context: context, characters: gameplay.characters);
                         Navigator.pop(context);
-                      } else {
-                        //Earn Xp
-                        gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
-                        //XP Add
-                        while (true) {
-                          if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
-                            //Removing the xp difference
-                            gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
-                            //Increasing the level
-                            gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
-                            levelUpDialog = true;
-                          } else {
-                            break;
-                          }
-                        }
-                        //Update Database
-                        final result = await MySQL.pushUploadCharacters(context: context);
-                        //Error Treatment
-                        if (true) {
-                          //Connection
-                          if (result == 'Connection Error') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                          //Invalid Login
-                          if (result == 'Invalid Login') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                        }
                       }
                       Navigator.pop(context);
                       Navigator.pop(context);
@@ -575,7 +477,7 @@ class GlobalFunctions {
                                             '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${settings.baseAtributes[characterClass]!['intelligenceLevel']}',
                                             style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
-                                          //Skillpoints TExt
+                                          //Skillpoints Text
                                           const SizedBox(height: 4),
                                           Text(
                                             '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
