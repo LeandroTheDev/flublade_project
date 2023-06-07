@@ -81,7 +81,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     options.changeId(SaveDatas.getId() ?? 0);
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
     options.changeTextSpeed(SaveDatas.getTextSpeed() ?? 700);
-    gameplay.changeCharacters(SaveDatas.getCharacters() ?? '{}');
+    gameplay.changeCharacters(jsonDecode(SaveDatas.getCharacters() ?? '{}'));
     Future.delayed(const Duration(seconds: 1), () async {
       options.changeRemember(value: SaveDatas.getRemember() ?? false);
       await Future.delayed(const Duration(milliseconds: 1));
@@ -113,20 +113,21 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           options.changeUsername(result['username']);
           options.changeLanguage(result['language']);
           options.changeToken(result['token']);
-          gameplay.changeCharacters(result['characters']);
+          gameplay.changeCharacters(jsonDecode(result['characters']));
           //Save reload
           SaveDatas.setId(options.id);
           SaveDatas.setUsername(options.username);
           SaveDatas.setLanguage(options.language);
           SaveDatas.setToken(options.token);
-          SaveDatas.setCharacters(gameplay.characters);
+          SaveDatas.setCharacters(jsonEncode(gameplay.characters));
           Navigator.pushReplacementNamed(context, '/mainmenu');
         } else if (result['message'] == 'Invalid Login') {
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
           GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context);
         } else {
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+          GlobalFunctions.errorDialog(
+              errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
         }
       } else {
         Navigator.of(context).pushReplacementNamed('/authenticationpage');

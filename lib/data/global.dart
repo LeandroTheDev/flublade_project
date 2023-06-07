@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flublade_project/components/character_creation.dart';
@@ -20,6 +21,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bonfire/bonfire.dart';
 import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/io.dart';
 
 import '../pages/gameplay/magics.dart';
 
@@ -30,6 +32,9 @@ class Options with ChangeNotifier {
   String _token = '';
   bool _remember = false;
   int _id = 0;
+  late IOWebSocketChannel _websocket;
+  late StreamSubscription _broadcast;
+  late GameController _gameController;
 
   String get language => _language;
   int get textSpeed => _textSpeed;
@@ -37,6 +42,55 @@ class Options with ChangeNotifier {
   String get token => _token;
   bool get remember => _remember;
   int get id => _id;
+  IOWebSocketChannel get websocket => _websocket;
+  StreamSubscription get broadcast => _broadcast;
+  GameController get gameController => _gameController;
+
+  //Change Game Controller
+  void changeGameController(value) {
+    _gameController = value;
+  }
+
+  //Websocket Initialize
+  void websocketInit(context) {
+    _websocket = IOWebSocketChannel.connect(
+      'ws://${SaveDatas.getServerAddress()}:8081',
+      pingInterval: const Duration(seconds: 5),
+    );
+
+    //Listen from the server
+    _broadcast = _websocket.stream.asBroadcastStream().listen((data) {},
+        onError: (error) => GlobalFunctions.errorDialog(
+            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
+  }
+
+  //Websocket Send Mensage
+  Future<String> websocketSend(value, context) async {
+    _websocket.sink.add(jsonEncode(value));
+    final result = await websocketListen(context);
+    return result;
+  }
+
+  //Websocket Receive Mensage
+  Future<String> websocketListen(context) async {
+    String result = '';
+    _broadcast.onData((data) {
+      result = data;
+    });
+    //Latency waiter
+    while (true) {
+      if (result != '') {
+        break;
+      }
+      await Future.delayed(const Duration(milliseconds: 1));
+    }
+    return result;
+  }
+
+  //Websocket Disconnect
+  void websocketDisconnect(context) async {
+    _websocket.sink.close();
+  }
 
   void changeLanguage(value) {
     _language = value;
@@ -246,8 +300,8 @@ class GlobalFunctions {
                   options.changeRemember(value: false);
                   options.changeId(0);
                   SaveDatas.setRemember(false);
-                  Provider.of<Gameplay>(context, listen: false).changeCharacters('{}');
-                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const AuthenticationPage()), (Route<dynamic> route) => false);
+                  Provider.of<Gameplay>(context, listen: false).changeCharacters({});
+                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const AuthenticationPage()), (route) => false);
                 },
                 child: Text(
                   Language.Translate('response_yes', options.language) ?? 'Yes',
@@ -268,11 +322,7 @@ class GlobalFunctions {
   }
 
   //Loot Dialog
-  static void lootDialog({
-    required BuildContext context,
-    required List loots,
-    required xp,
-  }) {
+  static void lootDialog({required BuildContext context, required List loots, required xp, required levelUpDialog}) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context, listen: false);
@@ -331,47 +381,13 @@ class GlobalFunctions {
                   ElevatedButton(
                     onPressed: () async {
                       MySQL.loadingWidget(context: context, language: options.language);
-                      //Earn Xp
-                      gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                       //Add items
                       gameplay.addInventoryItem(loots);
-                      //Level Update
-                      bool levelUpDialog = false;
-                      //XP Add
-                      while (true) {
-                        if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
-                          //Removing the xp difference
-                          gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
-                          //Increasing the level
-                          gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
-                          levelUpDialog = true;
-                          //Update Level Stats
-                          await MySQL.updateCharacters(context: context, characters: gameplay.characters, isLevelUp: true);
-                          //Update All Stats
-                          await MySQL.updateCharacters(context: context, characters: gameplay.characters);
-                        } else {
-                          break;
-                        }
-                      }
-                      final result = await MySQL.pushUploadCharacters(context: context);
+                      //Update All Stats
+                      await MySQL.updateCharacters(context: context, characters: jsonEncode(gameplay.characters));
                       Navigator.pop(context);
                       Navigator.pop(context);
                       Navigator.pop(context);
-                      //Error Treatment
-                      if (true) {
-                        //Connection
-                        if (result == 'Connection Error') {
-                          Navigator.pushNamed(context, '/authenticationpage');
-                          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
-                          return;
-                        }
-                        //Invalid Login
-                        if (result == 'Invalid Login') {
-                          Navigator.pushNamed(context, '/authenticationpage');
-                          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-                          return;
-                        }
-                      }
                       //Level up dialog
                       if (levelUpDialog == false) {
                         Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
@@ -391,7 +407,8 @@ class GlobalFunctions {
                                       children: [
                                         //Conffeti Level Up
                                         Container(
-                                          decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
+                                          decoration: BoxDecoration(
+                                              color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
                                           width: 280,
                                           height: 220,
                                           child: ClipRRect(
@@ -456,75 +473,15 @@ class GlobalFunctions {
                   ElevatedButton(
                     onPressed: () async {
                       bool levelUpDialog = false;
+                      //Add items
                       if (gameplay.playerInventorySelected.isNotEmpty) {
                         //Loading
                         MySQL.loadingWidget(context: context, language: options.language);
-                        //Earn Xp
-                        gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
                         //Add Items
                         gameplay.addInventoryItem(gameplay.playerInventorySelected);
-                        //XP Add
-                        while (true) {
-                          if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
-                            //Removing the xp difference
-                            gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
-                            //Increasing the level
-                            gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
-                            levelUpDialog = true;
-                          } else {
-                            break;
-                          }
-                        }
-                        //Update Database
-                        final result = await MySQL.pushUploadCharacters(context: context);
-                        //Error Treatment
-                        if (true) {
-                          //Connection
-                          if (result == 'Connection Error') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                          //Invalid Login
-                          if (result == 'Invalid Login') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                        }
+                        //Update All Stats
+                        await MySQL.updateCharacters(context: context, characters: jsonEncode(gameplay.characters));
                         Navigator.pop(context);
-                      } else {
-                        //Earn Xp
-                        gameplay.changeStats(value: gameplay.playerXP + xp, stats: 'xp');
-                        //XP Add
-                        while (true) {
-                          if (gameplay.playerXP >= settings.levelCaps[gameplay.playerLevel.toString()]!) {
-                            //Removing the xp difference
-                            gameplay.changeStats(value: gameplay.playerXP - settings.levelCaps[gameplay.playerLevel.toString()]!, stats: 'xp');
-                            //Increasing the level
-                            gameplay.changeStats(value: gameplay.playerLevel + 1, stats: 'level');
-                            levelUpDialog = true;
-                          } else {
-                            break;
-                          }
-                        }
-                        //Update Database
-                        final result = await MySQL.pushUploadCharacters(context: context);
-                        //Error Treatment
-                        if (true) {
-                          //Connection
-                          if (result == 'Connection Error') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                          //Invalid Login
-                          if (result == 'Invalid Login') {
-                            Navigator.pushNamed(context, '/authenticationpage');
-                            GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-                            return;
-                          }
-                        }
                       }
                       Navigator.pop(context);
                       Navigator.pop(context);
@@ -532,7 +489,7 @@ class GlobalFunctions {
                       if (levelUpDialog == false) {
                         Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                       } else {
-                        final characters = jsonDecode(Provider.of<Gameplay>(context, listen: false).characters);
+                        final characters = Provider.of<Gameplay>(context, listen: false).characters;
                         final characterClass = characters['character${gameplay.selectedCharacter}']['class'];
                         //Level up Dialog
                         showDialog(
@@ -575,7 +532,7 @@ class GlobalFunctions {
                                             '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${settings.baseAtributes[characterClass]!['intelligenceLevel']}',
                                             style: TextStyle(color: Theme.of(context).primaryColor),
                                           ),
-                                          //Skillpoints TExt
+                                          //Skillpoints Text
                                           const SizedBox(height: 4),
                                           Text(
                                             '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
@@ -657,7 +614,10 @@ class GlobalFunctions {
   }
 
   //Pause Dialog
-  static pauseDialog({required BuildContext context}) {
+  static pauseDialog({
+    required BuildContext context,
+    required IOWebSocketChannel websocket,
+  }) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     showDialog(
@@ -700,6 +660,7 @@ class GlobalFunctions {
                       padding: const EdgeInsets.all(15.0),
                       child: ElevatedButton(
                         onPressed: () {
+                          options.websocketDisconnect(context);
                           gameplay.changeIsTalkable(false);
                           Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },
@@ -850,10 +811,13 @@ class GlobalFunctions {
                                                               context: context,
                                                               builder: (context) => FittedBox(
                                                                     child: AlertDialog(
-                                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                      shape: const RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.all(Radius.circular(32.0))),
                                                                       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                                       title: Text(
-                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}', options.language) ?? 'Language Error',
+                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}',
+                                                                                options.language) ??
+                                                                            'Language Error',
                                                                         style: TextStyle(color: Theme.of(context).primaryColor),
                                                                       ),
                                                                       content: SizedBox(
@@ -868,8 +832,12 @@ class GlobalFunctions {
                                                                                 child: Column(
                                                                                   children: [
                                                                                     Text(
-                                                                                      Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}_desc', options.language) ?? 'Language Error',
-                                                                                      style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),
+                                                                                      Language.Translate(
+                                                                                              'magics_${gameplay.playerDebuffs[index]['name']}_desc',
+                                                                                              options.language) ??
+                                                                                          'Language Error',
+                                                                                      style: TextStyle(
+                                                                                          color: Theme.of(context).primaryColor, fontSize: 20),
                                                                                     ),
                                                                                   ],
                                                                                 ),
@@ -946,13 +914,13 @@ class Gameplay with ChangeNotifier {
   }
 
   //System Provider
-  String _characters = '{}';
+  Map _characters = {};
   int _selectedCharacter = 0;
 
-  String get characters => _characters;
+  Map get characters => _characters;
   int get selectedCharacter => _selectedCharacter;
 
-  void changeCharacters(String value) {
+  void changeCharacters(Map value) {
     _characters = value;
   }
 
@@ -967,6 +935,7 @@ class Gameplay with ChangeNotifier {
   String _selectedNPC = 'wizard';
   int _worldId = 0;
   List<String> _battleLog = [];
+  String _location = '';
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
@@ -1000,12 +969,15 @@ class Gameplay with ChangeNotifier {
   List _enemyDebuffs = [];
   List _enemySkills = [];
 
+  Map _usersInWorld = {};
+
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
   int get worldId => _worldId;
   List<String> get selectedTalk => _selectedTalk;
   String get selectedNPC => _selectedNPC;
   List<String> get battleLog => _battleLog;
+  String get location => _location;
   double get playerLife => _playerLife;
   double get playerMana => _playerMana;
   double get playerGold => _playerGold;
@@ -1038,6 +1010,26 @@ class Gameplay with ChangeNotifier {
   List get enemyBuffs => _enemyBuffs;
   List get enemySkills => _enemySkills;
   List get enemyDebuffs => _enemyDebuffs;
+
+  Map get usersInWorld => _usersInWorld;
+
+  //Change location
+  void changeLocation(value) {
+    _location = value;
+  }
+
+  //Users Handle
+  void usersHandle(handle, [data]) {
+    if (handle == 'add') {
+      _usersInWorld[data['id']] = data;
+    } else if (handle == 'replace') {
+      _usersInWorld = data;
+    } else if (handle == 'remove') {
+    } else if (handle == 'move') {
+    } else if (handle == 'clean') {
+      _usersInWorld = {};
+    }
+  }
 
   //Change Selected Skill
   void changePlayerSelectedSkill(value) {

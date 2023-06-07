@@ -1,16 +1,48 @@
 import 'package:flublade_project/data/gameplay/characters.dart';
+import 'package:flublade_project/data/gameplay/enemys.dart';
 import 'package:flublade_project/data/gameplay/interface.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:bonfire/bonfire.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class InGame extends StatelessWidget {
+class InGame extends StatefulWidget {
   const InGame({super.key});
 
   @override
+  State<InGame> createState() => _InGameState();
+}
+
+class _InGameState extends State<InGame> {
+  void connectionSignal(context, gameRef) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    await options.websocketSend(
+      {
+        'message': 'login',
+        'id': options.id,
+        'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+        'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
+      },
+      context,
+    );
+  }
+
+  //Initialize Variables
+  @override
+  void initState() {
+    super.initState();
+    final options = Provider.of<Options>(context, listen: false);
+    options.websocketInit(context);
+    options.changeGameController(GameController());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Screen Resolution
     double zoomResolution() {
       if (MediaQuery.of(context).size.height <= 320) {
@@ -47,7 +79,7 @@ class InGame extends StatelessWidget {
       }
     }
 
-    return FutureBuilder(
+    return FutureBuilder<List>(
       //Level Load
       future: MySQLGameplay.returnLevel(
         context: context,
@@ -57,6 +89,8 @@ class InGame extends StatelessWidget {
         if (future.hasData) {
           return Scaffold(
             body: BonfireWidget(
+              //Game Controller
+              gameController: options.gameController,
               // showCollisionArea: true,
               //Camera
               cameraConfig: CameraConfig(
@@ -95,6 +129,13 @@ class InGame extends StatelessWidget {
               },
               //Events
               decorations: const [],
+              //After Loads everthing
+              onReady: (gameRef) {
+                //Send a message for the server that you are in
+                connectionSignal(context, gameRef);
+                gameplay.usersHandle('clean');
+              },
+              //?
               initialActiveOverlays: const ['pause'],
             ),
           );

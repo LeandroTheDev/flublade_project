@@ -336,15 +336,14 @@ class _BattleSceneState extends State<BattleScene> {
                                           'token': options.token,
                                         }));
                                     result = jsonDecode(result.body);
-                                    //Continue Battle
+                                    //Battle Log
                                     for (int i = 0; i < result['battleLog'].length; i++) {
                                       gameplay.addBattleLog(result['battleLog'][i], context);
                                       //Animation
-                                      Future.delayed(const Duration(milliseconds: 100)).then((value) => //Animation
-                                          _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+                                      Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
                                       await Future.delayed(Duration(milliseconds: options.textSpeed));
                                     }
-                                    //Update Enemy
+                                    //Update screen
                                     if (true) {
                                       gameplay.changeStats(value: result['enemyLife'], stats: 'elife');
                                       gameplay.changeStats(value: result['enemyMana'], stats: 'emana');
@@ -363,7 +362,7 @@ class _BattleSceneState extends State<BattleScene> {
                                     await MySQL.returnPlayerStats(context);
                                     //Enemy Dead
                                     if (result['message'] == 'Enemy Dead') {
-                                      GlobalFunctions.lootDialog(context: context, loots: result['loots'], xp: result['earnedXP']);
+                                      GlobalFunctions.lootDialog(context: context, loots: result['loots'], xp: result['earnedXP'], levelUpDialog: result['levelUpDialog']);
                                       gameplay.resetBattleLog();
                                     }
                                     setState(() {
@@ -377,7 +376,7 @@ class _BattleSceneState extends State<BattleScene> {
                                   child: Text(Language.Translate('magics_${gameplay.playerSelectedSkill}', options.language) ?? 'Attack'),
                                 ),
                           const SizedBox(width: 20),
-                          //Defence Button
+                          //Stats Button
                           !isFighting
                               ? ElevatedButton(
                                   onPressed: () {

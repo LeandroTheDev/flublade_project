@@ -159,11 +159,20 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             late final http.Response result;
                                             try {
                                               //Backend Work
-                                              result = await http.post(Uri.http(mysql.serverAddress, '/createAcc'), headers: MySQL.headers, body: jsonEncode({"username": registerUsername.text, "password": registerPassword.text, "language": options.language}));
+                                              result = await http.post(Uri.http(mysql.serverAddress, '/createAcc'),
+                                                  headers: MySQL.headers,
+                                                  body: jsonEncode({
+                                                    "username": registerUsername.text,
+                                                    "password": registerPassword.text,
+                                                    "language": options.language
+                                                  }));
                                               //No connection
                                             } catch (error) {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                              GlobalFunctions.errorDialog(
+                                                  errorMsgTitle: 'authentication_register_problem_connection',
+                                                  errorMsgContext: 'Failed to connect to the Servers',
+                                                  context: context);
                                               return;
                                             }
                                             //Account Rules Check
@@ -221,11 +230,13 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                         //Sucess Text
                                                         title: Text(
-                                                          Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
+                                                          Language.Translate('authentication_register_sucess', options.language) ??
+                                                              'Failed to connect to the Servers',
                                                           style: TextStyle(color: Theme.of(context).primaryColor),
                                                         ),
                                                         content: Text(
-                                                          Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
+                                                          Language.Translate('authentication_register_sucess_account', options.language) ??
+                                                              'Failed to connect to the Servers',
                                                           style: TextStyle(color: Theme.of(context).primaryColor),
                                                         ),
                                                         actions: [
@@ -366,7 +377,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   }));
                                             } catch (error) {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                              GlobalFunctions.errorDialog(
+                                                  errorMsgTitle: 'authentication_register_problem_connection_tryAddress',
+                                                  errorMsgContext: 'Failed to connect to the Servers',
+                                                  context: context);
                                               return;
                                             }
                                             if (jsonDecode(result.body)['message'] == 'Success') {
@@ -379,7 +393,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               });
                                             } else {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                              GlobalFunctions.errorDialog(
+                                                  errorMsgTitle: 'authentication_register_problem_connection_tryAddress',
+                                                  errorMsgContext: 'Failed to connect to the Servers',
+                                                  context: context);
                                               return;
                                             }
                                           },
@@ -431,7 +448,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(200),
                           ),
-                          child: Image.asset('assets/authentication_image.png', fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
+                          child: Image.asset('assets/authentication_image.png',
+                              fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
                         ),
                         //Auth
                         SizedBox(
@@ -455,7 +473,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         child: FittedBox(
                                           child: Text(
                                             mysql.serverName,
-                                            style: TextStyle(letterSpacing: 4, fontWeight: FontWeight.w900),
+                                            style: const TextStyle(letterSpacing: 4, fontWeight: FontWeight.w900),
                                           ),
                                         ),
                                       ),
@@ -594,7 +612,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               dynamic result;
                                               try {
                                                 //Credentials Check
-                                                result = await http.post(Uri.http(mysql.serverAddress, '/login'), headers: MySQL.headers, body: jsonEncode({"username": username.text, "password": password.text}));
+                                                result = await http.post(Uri.http(mysql.serverAddress, '/login'),
+                                                    headers: MySQL.headers, body: jsonEncode({"username": username.text, "password": password.text}));
                                               } catch (error) {
                                                 //Connection error
                                                 settings.changeIsLoading(value: false);
@@ -631,7 +650,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   SaveDatas.setId(options.id);
                                                   //Push Characters
                                                   String characters = await MySQL.pushCharacters(context: context);
-                                                  gameplay.changeCharacters(characters);
+                                                  gameplay.changeCharacters(jsonDecode(characters));
                                                   SaveDatas.setCharacters(characters);
                                                 } else {
                                                   //Update Providers
@@ -641,7 +660,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   options.changeToken(result['token']);
                                                   //Push Characters
                                                   String characters = await MySQL.pushCharacters(context: context);
-                                                  Provider.of<Gameplay>(context, listen: false).changeCharacters(characters);
+                                                  Provider.of<Gameplay>(context, listen: false).changeCharacters(jsonDecode(characters));
                                                 }
                                                 settings.changeIsLoading(value: false);
                                                 Navigator.pushReplacementNamed(context, '/mainmenu');

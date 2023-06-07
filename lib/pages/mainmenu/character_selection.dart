@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:convert';
-
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -16,7 +14,7 @@ class CharacterSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
-    final characters = jsonDecode(Provider.of<Gameplay>(context).characters);
+    final characters = Provider.of<Gameplay>(context).characters;
 
     returnGold(index) {
       try {
@@ -60,8 +58,7 @@ class CharacterSelection extends StatelessWidget {
                           children: [
                             //Board Image
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 85.0),
+                              padding: const EdgeInsets.symmetric(vertical: 85.0),
                               child: SizedBox(
                                 width: 2800,
                                 height: 1800,
@@ -81,10 +78,7 @@ class CharacterSelection extends StatelessWidget {
                                   child: FittedBox(
                                     child: Text(
                                       characters['character$index']['name'],
-                                      style: const TextStyle(
-                                          fontFamily: 'Explora',
-                                          fontSize: 400,
-                                          fontWeight: FontWeight.bold),
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 400, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
@@ -92,8 +86,7 @@ class CharacterSelection extends StatelessWidget {
                             ),
                             //Character Infos
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 380, left: 230),
+                              padding: const EdgeInsets.only(top: 380, left: 230),
                               child: SizedBox(
                                 height: 1600,
                                 width: 1450,
@@ -109,8 +102,7 @@ class CharacterSelection extends StatelessWidget {
                                             fontFamily: 'Explora',
                                             fontSize: 250,
                                             fontWeight: FontWeight.bold,
-                                            color:
-                                                Theme.of(context).primaryColor,
+                                            color: Theme.of(context).primaryColor,
                                             overflow: TextOverflow.ellipsis),
                                       ),
                                     ),
@@ -153,8 +145,7 @@ class CharacterSelection extends StatelessWidget {
                             ),
                             //Class Image
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 400.0, left: 1440),
+                              padding: const EdgeInsets.only(top: 400.0, left: 1440),
                               child: SizedBox(
                                 width: 1150,
                                 height: 1300,
@@ -166,50 +157,33 @@ class CharacterSelection extends StatelessWidget {
                             ),
                             //Select Button
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 1100.0, top: 1673),
+                              padding: const EdgeInsets.only(left: 1100.0, top: 1673),
                               child: SizedBox(
                                   width: 600,
                                   height: 170,
                                   child: ElevatedButton(
                                       onPressed: () async {
-                                        MySQL.loadingWidget(
-                                            context: context,
-                                            language: options.language);
-                                        final result =
-                                            await MySQL.pushCharacters(
-                                                context: context);
+                                        MySQL.loadingWidget(context: context, language: options.language);
+                                        final result = await MySQL.pushCharacters(context: context);
                                         //Check if connection success
                                         if (result != false) {
-                                          Provider.of<Gameplay>(context,
-                                                  listen: false)
-                                              .changeSelectedCharacter(index);
-                                          await MySQL.returnPlayerStats(
-                                              context);
-                                          await MySQLGameplay
-                                              .returnGameplayStats(context);
-                                          Navigator.of(context)
-                                              .pushNamedAndRemoveUntil(
-                                                  '/ingame',
-                                                  (Route route) => false);
+                                          Provider.of<Gameplay>(context, listen: false).changeSelectedCharacter(index);
+                                          await MySQL.returnPlayerStats(context);
+                                          await MySQLGameplay.returnGameplayStats(context);
+                                          Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
                                         } else {
                                           GlobalFunctions.errorDialog(
-                                            errorMsgTitle:
-                                                'authentication_register_problem_connection',
-                                            errorMsgContext:
-                                                'Failed to connect to the Servers',
+                                            errorMsgTitle: 'authentication_register_problem_connection',
+                                            errorMsgContext: 'Failed to connect to the Servers',
                                             context: context,
                                           );
                                         }
                                       },
                                       style: ButtonStyle(
-                                        shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(40.0),
-                                            side: const BorderSide(
-                                                color: Colors.black),
+                                            borderRadius: BorderRadius.circular(40.0),
+                                            side: const BorderSide(color: Colors.black),
                                           ),
                                         ),
                                       ),
@@ -217,12 +191,8 @@ class CharacterSelection extends StatelessWidget {
                                           child: Padding(
                                         padding: const EdgeInsets.all(200.0),
                                         child: Text(
-                                          Language.Translate('response_select',
-                                                  options.language) ??
-                                              'Select',
-                                          style: const TextStyle(
-                                              fontFamily: 'PressStart',
-                                              fontSize: 500),
+                                          Language.Translate('response_select', options.language) ?? 'Select',
+                                          style: const TextStyle(fontFamily: 'PressStart', fontSize: 500),
                                         ),
                                       )))),
                             )
