@@ -480,10 +480,6 @@ class MySQLGameplay {
     List<GameComponent> npc = await returnNPCs(jsonDecode(result['npc']));
     results.add(npc);
 
-    //Returning the Enemys
-    List<Enemy> enemy = await returnEnemys(jsonDecode(result['enemy']));
-    results.add(enemy);
-
     //Returning player position
     results.add(
         Vector2(double.parse(jsonDecode(result['event'])['player']['positionx']), double.parse(jsonDecode(result['event'])['player']['positiony'])));
@@ -542,6 +538,7 @@ class MySQLGameplay {
       skills = enemysdb['enemy0']['skills'];
       //Adding the first enemy
       enemy.add(ENEMY(
+        id: 0,
         position: Vector2(positionx, positiony),
         name: name,
         life: life,
@@ -568,6 +565,7 @@ class MySQLGameplay {
           buffs = enemysdb['enemy$i']['buffs'];
           skills = enemysdb['enemy$i']['skills'];
           enemy.add(ENEMY(
+            id: i,
             position: Vector2(positionx, positiony),
             name: name,
             life: life,

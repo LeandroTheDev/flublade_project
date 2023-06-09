@@ -1,5 +1,4 @@
 import 'package:flublade_project/data/gameplay/characters.dart';
-import 'package:flublade_project/data/gameplay/enemys.dart';
 import 'package:flublade_project/data/gameplay/interface.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
@@ -16,7 +15,7 @@ class InGame extends StatefulWidget {
 }
 
 class _InGameState extends State<InGame> {
-  void connectionSignal(context, gameRef) async {
+  Future<void> connectionSignal(context) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     await options.websocketSend(
@@ -25,6 +24,7 @@ class _InGameState extends State<InGame> {
         'id': options.id,
         'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
         'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
+        'token': options.token,
       },
       context,
     );
@@ -35,6 +35,11 @@ class _InGameState extends State<InGame> {
   void initState() {
     super.initState();
     final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    //Reset Game State
+    gameplay.usersHandle('clean');
+    gameplay.enemyHandle('clean');
+    //Init WebSocket
     options.websocketInit(context);
     options.changeGameController(GameController());
   }
@@ -91,7 +96,7 @@ class _InGameState extends State<InGame> {
             body: BonfireWidget(
               //Game Controller
               gameController: options.gameController,
-              // showCollisionArea: true,
+              showCollisionArea: true,
               //Camera
               cameraConfig: CameraConfig(
                 moveOnlyMapArea: true,
@@ -114,13 +119,11 @@ class _InGameState extends State<InGame> {
               ),
               //Player Call
               player: PlayerClient(
-                future.data![3],
+                future.data![2],
                 context,
               ),
               //Npcs
               components: future.data![1],
-              //Enemies
-              enemies: future.data![2],
               //HUD
               overlayBuilderMap: {
                 'pause': (BuildContext context, BonfireGame game) {
@@ -132,7 +135,7 @@ class _InGameState extends State<InGame> {
               //After Loads everthing
               onReady: (gameRef) {
                 //Send a message for the server that you are in
-                connectionSignal(context, gameRef);
+                connectionSignal(context);
                 gameplay.usersHandle('clean');
               },
               //?

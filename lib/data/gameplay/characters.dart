@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flublade_project/data/gameplay/enemys.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
@@ -33,7 +34,8 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final position = jsonDecode(gameRef.player!.position.toString());
-    final result = jsonDecode(await options.websocketSend({
+
+    final websocketMessage = await options.websocketSend({
       'message': 'playersPosition',
       'id': options.id,
       'positionX': position[0],
@@ -41,17 +43,27 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
       'direction': isIdle ? 'Direction.idle' : gameRef.player!.lastDirection.toString(),
       'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
       'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
-    }, context));
+    }, context);
+
+    //Loading Check
+    if (websocketMessage == "OK" || websocketMessage == "{}") {
+      return;
+    }
+    //Result
+    final players = jsonDecode(websocketMessage);
+    players.remove("enemy");
+    final enemy = jsonDecode(websocketMessage)['enemy'];
+
     //Update Users
-    if (true) {
+    if (players != {}) {
       //Store old Values
       List oldUsers = [];
       gameplay.usersInWorld.forEach((key, value) => oldUsers.add(value));
 
       //Clean
-      gameplay.usersHandle('replace', result);
+      gameplay.usersHandle('replace', players);
 
-      //Load New Values
+      // Load New Values
       List users = [];
       gameplay.usersInWorld.forEach((key, value) => users.add(value));
       List idRemove = [];
@@ -74,7 +86,7 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
             add = false;
           }
           //Add if not exist
-          if (add) {
+          if (add && users[i]['positionX'] != null && users[i]['positionY'] != null) {
             idAdd.add(users[i]['id']);
             final positionX = double.parse(users[i]['positionX'].toString());
             final positionY = double.parse(users[i]['positionY'].toString());
@@ -101,7 +113,79 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
           }
         }
       }
-      //Update Players
+    }
+    //Update Enemies
+    if (enemy != {}) {
+      //Store old Values
+      List oldEnemies = [];
+      gameplay.enemiesInWorld.forEach((key, value) => oldEnemies.add(value));
+
+      //Clean
+      gameplay.enemyHandle('replace', enemy);
+
+      // Load New Values
+      List enemies = [];
+      gameplay.enemiesInWorld.forEach((key, value) => enemies.add(value));
+      List idRemove = [];
+      List idAdd = [];
+      //Verify changes
+      if (oldEnemies.length != enemies.length) {
+        try {
+          //Sweep enemies
+          for (int i = 0; i < enemies.length; i++) {
+            bool add = true;
+            //Add Sweep
+            if (oldEnemies.length < enemies.length) {
+              for (int j = 0; j < oldEnemies.length; j++) {
+                //If already exist
+                if (enemies[i]['id'] == oldEnemies[j]['id']) {
+                  add = false;
+                  break;
+                }
+              }
+            } else {
+              add = false;
+            }
+            //Add if not exist
+            if (add && enemies[i]['positionX'] != null && enemies[i]['positionY'] != null) {
+              idAdd.add(enemies[i]['id']);
+              final positionX = double.parse(enemies[i]['positionX'].toString());
+              final positionY = double.parse(enemies[i]['positionY'].toString());
+              if (enemies[i]['id'] != options.id) {
+                options.gameController.addGameComponent(
+                    // ignore: use_build_context_synchronously
+                    ENEMY(
+                        id: int.parse(enemies[i]['id'].toString()),
+                        position: Vector2(positionX, positionY),
+                        name: enemies[i]['name'],
+                        life: double.parse(enemies[i]['life'].toString()),
+                        mana: double.parse(enemies[i]['mana'].toString()),
+                        damage: double.parse(enemies[i]['damage'].toString()),
+                        armor: double.parse(enemies[i]['armor'].toString()),
+                        level: enemies[i]['level'],
+                        xp: double.parse(enemies[i]['xp'].toString()),
+                        buffs: enemies[i]['buffs'],
+                        skills: enemies[i]['skills']));
+              }
+            }
+          }
+          // //Sweep Old enemies
+          // for (int i = 0; i < oldEnemies.length; i++) {
+          //   //Find if no longer online
+          //   bool remove = true;
+          //   for (int j = 0; j < enemies.length; j++) {
+          //     if (oldEnemies[i]['id'] == enemies[j]['id']) {
+          //       remove = false;
+          //       break;
+          //     }
+          //   }
+          //   //Remove if no longer online
+          //   if (remove) {
+          //     idRemove.add(oldEnemies[i]['id']);
+          //   }
+          // }
+        } catch (_) {}
+      }
     }
   }
 }
@@ -220,62 +304,6 @@ class UserClient extends SimpleEnemy {
               return;
             }
         }
-        //Animations Handle
-        // if (gameplay.usersInWorld[id]['direction'] != 'Direction.idle') {
-        //   if (gameplay.usersInWorld[id]['direction'] == 'Direction.left' ||
-        //       gameplay.usersInWorld[id]['direction'] == 'Direction.downLeft' ||
-        //       gameplay.usersInWorld[id]['direction'] == 'Direction.upLeft') {
-        //     if (!animationLoad) {
-        //       animation?.playOnce(SpriteAnimation.load(
-        //         "players/berserk/berserk_ingame_runright.png",
-        //         SpriteAnimationData.sequenced(
-        //           amount: 4,
-        //           stepTime: 0.1,
-        //           textureSize: Vector2(16, 16),
-        //         ),
-        //       ));
-        //       Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
-        //       animationLoad = true;
-        //     }
-        //     animation?.isFlipHorizontally = true;
-        //     lastAnimation = true;
-        //   }
-        //   if (gameplay.usersInWorld[id]['direction'] == 'Direction.right' ||
-        //       gameplay.usersInWorld[id]['direction'] == 'Direction.downRight' ||
-        //       gameplay.usersInWorld[id]['direction'] == 'Direction.upRight') {
-        //     if (!animationLoad) {
-        //       animation?.playOnce(SpriteAnimation.load(
-        //         "players/berserk/berserk_ingame_runright.png",
-        //         SpriteAnimationData.sequenced(
-        //           amount: 4,
-        //           stepTime: 0.1,
-        //           textureSize: Vector2(16, 16),
-        //         ),
-        //       ));
-        //       Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
-        //       animationLoad = true;
-        //     }
-        //     animation?.isFlipHorizontally = false;
-        //     lastAnimation = false;
-        //   }
-        //   if (gameplay.usersInWorld[id]['direction'] == 'Direction.up' || gameplay.usersInWorld[id]['direction'] == 'Direction.down') {
-        //     if (!animationLoad) {
-        //       animation?.playOnce(SpriteAnimation.load(
-        //         "players/berserk/berserk_ingame_runright.png",
-        //         SpriteAnimationData.sequenced(
-        //           amount: 4,
-        //           stepTime: 0.1,
-        //           textureSize: Vector2(16, 16),
-        //         ),
-        //       ));
-        //       Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
-        //       animationLoad = true;
-        //     }
-        //     animation?.isFlipHorizontally = lastAnimation;
-        //   }
-        // } else {
-        //   animation?.isFlipHorizontally = lastAnimation;
-        // }
       }
       //Update player posistion
       position = Vector2(

@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
@@ -35,6 +36,7 @@ class Options with ChangeNotifier {
   late IOWebSocketChannel _websocket;
   late StreamSubscription _broadcast;
   late GameController _gameController;
+  bool _disconnect = false;
 
   String get language => _language;
   int get textSpeed => _textSpeed;
@@ -45,6 +47,7 @@ class Options with ChangeNotifier {
   IOWebSocketChannel get websocket => _websocket;
   StreamSubscription get broadcast => _broadcast;
   GameController get gameController => _gameController;
+  bool get disconnect => _disconnect;
 
   //Change Game Controller
   void changeGameController(value) {
@@ -53,9 +56,12 @@ class Options with ChangeNotifier {
 
   //Websocket Initialize
   void websocketInit(context) {
+    final httpClient = HttpClient();
+    httpClient.connectionTimeout = const Duration(seconds: 3);
+    _disconnect = false;
     _websocket = IOWebSocketChannel.connect(
       'ws://${SaveDatas.getServerAddress()}:8081',
-      pingInterval: const Duration(seconds: 5),
+      customClient: httpClient,
     );
 
     //Listen from the server
@@ -66,9 +72,20 @@ class Options with ChangeNotifier {
 
   //Websocket Send Mensage
   Future<String> websocketSend(value, context) async {
+    if (_disconnect) {
+      return "{}";
+    }
     _websocket.sink.add(jsonEncode(value));
     final result = await websocketListen(context);
     return result;
+  }
+
+  //Websocket Send Mensage
+  Future<void> websocketOnlySend(value, context) async {
+    if (_disconnect) {
+      return;
+    }
+    _websocket.sink.add(jsonEncode(value));
   }
 
   //Websocket Receive Mensage
@@ -89,6 +106,7 @@ class Options with ChangeNotifier {
 
   //Websocket Disconnect
   void websocketDisconnect(context) async {
+    _disconnect = true;
     _websocket.sink.close();
   }
 
@@ -970,6 +988,7 @@ class Gameplay with ChangeNotifier {
   List _enemySkills = [];
 
   Map _usersInWorld = {};
+  Map _enemiesInWorld = {};
 
   bool get isTalkable => _isTalkable;
   bool get enemysMove => _enemysMove;
@@ -1012,6 +1031,7 @@ class Gameplay with ChangeNotifier {
   List get enemyDebuffs => _enemyDebuffs;
 
   Map get usersInWorld => _usersInWorld;
+  Map get enemiesInWorld => _enemiesInWorld;
 
   //Change location
   void changeLocation(value) {
@@ -1028,6 +1048,18 @@ class Gameplay with ChangeNotifier {
     } else if (handle == 'move') {
     } else if (handle == 'clean') {
       _usersInWorld = {};
+    }
+  }
+
+  void enemyHandle(handle, [data]) {
+    if (handle == 'add') {
+      _enemiesInWorld[data['id']] = data;
+    } else if (handle == 'replace') {
+      _enemiesInWorld = data;
+    } else if (handle == 'remove') {
+    } else if (handle == 'move') {
+    } else if (handle == 'clean') {
+      _enemiesInWorld = {};
     }
   }
 
