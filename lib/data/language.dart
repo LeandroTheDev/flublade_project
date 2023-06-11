@@ -45,6 +45,7 @@ class Language {
     'response_status': 'Stats',
     'response_debuffs': 'Debuffs',
     'response_passives': 'Passives',
+    'response_view': 'View',
     'response_servers': 'Servers',
     'response_serverAddress': 'Server IP',
     'response_equipmentIndex_0': 'Head',
@@ -74,7 +75,8 @@ class Language {
     'authentication_register_problem_existusername': 'Username already exist',
     'authentication_register_problem_password': 'Password needs to have 3 or more Caracters',
     'authentication_register_problem_connection': 'Failed to connect to the Servers.',
-    'authentication_register_problem_connection_tryAddress': 'Failed to connect to the Servers, verify your internet connection or check the server IP.',
+    'authentication_register_problem_connection_tryAddress':
+        'Failed to connect to the Servers, verify your internet connection or check the server IP.',
     'authentication_register_loading': 'Loading...',
     'authentication_register_sucess': 'Sucess',
     'authentication_register_sucess_account': 'Account Created',
@@ -103,18 +105,30 @@ class Language {
     'characters_create_error': 'Ops, there\'s was a problem creating your character try again later',
     'characters_create_error_namelimit': 'Character name cannot be longer than 10 characters',
     'characters_create_error_empty': 'You need to make a name to your character',
-    'characters_class_archer_info': 'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
-    'characters_class_assassin_info': 'Assassin\nSilent, barely audible, fragile, high ease of stealing, high dodge chance, high damage if caught off guard.',
-    'characters_class_bard_info': 'Bard\nDoesn\'t know how to be silent, bad at stealing, robust, good at cheering up, healer, manages to tame easily, raises the spirits of the group and himself, can manage.',
-    'characters_class_beastmaster_info': 'Beast Master\nFriend of Nature, animals do not attack him, can be tamed very easily, very fragile, tamed animals have 10% additional stats.',
-    'characters_class_berserk_info': 'Berserk\nEnemy of all, can\'t be silent, can\'t use elemental magic, the less health the more damage and regeneration, can\'t tame, difficulty creating friendships, extremely robust.',
-    'characters_class_druid_info': 'Druid\nFriend of Nature, can transform into an animal from each biome, great healer, fragile if not transformed, can\'t dodge in human form or use healing spells, can easily tame, high health regeneration .',
-    'characters_class_mage_info': 'Mage\nHigh mana and regeneration, elemental spells deal 10% more damage, difficult to create friendships, extremely fragile.',
-    'characters_class_paladin_info': 'Paladin\nExtremely robust, shield spells are 10% more effective, incoming heals are 10% stronger, great healer, excellent at making friends, easy to tame.',
-    'characters_class_priest_info': 'Priest\nExcellent healer, excellent at making friends, 5% of damage dealt heals you and 1% to allies, reduces damage taken from dark spells by 50%, damage from light spells is 10% more effective extremely fragile.',
-    'characters_class_trickmagician_info': 'Trick Magician\nPolymorph spells cost no mana, extremely silent, immune to persuasion, great at making friends, fragile.',
-    'characters_class_weaponsmith_info': 'Weaponsmith\nForged weapons are 10% more effective, great at making friends, robust, can create wards, chance to forge with enchantment.',
-    'characters_class_witch_info': 'Witch\nDamage with dark spells 10% more effective, 10% of damage dealt is converted to life, extremely fragile, can charm enemies, excellent at making friends, takes 10% more damage from light spells.',
+    'characters_class_archer_info':
+        'Archer\nFast and agile, good aim, less chance of missing, fragile, greater chance of dodging, little ease in robberies.',
+    'characters_class_assassin_info':
+        'Assassin\nSilent, barely audible, fragile, high ease of stealing, high dodge chance, high damage if caught off guard.',
+    'characters_class_bard_info':
+        'Bard\nDoesn\'t know how to be silent, bad at stealing, robust, good at cheering up, healer, manages to tame easily, raises the spirits of the group and himself, can manage.',
+    'characters_class_beastmaster_info':
+        'Beast Master\nFriend of Nature, animals do not attack him, can be tamed very easily, very fragile, tamed animals have 10% additional stats.',
+    'characters_class_berserk_info':
+        'Berserk\nEnemy of all, can\'t be silent, can\'t use elemental magic, the less health the more damage and regeneration, can\'t tame, difficulty creating friendships, extremely robust.',
+    'characters_class_druid_info':
+        'Druid\nFriend of Nature, can transform into an animal from each biome, great healer, fragile if not transformed, can\'t dodge in human form or use healing spells, can easily tame, high health regeneration .',
+    'characters_class_mage_info':
+        'Mage\nHigh mana and regeneration, elemental spells deal 10% more damage, difficult to create friendships, extremely fragile.',
+    'characters_class_paladin_info':
+        'Paladin\nExtremely robust, shield spells are 10% more effective, incoming heals are 10% stronger, great healer, excellent at making friends, easy to tame.',
+    'characters_class_priest_info':
+        'Priest\nExcellent healer, excellent at making friends, 5% of damage dealt heals you and 1% to allies, reduces damage taken from dark spells by 50%, damage from light spells is 10% more effective extremely fragile.',
+    'characters_class_trickmagician_info':
+        'Trick Magician\nPolymorph spells cost no mana, extremely silent, immune to persuasion, great at making friends, fragile.',
+    'characters_class_weaponsmith_info':
+        'Weaponsmith\nForged weapons are 10% more effective, great at making friends, robust, can create wards, chance to forge with enchantment.',
+    'characters_class_witch_info':
+        'Witch\nDamage with dark spells 10% more effective, 10% of damage dealt is converted to life, extremely fragile, can charm enemies, excellent at making friends, takes 10% more damage from light spells.',
     'characters_class_archer': 'Archer',
     'characters_class_assassin': 'Assassin',
     'characters_class_bard': 'Bard',
@@ -138,7 +152,8 @@ class Language {
     //Ingame Texts
     'dialog_npc_wizard_name': 'Wizard',
     'dialog_npc_wizard_prologue1': 'Hello Adventurer.',
-    'dialog_npc_wizard_prologue2': 'This place is known by the name of heaven, but be careful with spiders, and especially against weber, he is more dangerous than heaven, you will probably find him soon.\nIf you want to leave here of course.',
+    'dialog_npc_wizard_prologue2':
+        'This place is known by the name of heaven, but be careful with spiders, and especially against weber, he is more dangerous than heaven, you will probably find him soon.\nIf you want to leave here of course.',
     //Battle Texts
     'battle_life': 'Life',
     'battle_mana': 'Mana',
@@ -173,13 +188,16 @@ class Language {
     'levelup_skillpoints': 'Skillpoints earned:',
     //Items Name
     'items_gold': 'Gold',
-    'items_gold_desc': 'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
+    'items_gold_desc':
+        'In nature, gold is produced from the collision of two neutron stars. Gold is widely used in jewellery, as well as a store of value.',
     'items_wooden_sword': 'Wooden Sword',
-    'items_wooden_sword_desc': 'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
+    'items_wooden_sword_desc':
+        'In war, it is not normally used, but in combat training yes, to simply not hurt your tutor or person you are training.',
     'items_thread': 'Thread',
     'items_thread_desc': 'Made from twisted fibers of linen, cotton, silk, synthetics, etc., used in sewing, embroidery, lace, fabrication',
     'items_cloth': 'Cloth',
-    'items_cloth_desc': 'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
+    'items_cloth_desc':
+        'Cloth, made from threads, on looms where the interweaving of the filaments will be carried out, which will later be transformed into cloth.',
     //Enemy Names
     'enemy_small_spider': 'Small Spider',
     //Magics Names
@@ -188,7 +206,8 @@ class Language {
     'magics_basicAttack': 'Basic Attack',
     'magics_basicAttack_desc': 'Attacks the enemy with your weapon, dealing the total attack damage',
     'magics_furiousAttack': 'Furious Attack',
-    'magics_furiousAttack_desc': 'Attacks the enemy with furious, consuming 10% of your maximum health and dealing an additional 100% of your total attack damage',
+    'magics_furiousAttack_desc':
+        'Attacks the enemy with furious, consuming 10% of your maximum health and dealing an additional 100% of your total attack damage',
     'magics_poisonous': 'Poisonous',
     'magics_poisonous_desc': 'Poisons the enemy causing 2 damage per round multiplied by skill tier, duration of 3 turns, can be stacked',
     //Passives Names
@@ -248,6 +267,7 @@ class Language {
     'response_status': 'Status',
     'response_debuffs': 'Efeitos Negativos',
     'response_passives': 'Passivas',
+    'response_view': 'Analisar',
     'response_servers': 'Servidores',
     'response_serverAddress': 'IP do Servidor',
     'response_equipmentIndex_0': 'Cabeça',
@@ -277,7 +297,8 @@ class Language {
     'authentication_register_problem_existusername': 'Usuário já existe',
     'authentication_register_problem_password': 'Senha precisa ter 3 ou mais dígitos e menos que 100 dígitos',
     'authentication_register_problem_connection': 'Falha ao connectar no Servidor.',
-    'authentication_register_problem_connection_tryAddress': 'Falha ao connectar no Servidor, verifique sua conexão com a internet ou se está correto o endereço.',
+    'authentication_register_problem_connection_tryAddress':
+        'Falha ao connectar no Servidor, verifique sua conexão com a internet ou se está correto o endereço.',
     'authentication_register_loading': 'Carregando...',
     'authentication_register_sucess': 'Sucesso',
     'authentication_register_sucess_account': 'Conta Criada',
@@ -305,18 +326,30 @@ class Language {
     'characters_create_name': 'Nome do Personagem',
     'characters_create_error': 'Ops, tivemos um problema ao criar seu personagem tente novamente mais tarde',
     'characters_create_error_namelimit': 'Nome do personagem não pode ter mais de 10 caracteres',
-    'characters_class_archer_info': 'Arqueiro\nVeloz e ágil, boa pontaria, menos chance de errar, frágil, maior chance de esquiva, pequena facilidade em roubos.',
-    'characters_class_assassin_info': 'Assassino\nSilencioso, quase não da pra ouvir, frágil, facilidade alta em roubos, chances altas de esquiva, danos altos se pego desprevinido.',
-    'characters_class_bard_info': 'Bardo\nNão sabe ser silencioso, péssimo em roubos, robusto, bom para alegrar, curandeiro, consegue domesticar com facilidade, aumenta o astral do grupo e de si mesmo, consegue se virar.',
-    'characters_class_beastmaster_info': 'Domador de Fera\nAmigo da Natureza, animais não o atacam, consegue domesticar com muita facilidade, muito frágil, animais domesticados tem 10% de status adicionais.',
-    'characters_class_berserk_info': 'Berserk\nInimigo de todos, não consegue ser silencioso, não consegue usar magias elementais, quanto menos vida mais dano e regeneração, não pode domesticar, dificuldade em criar amizades, extremamente robusto.',
-    'characters_class_druid_info': 'Druida\nAmigo da Natureza, pode se transformar em um animal de cada bioma, ótimo curandeiro, frágil se não transformado, não consegue esquivar na forma humana nem usar magias de cura, pode domesticar com facilidade, regeneração alta de vida.',
-    'characters_class_mage_info': 'Mago\nMana e regeneração altas, magias elementais dão 10% mais de dano, dificuldade em criar amizades, extremamente frágil.',
-    'characters_class_paladin_info': 'Paladino\nExtremamente robusto, magias de escudo são 10% mais eficazes, curas recebidas são 10% mais fortes, ótimo curandeiro, excelente em fazer amizades, facilidade em domesticar.',
-    'characters_class_priest_info': 'Sacerdote\nExcelente curandeiro, excelente em fazer amizades, 5% do dano causado cura você e 1% para aliados, reduz 50% do dano recebido de magias escuras, dano de magias da luz são 10% mais eficazes extremamente frágil.',
-    'characters_class_trickmagician_info': 'Mágico\nMagias de polimorfe não custam mana, extremamente silencioso, imune a persuação, ótimo em fazer amizades, frágil.',
-    'characters_class_weaponsmith_info': 'Armeiro\nArmas forjadas são 10% mais eficazes, ótimo em fazer amizades, robusto, consegue criar sentinelas, chance de forjar com encantamento.',
-    'characters_class_witch_info': 'Bruxa\nDanos com magias escuras 10% mais eficazes, 10% do dano causado é convertido em vida, extremamente frágil, consegue encantar inimigos, excelente em fazer amizades, recebe 10% mais de dano em magias da luz.',
+    'characters_class_archer_info':
+        'Arqueiro\nVeloz e ágil, boa pontaria, menos chance de errar, frágil, maior chance de esquiva, pequena facilidade em roubos.',
+    'characters_class_assassin_info':
+        'Assassino\nSilencioso, quase não da pra ouvir, frágil, facilidade alta em roubos, chances altas de esquiva, danos altos se pego desprevinido.',
+    'characters_class_bard_info':
+        'Bardo\nNão sabe ser silencioso, péssimo em roubos, robusto, bom para alegrar, curandeiro, consegue domesticar com facilidade, aumenta o astral do grupo e de si mesmo, consegue se virar.',
+    'characters_class_beastmaster_info':
+        'Domador de Fera\nAmigo da Natureza, animais não o atacam, consegue domesticar com muita facilidade, muito frágil, animais domesticados tem 10% de status adicionais.',
+    'characters_class_berserk_info':
+        'Berserk\nInimigo de todos, não consegue ser silencioso, não consegue usar magias elementais, quanto menos vida mais dano e regeneração, não pode domesticar, dificuldade em criar amizades, extremamente robusto.',
+    'characters_class_druid_info':
+        'Druida\nAmigo da Natureza, pode se transformar em um animal de cada bioma, ótimo curandeiro, frágil se não transformado, não consegue esquivar na forma humana nem usar magias de cura, pode domesticar com facilidade, regeneração alta de vida.',
+    'characters_class_mage_info':
+        'Mago\nMana e regeneração altas, magias elementais dão 10% mais de dano, dificuldade em criar amizades, extremamente frágil.',
+    'characters_class_paladin_info':
+        'Paladino\nExtremamente robusto, magias de escudo são 10% mais eficazes, curas recebidas são 10% mais fortes, ótimo curandeiro, excelente em fazer amizades, facilidade em domesticar.',
+    'characters_class_priest_info':
+        'Sacerdote\nExcelente curandeiro, excelente em fazer amizades, 5% do dano causado cura você e 1% para aliados, reduz 50% do dano recebido de magias escuras, dano de magias da luz são 10% mais eficazes extremamente frágil.',
+    'characters_class_trickmagician_info':
+        'Mágico\nMagias de polimorfe não custam mana, extremamente silencioso, imune a persuação, ótimo em fazer amizades, frágil.',
+    'characters_class_weaponsmith_info':
+        'Armeiro\nArmas forjadas são 10% mais eficazes, ótimo em fazer amizades, robusto, consegue criar sentinelas, chance de forjar com encantamento.',
+    'characters_class_witch_info':
+        'Bruxa\nDanos com magias escuras 10% mais eficazes, 10% do dano causado é convertido em vida, extremamente frágil, consegue encantar inimigos, excelente em fazer amizades, recebe 10% mais de dano em magias da luz.',
     'characters_class_archer': 'Arqueiro',
     'characters_class_assassin': 'Assassino',
     'characters_class_bard': 'Bardo',
@@ -340,7 +373,8 @@ class Language {
     //Ingame Texts
     'dialog_npc_wizard_name': 'Mago',
     'dialog_npc_wizard_prologue1': 'Olá aventureiro.',
-    'dialog_npc_wizard_prologue2': 'Este lugar é conhecido pelo nome de heaven, mas tome cuidado com as aranhas, e principalmente contra o weber, ele é maior perigo de heaven, você provavelmente irá encontra-lo em breve.\nSe você quiser sair daqui é claro.',
+    'dialog_npc_wizard_prologue2':
+        'Este lugar é conhecido pelo nome de heaven, mas tome cuidado com as aranhas, e principalmente contra o weber, ele é maior perigo de heaven, você provavelmente irá encontra-lo em breve.\nSe você quiser sair daqui é claro.',
     //Battle Texts
     'battle_life': 'Vida',
     'battle_mana': 'Mana',
@@ -375,13 +409,16 @@ class Language {
     'levelup_skillpoints': 'Pontos de Habilidade ganha:',
     //Items Names
     'items_gold': 'Ouro',
-    'items_gold_desc': 'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
+    'items_gold_desc':
+        'Na natureza, o ouro é produzido a partir da colisão de duas estrelas de nêutrons. O ouro é utilizado de forma generalizada em joalharia, bem como reserva de valor',
     'items_wooden_sword': 'Espada de Madeira',
-    'items_wooden_sword_desc': 'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
+    'items_wooden_sword_desc':
+        'Na guerra, não é normalmente utilizada, mas em treinos de combate sim, para simplesmente não ferir seu tutor ou pessoa que está treinando.',
     'items_thread': 'Linha',
     'items_thread_desc': 'Fio de fibras torcidas de linho, algodão, seda, sintéticas etc., usado em costuras, bordados, rendas, fabricação',
     'items_cloth': 'Pano',
-    'items_cloth_desc': 'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
+    'items_cloth_desc':
+        'Feito com linhas, em teares onde será realizado o entrelaçamento dos filamentos que posteriormente serão transformados em panos.',
     //Enemy Names
     'enemy_small_spider': 'Aranha Pequena',
     //Magics Names
@@ -390,7 +427,8 @@ class Language {
     'magics_basicAttack': 'Ataque Básico',
     'magics_basicAttack_desc': 'Ataca o inimigo com sua arma, causando dano de ataque total',
     'magics_furiousAttack': 'Ataque Furioso',
-    'magics_furiousAttack_desc': 'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
+    'magics_furiousAttack_desc':
+        'Ataca o inimigo com um poderoso ataque furioso, consumindo 10% de sua vida maxima e causando 100% de dano adicional do dano de ataque total',
     'magics_poisonous': 'Veneno',
     'magics_poisonous_desc': 'Envenena o inimigo',
     //Passives Names
@@ -405,6 +443,7 @@ class Language {
     'magics_noisy': 'Barulhento',
     'magics_noisy_desc': 'Não pode se camuflar',
     'magics_poisoned': 'Envenenado',
-    'magics_poisoned_desc': 'Envenena o alvo causando 2 de dano por rodada multiplicado pelo nivel da habilidade, dura até 3 rodadas, pode ser stackado',
+    'magics_poisoned_desc':
+        'Envenena o alvo causando 2 de dano por rodada multiplicado pelo nivel da habilidade, dura até 3 rodadas, pode ser stackado',
   };
 }

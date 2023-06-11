@@ -63,12 +63,12 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
       //Clean
       gameplay.usersHandle('replace', players);
 
-      // Load New Values
+      //Load New Values
       List users = [];
       gameplay.usersInWorld.forEach((key, value) => users.add(value));
       List idRemove = [];
       List idAdd = [];
-      //Verify changes
+      //Add Function
       if (oldUsers.length != users.length) {
         //Sweep Users
         for (int i = 0; i < users.length; i++) {
@@ -123,12 +123,12 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
       //Clean
       gameplay.enemyHandle('replace', enemy);
 
-      // Load New Values
+      //Load New Values
       List enemies = [];
       gameplay.enemiesInWorld.forEach((key, value) => enemies.add(value));
-      List idRemove = [];
       List idAdd = [];
-      //Verify changes
+
+      //Add Function
       if (oldEnemies.length != enemies.length) {
         try {
           //Sweep enemies
@@ -169,23 +169,10 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
               }
             }
           }
-          // //Sweep Old enemies
-          // for (int i = 0; i < oldEnemies.length; i++) {
-          //   //Find if no longer online
-          //   bool remove = true;
-          //   for (int j = 0; j < enemies.length; j++) {
-          //     if (oldEnemies[i]['id'] == enemies[j]['id']) {
-          //       remove = false;
-          //       break;
-          //     }
-          //   }
-          //   //Remove if no longer online
-          //   if (remove) {
-          //     idRemove.add(oldEnemies[i]['id']);
-          //   }
-          // }
         } catch (_) {}
       }
+
+      //Verify if is revived
     }
   }
 }

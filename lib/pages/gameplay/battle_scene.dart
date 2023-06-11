@@ -33,7 +33,8 @@ class _BattleSceneState extends State<BattleScene> {
   void initState() {
     super.initState();
     //Start battle in last log
-    Future.delayed(const Duration(milliseconds: 1)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 1), curve: Curves.linear));
+    Future.delayed(const Duration(milliseconds: 1)).then((value) =>
+        _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 1), curve: Curves.linear));
   }
 
   @override
@@ -52,6 +53,7 @@ class _BattleSceneState extends State<BattleScene> {
             SizedBox(height: screenSize.height * 0.07),
             //Top Side Screen
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 //Life & Mana
                 Padding(
@@ -123,6 +125,30 @@ class _BattleSceneState extends State<BattleScene> {
                     ],
                   ),
                 ),
+                //Stats Button
+                !isFighting
+                    ? SizedBox(
+                        width: screenSize.width * 0.3,
+                        height: screenSize.height * 0.05,
+                        child: FittedBox(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              GlobalFunctions.playerStats(context);
+                            },
+                            child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        width: screenSize.width * 0.3,
+                        height: screenSize.height * 0.05,
+                        child: FittedBox(
+                          child: ElevatedButton(
+                            onPressed: null,
+                            child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
+                          ),
+                        ),
+                      ),
               ],
             ),
             //Enemy Show
@@ -299,12 +325,65 @@ class _BattleSceneState extends State<BattleScene> {
               width: screenSize.width,
               child: Column(
                 children: [
-                  const Spacer(),
-                  //Attack & Defence
-                  Container(
-                    padding: const EdgeInsets.all(20),
+                  SizedBox(
                     width: screenSize.width,
-                    height: screenSize.height * 0.2,
+                    height: screenSize.height * 0.1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        //Party
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            width: screenSize.width * 0.2 - 20,
+                            height: screenSize.height * 0.2,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset("assets/images/interface/party_button.png"),
+                            ),
+                          ),
+                        ),
+                        //Actual Enemy
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: screenSize.width * 0.6 - 32,
+                            child: FittedBox(
+                              child: Text(
+                                Language.Translate('enemy_${gameplay.enemyName}', options.language) ?? 'Language Error',
+                                style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 100, fontFamily: "PressStart"),
+                              ),
+                            ),
+                          ),
+                        ),
+                        //Enemys
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            width: screenSize.width * 0.2 - 20,
+                            height: screenSize.height * 0.2,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset("assets/images/interface/enemy_button.png"),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //Attack & View
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    width: screenSize.width,
+                    height: screenSize.height * 0.1,
                     child: FittedBox(
                       child: Row(
                         children: [
@@ -340,7 +419,10 @@ class _BattleSceneState extends State<BattleScene> {
                                     for (int i = 0; i < result['battleLog'].length; i++) {
                                       gameplay.addBattleLog(result['battleLog'][i], context);
                                       //Animation
-                                      Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+                                      Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(
+                                          _scrollController.position.maxScrollExtent,
+                                          duration: const Duration(milliseconds: 300),
+                                          curve: Curves.easeOut));
                                       await Future.delayed(Duration(milliseconds: options.textSpeed));
                                     }
                                     //Update screen
@@ -362,7 +444,8 @@ class _BattleSceneState extends State<BattleScene> {
                                     await MySQL.returnPlayerStats(context);
                                     //Enemy Dead
                                     if (result['message'] == 'Enemy Dead') {
-                                      GlobalFunctions.lootDialog(context: context, loots: result['loots'], xp: result['earnedXP'], levelUpDialog: result['levelUpDialog']);
+                                      GlobalFunctions.lootDialog(
+                                          context: context, loots: result['loots'], xp: result['earnedXP'], levelUpDialog: result['levelUpDialog']);
                                       gameplay.resetBattleLog();
                                     }
                                     setState(() {
@@ -382,21 +465,20 @@ class _BattleSceneState extends State<BattleScene> {
                                   onPressed: () {
                                     GlobalFunctions.playerStats(context);
                                   },
-                                  child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
+                                  child: Text(Language.Translate('response_view', options.language) ?? 'View'),
                                 )
                               : ElevatedButton(
                                   onPressed: null,
-                                  child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
+                                  child: Text(Language.Translate('response_view', options.language) ?? 'View'),
                                 ),
                         ],
                       ),
                     ),
                   ),
-                  const Spacer(),
                   //Inventory & Magics & Log
                   SizedBox(
                     width: screenSize.width,
-                    height: screenSize.height * 0.10,
+                    height: screenSize.height * 0.1,
                     child: FittedBox(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -5,7 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ENEMY extends SimpleEnemy with ObjectCollision {
+  int ticksDelays = 0;
+  bool leftDirection = false;
+  bool rightDirection = false;
+  bool lastAnimation = false;
+  bool animationLoad = false;
   bool stopLoading = false;
+  bool alreadyInBattle = false;
   late int enemyID;
   late String enemyName;
   late double enemyLife;
@@ -187,41 +193,129 @@ class ENEMY extends SimpleEnemy with ObjectCollision {
     super.update(dt);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
-    //Update player posistion
+    //Verify if is dead
+    if (gameplay.enemiesInWorld['enemy$enemyID']['isDead']) {
+      die();
+      return;
+    }
+
+    //Update enemy position
     position = Vector2(
       double.parse(gameplay.enemiesInWorld['enemy$enemyID']['positionX'].toString()),
       double.parse(gameplay.enemiesInWorld['enemy$enemyID']['positionY'].toString()),
     );
-    seePlayer(
-      radiusVision: 80,
-      notObserved: () {
-        options.websocketOnlySend({
-          'message': 'enemyMoving',
-          'id': options.id,
-          'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-          'enemyID': enemyID,
-          'isSee': false,
-        }, context);
-      },
-      observed: (player) async {
-        //Check if collided
-        isCollision();
-        //Send message to the server
-        await options.websocketOnlySend({
-          'message': 'enemyMoving',
-          'id': options.id,
-          'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-          'enemyID': enemyID,
-          'isSee': true,
-        }, context);
-      },
-    );
+
+    //If see the player
+    if (!alreadyInBattle) {
+      seePlayer(
+        radiusVision: 80,
+        notObserved: () {
+          options.websocketOnlySend({
+            'message': 'enemyMoving',
+            'id': options.id,
+            'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+            'enemyID': enemyID,
+            'isSee': false,
+          }, context);
+        },
+        observed: (player) async {
+          //Check if collided
+          isCollision();
+          //Send message to the server
+          await options.websocketOnlySend({
+            'message': 'enemyMoving',
+            'id': options.id,
+            'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+            'enemyID': enemyID,
+            'isSee': true,
+          }, context);
+        },
+      );
+    }
+
+    //Animations
+    if (ticksDelays >= 1) {
+      ticksDelays = 0;
+      switch (gameplay.enemiesInWorld["enemy$enemyID"]['direction']) {
+        case 'Direction.left':
+          {
+            if (!animationLoad) {
+              animation?.play(SimpleAnimationEnum.runLeft);
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = true;
+            }
+            return;
+          }
+        case 'Direction.downLeft':
+          {
+            if (!animationLoad) {
+              animation?.play(SimpleAnimationEnum.runDown);
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = true;
+            }
+            return;
+          }
+        case 'Direction.upLeft':
+          {
+            if (!animationLoad) {
+              animation?.play(SimpleAnimationEnum.runUp);
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = true;
+            }
+            return;
+          }
+        case 'Direction.right':
+          {
+            if (!animationLoad) {
+              animation?.play(SimpleAnimationEnum.runRight);
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = false;
+            }
+            return;
+          }
+        case 'Direction.downRight':
+          {
+            if (!animationLoad) {
+              animation?.play(SimpleAnimationEnum.runDown);
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = false;
+            }
+            return;
+          }
+        case 'Direction.upRight':
+          {
+            if (!animationLoad) {
+              animation?.play(SimpleAnimationEnum.runUp);
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = false;
+            }
+            return;
+          }
+        case 'Direction.idle':
+          {
+            if (lastAnimation) {
+              animation!.play(SimpleAnimationEnum.idleLeft);
+            } else {
+              animation!.play(SimpleAnimationEnum.idleRight);
+            }
+            return;
+          }
+      }
+    }
+    ticksDelays += 1;
   }
 
   @override
   bool onCollision(GameComponent component, bool active) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    if (component is Player) {
+    if (component is Player && !alreadyInBattle) {
+      alreadyInBattle = true;
       //Freeze Other Enemys
       gameplay.changeEnemyMove(false);
       //Add Enemy Stats
@@ -245,7 +339,6 @@ class ENEMY extends SimpleEnemy with ObjectCollision {
                 )),
       );
       stopLoading = true;
-      die();
     }
     return super.onCollision(component, active);
   }
