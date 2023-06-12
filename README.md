@@ -1,8 +1,9 @@
 # Flublade Project
 
-This is a MMORPG turn based game, it uses the MYSQL database to work, the idea is to make any game that can be all changed in the servers database, the applications will be a template to database and push the informations from database and work with the informations and show everthing in the screen.
+This is a MMORPG turn based game, it uses the backend server and database to work, the idea is to make any game that can be changed and configured in the backend servers, the applications will work together with the server and cannot work without it (better for anti cheat), like the triple A MMO games.
 
-Real time player moviment and interaction using websockets tecnologies.
+Features:
+- > //To do
 
 
 
@@ -35,4 +36,4 @@ I have permissions to change the code of this project?
 > Of course, this is a open source project, just leave the credits.
 
 I need compile the flublade_project to create my own server?
-> Depends, if you want to change something in the client like the images, or add new things on the game, so yes you need to change what you want and then compile, in the future will be available documentation for understanding better the code.
+> Depends, if you want to change something in the client like the images, or add new features to the game, so yes you need to change what you want and then compile.

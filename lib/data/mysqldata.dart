@@ -62,7 +62,7 @@ class MySQL with ChangeNotifier {
   }
 
   //Change Language
-  static Future<void> changeLanguage(context, widget) async {
+  static Future<void> changeLanguage(context, widget, [needConnection = true]) async {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context, listen: false);
     final mysql = Provider.of<MySQL>(context, listen: false);
@@ -72,27 +72,29 @@ class MySQL with ChangeNotifier {
       //Update Datas
       options.changeLanguage(language);
       SaveDatas.setLanguage(language);
-      late final http.Response result;
-      try {
-        //Credentials Check
-        result = await http.post(
-          Uri.http(mysql._serverAddress, '/updateLanguage'),
-          headers: headers,
-          body: jsonEncode({"id": options.id, "language": language, "token": options.token}),
-        );
-      } catch (error) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
-        GlobalFunctions.errorDialog(
-            errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
-        return;
-      }
-      if (jsonDecode(result.body)['message'] == 'Invalid Login') {
-        GlobalFunctions.errorDialog(
-            errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-        Navigator.pushReplacementNamed(context, '/authenticationpage');
-        return;
+      if (needConnection) {
+        late final http.Response result;
+        try {
+          //Credentials Check
+          result = await http.post(
+            Uri.http(mysql._serverAddress, '/updateLanguage'),
+            headers: headers,
+            body: jsonEncode({"id": options.id, "language": language, "token": options.token}),
+          );
+        } catch (error) {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
+          GlobalFunctions.errorDialog(
+              errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+          return;
+        }
+        if (jsonDecode(result.body)['message'] == 'Invalid Login') {
+          GlobalFunctions.errorDialog(
+              errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+          Navigator.pushReplacementNamed(context, '/authenticationpage');
+          return;
+        }
       }
       //Pop the Dialog
       Navigator.pop(context);
@@ -428,6 +430,7 @@ class MySQL with ChangeNotifier {
     gameplay.changeStats(value: selectedCharacter['skillpoint'], stats: 'skillpoint');
     gameplay.changeStats(value: selectedCharacter['skills'], stats: 'skills');
     gameplay.changeStats(value: selectedCharacter['debuffs'], stats: 'debuffs');
+    gameplay.changeLocation(selectedCharacter['location']);
   }
 }
 

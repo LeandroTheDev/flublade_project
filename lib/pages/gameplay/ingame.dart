@@ -18,12 +18,13 @@ class _InGameState extends State<InGame> {
   Future<void> connectionSignal(context) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    await options.websocketSend(
+    await options.websocketSendIngame(
       {
         'message': 'login',
         'id': options.id,
         'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
         'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
+        'selectedCharacter': gameplay.selectedCharacter,
         'token': options.token,
       },
       context,
@@ -40,7 +41,7 @@ class _InGameState extends State<InGame> {
     gameplay.usersHandle('clean');
     gameplay.enemyHandle('clean');
     //Init WebSocket
-    options.websocketInit(context);
+    options.websocketInitIngame(context);
     options.changeGameController(GameController());
   }
 

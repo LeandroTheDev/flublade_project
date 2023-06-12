@@ -575,7 +575,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         //Language Button
                                         ElevatedButton(
                                             onPressed: () {
-                                              MySQL.changeLanguage(context, super.widget);
+                                              MySQL.changeLanguage(context, super.widget, false);
                                             },
                                             child: Text(Language.Translate('authentication_language', options.language) ?? 'Language'))
                                       ],

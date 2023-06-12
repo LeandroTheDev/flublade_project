@@ -10,7 +10,6 @@ class ENEMY extends SimpleEnemy with ObjectCollision {
   bool rightDirection = false;
   bool lastAnimation = false;
   bool animationLoad = false;
-  bool stopLoading = false;
   bool alreadyInBattle = false;
   late int enemyID;
   late String enemyName;
@@ -210,7 +209,7 @@ class ENEMY extends SimpleEnemy with ObjectCollision {
       seePlayer(
         radiusVision: 80,
         notObserved: () {
-          options.websocketOnlySend({
+          options.websocketOnlySendIngame({
             'message': 'enemyMoving',
             'id': options.id,
             'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
@@ -222,7 +221,7 @@ class ENEMY extends SimpleEnemy with ObjectCollision {
           //Check if collided
           isCollision();
           //Send message to the server
-          await options.websocketOnlySend({
+          await options.websocketOnlySendIngame({
             'message': 'enemyMoving',
             'id': options.id,
             'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
@@ -313,32 +312,41 @@ class ENEMY extends SimpleEnemy with ObjectCollision {
 
   @override
   bool onCollision(GameComponent component, bool active) {
+    final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    if (component is Player && !alreadyInBattle) {
+    //If not in battle
+    if (component is Player && !alreadyInBattle && !gameplay.alreadyInBattle) {
+      gameplay.changeAlreadyInBattle(true);
+      //Remove enemy from the world
+      options.websocketOnlySendIngame({
+        'message': 'playerCollide',
+        'id': options.id,
+        'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+        'enemyID': enemyID,
+      }, context);
       alreadyInBattle = true;
-      //Freeze Other Enemys
-      gameplay.changeEnemyMove(false);
-      //Add Enemy Stats
-      gameplay.changeEnemyName(enemyName);
-      gameplay.changeStats(value: enemyLife, stats: 'elife');
-      gameplay.changeStats(value: enemyMana, stats: 'emana');
-      gameplay.changeStats(value: enemyDamage, stats: 'edamage');
-      gameplay.changeStats(value: enemyArmor, stats: 'earmor');
-      gameplay.changeStats(value: enemyLevel, stats: 'elevel');
-      gameplay.changeStats(value: enemyXP, stats: 'exp');
-      gameplay.changeStats(value: enemyBuffs, stats: 'ebuffs');
-      gameplay.changeStats(value: enemySkills, stats: 'eskills');
       //Push to battle scene
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (context) => BattleScene(
-                  backContext: gameRef.context,
-                  enemyMaxLife: gameplay.enemyLife,
-                  enemyMaxMana: gameplay.enemyMana,
-                )),
+        MaterialPageRoute(builder: (context) => BattleScene(backContext: gameRef.context, enemyID: enemyID)),
       );
-      stopLoading = true;
+    }
+    //If in battle
+    else if (component is Player && !alreadyInBattle) {
+      gameplay.changeAlreadyInBattle(true);
+      //Remove enemy from the world
+      options.websocketOnlySendIngame({
+        'message': 'playerCollide',
+        'id': options.id,
+        'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+        'enemyID': enemyID,
+      }, context);
+      //Add enemy to the lobby
+      options.websocketOnlySendBattle({
+        'message': 'newEnemy',
+        'enemyID': enemyID,
+      }, context);
+      alreadyInBattle = true;
     }
     return super.onCollision(component, active);
   }

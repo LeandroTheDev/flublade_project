@@ -13,7 +13,6 @@ class _IngameInterfaceState extends State<IngameInterface> {
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
-    final options = Provider.of<Options>(context, listen: false);
     final settings = Provider.of<Settings>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
@@ -83,7 +82,7 @@ class _IngameInterfaceState extends State<IngameInterface> {
                       //Pause Button
                       TextButton(
                         onPressed: () {
-                          GlobalFunctions.pauseDialog(context: context, websocket: options.websocket);
+                          GlobalFunctions.pauseDialog(context: context);
                         },
                         child: Container(
                           width: screenSize.width * 0.2,

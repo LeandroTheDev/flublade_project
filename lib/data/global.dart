@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
@@ -33,8 +32,10 @@ class Options with ChangeNotifier {
   String _token = '';
   bool _remember = false;
   int _id = 0;
-  late IOWebSocketChannel _websocket;
-  late StreamSubscription _broadcast;
+  late IOWebSocketChannel _websocketIngame;
+  late StreamSubscription _broadcastIngame;
+  late IOWebSocketChannel _websocketBattle;
+  late StreamSubscription _broadcastBattle;
   late GameController _gameController;
   bool _disconnect = false;
 
@@ -44,8 +45,10 @@ class Options with ChangeNotifier {
   String get token => _token;
   bool get remember => _remember;
   int get id => _id;
-  IOWebSocketChannel get websocket => _websocket;
-  StreamSubscription get broadcast => _broadcast;
+  IOWebSocketChannel get websocketIngame => _websocketIngame;
+  StreamSubscription get broadcastIngame => _broadcastIngame;
+  IOWebSocketChannel get websocketBattle => _websocketBattle;
+  StreamSubscription get broadcastBattle => _broadcastBattle;
   GameController get gameController => _gameController;
   bool get disconnect => _disconnect;
 
@@ -54,61 +57,129 @@ class Options with ChangeNotifier {
     _gameController = value;
   }
 
-  //Websocket Initialize
-  void websocketInit(context) {
-    final httpClient = HttpClient();
-    httpClient.connectionTimeout = const Duration(seconds: 3);
+  //--------------------------------------------------------
+
+  //Websocket Ingame Initialize
+  void websocketInitIngame(context) {
     _disconnect = false;
-    _websocket = IOWebSocketChannel.connect(
+    _websocketIngame = IOWebSocketChannel.connect(
       'ws://${SaveDatas.getServerAddress()}:8081',
-      customClient: httpClient,
     );
 
     //Listen from the server
-    _broadcast = _websocket.stream.asBroadcastStream().listen((data) {},
+    _broadcastIngame = _websocketIngame.stream.asBroadcastStream().listen((data) {},
         onError: (error) => GlobalFunctions.errorDialog(
             errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
   }
 
-  //Websocket Send Mensage
-  Future<String> websocketSend(value, context) async {
+  //Websocket Ingame Send Mensage
+  Future<String> websocketSendIngame(value, context) async {
     if (_disconnect) {
-      return "{}";
+      return "timeout";
     }
-    _websocket.sink.add(jsonEncode(value));
-    final result = await websocketListen(context);
+    _websocketIngame.sink.add(jsonEncode(value));
+    final result = await websocketListenIngame(context);
     return result;
   }
 
-  //Websocket Send Mensage
-  Future<void> websocketOnlySend(value, context) async {
+  //Websocket Ingame Send Mensage
+  Future<void> websocketOnlySendIngame(value, context) async {
     if (_disconnect) {
       return;
     }
-    _websocket.sink.add(jsonEncode(value));
+    _websocketIngame.sink.add(jsonEncode(value));
   }
 
-  //Websocket Receive Mensage
-  Future<String> websocketListen(context) async {
+  //Websocket Ingame Receive Mensage
+  Future<String> websocketListenIngame(context) async {
     String result = '';
-    _broadcast.onData((data) {
+    int ticks = 0;
+    _broadcastIngame.onData((data) {
       result = data;
     });
     //Latency waiter
     while (true) {
+      //Result
       if (result != '') {
-        break;
+        return result;
       }
       await Future.delayed(const Duration(milliseconds: 1));
+      //Timeout
+      ticks += 1;
+      if (ticks > 200) {
+        return 'timeout';
+      }
     }
+  }
+
+  //Websocket Ingame Disconnect
+  void websocketDisconnectIngame(context) async {
+    _disconnect = true;
+    _websocketIngame.sink.close();
+  }
+
+  //--------------------------------------------------------
+
+  //Websocket Battle Initialize
+  void websocketInitBattle(context) {
+    _disconnect = false;
+    _websocketBattle = IOWebSocketChannel.connect(
+      'ws://${SaveDatas.getServerAddress()}:8082',
+    );
+
+    //Listen from the server
+    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {},
+        onError: (error) => GlobalFunctions.errorDialog(
+            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
+  }
+
+  //Websocket Battle Send Mensage
+  Future<String> websocketSendBattle(value, context) async {
+    if (_disconnect) {
+      return "timeout";
+    }
+    _websocketBattle.sink.add(jsonEncode(value));
+    final result = await websocketListenBattle(context);
     return result;
   }
 
-  //Websocket Disconnect
-  void websocketDisconnect(context) async {
-    _disconnect = true;
-    _websocket.sink.close();
+  //Websocket Battle Send Mensage
+  Future<void> websocketOnlySendBattle(value, context) async {
+    if (_disconnect) {
+      return;
+    }
+    _websocketBattle.sink.add(jsonEncode(value));
   }
+
+  //Websocket Battle Receive Mensage
+  Future<String> websocketListenBattle(context) async {
+    String result = '';
+    int ticks = 0;
+    _broadcastBattle.onData((data) {
+      result = data;
+    });
+    //Latency waiter
+    while (true) {
+      //Result
+      if (result != '') {
+        return result;
+      }
+      await Future.delayed(const Duration(milliseconds: 1));
+      //Timeout
+      ticks += 1;
+      if (ticks > 200) {
+        return 'timeout';
+      }
+    }
+  }
+
+  //Websocket Battle Disconnect
+  void websocketDisconnectBattle(context) async {
+    _disconnect = true;
+    _websocketBattle.sink.close();
+  }
+
+  //--------------------------------------------------------
 
   void changeLanguage(value) {
     _language = value;
@@ -634,7 +705,6 @@ class GlobalFunctions {
   //Pause Dialog
   static pauseDialog({
     required BuildContext context,
-    required IOWebSocketChannel websocket,
   }) {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
@@ -678,7 +748,7 @@ class GlobalFunctions {
                       padding: const EdgeInsets.all(15.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          options.websocketDisconnect(context);
+                          options.websocketDisconnectIngame(context);
                           gameplay.changeIsTalkable(false);
                           Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },
@@ -973,19 +1043,8 @@ class Gameplay with ChangeNotifier {
   Map _playerSkills = {};
   String _playerSelectedSkill = 'basicAttack';
 
-  String _enemyName = '';
-  double _enemyLife = 0;
-  double _enemyMana = 0;
-  double _enemyArmor = 0;
-  int _enemyLevel = 0;
-  double _enemyStrength = 0;
-  double _enemyAgility = 0;
-  double _enemyIntelligence = 0;
-  double _enemyDamage = 0;
-  double _enemyXP = 0;
-  List _enemyBuffs = [];
-  List _enemyDebuffs = [];
-  List _enemySkills = [];
+  Map _enemies = {};
+  bool _alreadyInBattle = false;
 
   Map _usersInWorld = {};
   Map _enemiesInWorld = {};
@@ -1016,29 +1075,23 @@ class Gameplay with ChangeNotifier {
   String get playerSelectedSkill => _playerSelectedSkill;
   List get playerDebuffs => _playerDebuffs;
 
-  String get enemyName => _enemyName;
-  double get enemyLife => _enemyLife;
-  double get enemyMana => _enemyMana;
-  double get enemyArmor => _enemyArmor;
-  int get enemyLevel => _enemyLevel;
-  double get enemyStrength => _enemyStrength;
-  double get enemyAgility => _enemyAgility;
-  double get enemyIntelligence => _enemyIntelligence;
-  double get enemyDamage => _enemyDamage;
-  double get enemyXP => _enemyXP;
-  List get enemyBuffs => _enemyBuffs;
-  List get enemySkills => _enemySkills;
-  List get enemyDebuffs => _enemyDebuffs;
+  Map get enemies => _enemies;
+  bool get alreadyInBattle => _alreadyInBattle;
 
   Map get usersInWorld => _usersInWorld;
   Map get enemiesInWorld => _enemiesInWorld;
+
+  //Change already in battle
+  void changeAlreadyInBattle(bool value) {
+    _alreadyInBattle = value;
+  }
 
   //Change location
   void changeLocation(value) {
     _location = value;
   }
 
-  //Users Handle
+  //Users In World Handle
   void usersHandle(handle, [data]) {
     if (handle == 'add') {
       _usersInWorld[data['id']] = data;
@@ -1051,6 +1104,7 @@ class Gameplay with ChangeNotifier {
     }
   }
 
+  //Enemy In World Handle
   void enemyHandle(handle, [data]) {
     if (handle == 'add') {
       _enemiesInWorld[data['id']] = data;
@@ -1066,16 +1120,6 @@ class Gameplay with ChangeNotifier {
   //Change Selected Skill
   void changePlayerSelectedSkill(value) {
     _playerSelectedSkill = value;
-  }
-
-  //Change enemy XP
-  void changeEnemyXP(value) {
-    _enemyXP += value;
-  }
-
-  //Change enemy name
-  void changeEnemyName(value) {
-    _enemyName = value;
   }
 
   //Remove Specific Item in inventory
@@ -1159,6 +1203,7 @@ class Gameplay with ChangeNotifier {
     notifyListeners();
   }
 
+  //Reset Battle Log
   void resetBattleLog() {
     _battleLog = [];
     notifyListeners();
@@ -1174,8 +1219,8 @@ class Gameplay with ChangeNotifier {
     _playerInventory = value;
   }
 
-  //Change Player Stats (LIFE, MANA, GOLD) or Enemy Stats
-  void changeStats({required value, required String stats}) {
+  //Change Player Stats or Enemy Stats
+  void changeStats({required value, required String stats, int enemyNumber = -1}) {
     //Player Stats
     if (stats == 'life') {
       _playerLife = value;
@@ -1256,55 +1301,73 @@ class Gameplay with ChangeNotifier {
       _playerDebuffs = value;
       notifyListeners();
     }
+    //Check enemy number
+    if (enemyNumber == -1) {
+      return;
+    } else {
+      //Check if already exist
+      if (_enemies['enemy$enemyNumber'] == null) {
+        //Create
+        _enemies['enemy$enemyNumber'] = {};
+      }
+    }
     //Enemy Stats
     if (stats == 'elife') {
-      _enemyLife = double.parse(value.toStringAsFixed(2));
+      _enemies['enemy$enemyNumber']['life'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'emana') {
-      _enemyMana = double.parse(value.toStringAsFixed(2));
+      _enemies['enemy$enemyNumber']['mana'] = double.parse(value.toStringAsFixed(2));
+      notifyListeners();
+      return;
+    } else if (stats == 'ename') {
+      _enemies['enemy$enemyNumber']['name'] = value.toString();
       notifyListeners();
       return;
     } else if (stats == 'earmor') {
-      _enemyArmor = double.parse(value.toString());
+      _enemies['enemy$enemyNumber']['armor'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'elevel') {
-      _enemyLevel = value;
+      _enemies['enemy$enemyNumber']['level'] = int.parse(value.toString());
       notifyListeners();
       return;
     } else if (stats == 'edamage') {
-      _enemyDamage = value;
+      _enemies['enemy$enemyNumber']['damage'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'exp') {
-      _enemyXP = value;
+      _enemies['enemy$enemyNumber']['xp'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'ebuffs') {
-      _enemyBuffs = value;
+      _enemies['enemy$enemyNumber']['buffs'] = value;
       notifyListeners();
       return;
     } else if (stats == 'eskills') {
-      _enemySkills = value;
+      _enemies['enemy$enemyNumber']['skills'] = value;
       notifyListeners();
       return;
     } else if (stats == 'estrength') {
-      _enemyStrength = value;
+      _enemies['enemy$enemyNumber']['strength'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'eagility') {
-      _enemyAgility = value;
+      _enemies['enemy$enemyNumber']['agility'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'eintelligence') {
-      _enemyIntelligence = value;
+      _enemies['enemy$enemyNumber']['intelligence'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
     } else if (stats == 'edebuffs') {
-      _enemyDebuffs = value;
+      _enemies['enemy$enemyNumber']['debuffs'] = double.parse(value.toStringAsFixed(2));
       notifyListeners();
       return;
+    } else if (stats == 'ereset') {
+      _enemies = {};
+    } else if (stats == 'eid') {
+      _enemies['enemy$enemyNumber']['id'] = int.parse(value.toString());
     }
   }
 

@@ -35,7 +35,7 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
     final options = Provider.of<Options>(context, listen: false);
     final position = jsonDecode(gameRef.player!.position.toString());
 
-    final websocketMessage = await options.websocketSend({
+    final websocketMessage = await options.websocketSendIngame({
       'message': 'playersPosition',
       'id': options.id,
       'positionX': position[0],
@@ -46,7 +46,7 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
     }, context);
 
     //Loading Check
-    if (websocketMessage == "OK" || websocketMessage == "{}") {
+    if (websocketMessage == "OK" || websocketMessage == "timeout") {
       return;
     }
     //Result
@@ -126,7 +126,6 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
       //Load New Values
       List enemies = [];
       gameplay.enemiesInWorld.forEach((key, value) => enemies.add(value));
-      List idAdd = [];
 
       //Add Function
       if (oldEnemies.length != enemies.length) {
@@ -148,25 +147,23 @@ class PlayerClient extends SimplePlayer with ObjectCollision {
             }
             //Add if not exist
             if (add && enemies[i]['positionX'] != null && enemies[i]['positionY'] != null) {
-              idAdd.add(enemies[i]['id']);
               final positionX = double.parse(enemies[i]['positionX'].toString());
               final positionY = double.parse(enemies[i]['positionY'].toString());
-              if (enemies[i]['id'] != options.id) {
-                options.gameController.addGameComponent(
-                    // ignore: use_build_context_synchronously
-                    ENEMY(
-                        id: int.parse(enemies[i]['id'].toString()),
-                        position: Vector2(positionX, positionY),
-                        name: enemies[i]['name'],
-                        life: double.parse(enemies[i]['life'].toString()),
-                        mana: double.parse(enemies[i]['mana'].toString()),
-                        damage: double.parse(enemies[i]['damage'].toString()),
-                        armor: double.parse(enemies[i]['armor'].toString()),
-                        level: enemies[i]['level'],
-                        xp: double.parse(enemies[i]['xp'].toString()),
-                        buffs: enemies[i]['buffs'],
-                        skills: enemies[i]['skills']));
-              }
+              //Add
+              options.gameController.addGameComponent(
+                  // ignore: use_build_context_synchronously
+                  ENEMY(
+                      id: int.parse(enemies[i]['id'].toString()),
+                      position: Vector2(positionX, positionY),
+                      name: enemies[i]['name'],
+                      life: double.parse(enemies[i]['life'].toString()),
+                      mana: double.parse(enemies[i]['mana'].toString()),
+                      damage: double.parse(enemies[i]['damage'].toString()),
+                      armor: double.parse(enemies[i]['armor'].toString()),
+                      level: enemies[i]['level'],
+                      xp: double.parse(enemies[i]['xp'].toString()),
+                      buffs: enemies[i]['buffs'],
+                      skills: enemies[i]['skills']));
             }
           }
         } catch (_) {}

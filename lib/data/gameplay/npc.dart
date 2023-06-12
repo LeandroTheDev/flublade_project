@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 class NPC extends SimpleNpc with ObjectCollision {
   bool stopLoading = false;
+  // ignore: prefer_typing_uninitialized_variables
   final npc;
   NPC(
     Vector2 position,

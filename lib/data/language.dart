@@ -155,6 +155,7 @@ class Language {
     'dialog_npc_wizard_prologue2':
         'This place is known by the name of heaven, but be careful with spiders, and especially against weber, he is more dangerous than heaven, you will probably find him soon.\nIf you want to leave here of course.',
     //Battle Texts
+    'battle_entering': 'Starting Battle',
     'battle_life': 'Life',
     'battle_mana': 'Mana',
     'battle_attack': 'Attack',
@@ -376,6 +377,7 @@ class Language {
     'dialog_npc_wizard_prologue2':
         'Este lugar é conhecido pelo nome de heaven, mas tome cuidado com as aranhas, e principalmente contra o weber, ele é maior perigo de heaven, você provavelmente irá encontra-lo em breve.\nSe você quiser sair daqui é claro.',
     //Battle Texts
+    'battle_entering': 'Iniciando a Batalha',
     'battle_life': 'Vida',
     'battle_mana': 'Mana',
     'battle_attack': 'Atacar',
