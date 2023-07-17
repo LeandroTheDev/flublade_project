@@ -9,8 +9,7 @@ class Player extends SpriteComponent {
 
   @override
   Future<void> onLoad() async {
-    sprite = await Sprite.load(
-        'players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}_ingame_idleright.png');
+    sprite = await Sprite.load('players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}_ingame_idleright.png');
   }
 }
 

@@ -1,6 +1,6 @@
 import 'package:flame/game.dart';
-import 'package:flublade_project/components/game.dart';
 import 'package:flublade_project/components/interface.dart';
+import 'package:flublade_project/data/engine.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
@@ -16,9 +16,10 @@ class InGame extends StatefulWidget {
 
 class _InGameState extends State<InGame> {
   Future<void> connectionSignal(context) async {
+    final websocket = Provider.of<Websocket>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    await options.websocketSendIngame(
+    await websocket.websocketSendIngame(
       {
         'message': 'login',
         'id': options.id,
@@ -35,19 +36,23 @@ class _InGameState extends State<InGame> {
   @override
   void initState() {
     super.initState();
-    final options = Provider.of<Options>(context, listen: false);
+    final engine = Provider.of<Engine>(context, listen: false);
+    final websocket = Provider.of<Websocket>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Reset Game State
     gameplay.usersHandle('clean');
     gameplay.enemyHandle('clean');
     //Init WebSocket
-    options.websocketInitIngame(context);
+    websocket.websocketInitIngame(context);
+    //Init gameController
+    engine.initGameController(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final engine = Provider.of<Engine>(context, listen: false);
+    // final options = Provider.of<Options>(context, listen: false);
+    // final gameplay = Provider.of<Gameplay>(context, listen: false);
 
     return FutureBuilder<List>(
       //Level Load
@@ -59,7 +64,7 @@ class _InGameState extends State<InGame> {
         if (future.hasData) {
           return GameWidget(
             //Game Controller
-            game: Flublade(context),
+            game: engine.gameController,
             //Loading
             loadingBuilder: (p0) => const Center(child: CircularProgressIndicator()),
             //HUD

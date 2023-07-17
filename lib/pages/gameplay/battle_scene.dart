@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flublade_project/data/engine.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
@@ -38,9 +39,9 @@ class _BattleSceneState extends State<BattleScene> {
   @override
   void initState() {
     super.initState();
-    final options = Provider.of<Options>(context, listen: false);
+    final websocket = Provider.of<Websocket>(context, listen: false);
     //Initialize connection
-    options.websocketInitBattle(context);
+    websocket.websocketInitBattle(context);
     future = firstLoad(context);
     timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       try {
@@ -52,8 +53,9 @@ class _BattleSceneState extends State<BattleScene> {
   //First load
   Future firstLoad(context) async {
     final options = Provider.of<Options>(context, listen: false);
+    final websocket = Provider.of<Websocket>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final result = jsonDecode(await options.websocketSendBattle({
+    final result = jsonDecode(await websocket.websocketSendBattle({
       "message": "startBattle",
       "id": options.id,
       "location": gameplay.location,
@@ -82,19 +84,20 @@ class _BattleSceneState extends State<BattleScene> {
 
   //Update every message received
   Future update(context, [message = "updateBattle"]) async {
+    final websocket = Provider.of<Websocket>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     await Future.delayed(const Duration(seconds: 1));
     late final String result;
     //Stop sending updates if are attacking
     if (isFighting == false || message != "updateBattle") {
-      result = await options.websocketSendBattle({"message": message}, context);
+      result = await websocket.websocketSendBattle({"message": message}, context);
     } else {
       result = oldEnemyStats;
     }
 
     //Check if updated
-    if (oldEnemyStats == result || options.disconnectBattle) {
+    if (oldEnemyStats == result || websocket.disconnectBattle) {
       return;
     }
 
@@ -106,7 +109,7 @@ class _BattleSceneState extends State<BattleScene> {
         timeoutHandle = 200;
         gameplay.changeAlreadyInBattle(false);
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
-        options.disconnectWebsockets(context);
+        websocket.disconnectWebsockets(context);
         GlobalFunctions.errorDialog(
           errorMsgTitle: 'authentication_lost_connection',
           errorMsgContext: 'You have lost connection to the servers.',
@@ -154,8 +157,7 @@ class _BattleSceneState extends State<BattleScene> {
         for (int i = 0; i < stats['battleLog'].length; i++) {
           gameplay.addBattleLog(stats['battleLog'][i], context);
           //Animation
-          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
           await Future.delayed(Duration(milliseconds: options.textSpeed));
         }
       }
@@ -173,7 +175,7 @@ class _BattleSceneState extends State<BattleScene> {
       //Enemy Dead
       if (stats['win'] == true) {
         timer.cancel();
-        options.websocketDisconnectBattle(context);
+        websocket.websocketDisconnectBattle(context);
         GlobalFunctions.lootDialog(context: context, loots: stats['loots'], xp: stats['earnedXP'], levelUpDialog: stats['levelUpDialog']);
         gameplay.changeAlreadyInBattle(false);
         gameplay.resetBattleLog();
@@ -206,8 +208,8 @@ class _BattleSceneState extends State<BattleScene> {
                     ),
                     child: Drawer(
                       width: screenSize.width * 0.5,
-                      child: Column(
-                        children: const [],
+                      child: const Column(
+                        children: [],
                       ),
                     )),
                 //Enemies View
@@ -239,9 +241,7 @@ class _BattleSceneState extends State<BattleScene> {
                                       border: selectedEnemy == index ? Border.all(color: Theme.of(context).primaryColor) : Border.all(),
                                       borderRadius: BorderRadius.circular(20),
                                       color: Theme.of(context).colorScheme.primary,
-                                      image: DecorationImage(
-                                          image: ExactAssetImage("assets/images/enemys/infight/${actualEnemies[selectedEnemy]['name']}.png"),
-                                          fit: BoxFit.cover),
+                                      image: DecorationImage(image: ExactAssetImage("assets/images/enemys/infight/${actualEnemies[selectedEnemy]['name']}.png"), fit: BoxFit.cover),
                                     ),
                                   ),
                                 ),
@@ -707,8 +707,7 @@ class _BattleSceneState extends State<BattleScene> {
                                       //Battle Log
                                       Container(
                                         padding: const EdgeInsets.all(5),
-                                        decoration:
-                                            BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                                         width: screenSize.width * 0.6,
                                         height: screenSize.height * 0.1,
                                         child: FittedBox(

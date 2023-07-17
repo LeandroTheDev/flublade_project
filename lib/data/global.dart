@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
 import 'package:flublade_project/components/magic_widget.dart';
+import 'package:flublade_project/data/engine.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -20,7 +21,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/io.dart';
 
 import '../pages/gameplay/magics.dart';
 
@@ -31,12 +31,6 @@ class Options with ChangeNotifier {
   String _token = '';
   bool _remember = false;
   int _id = 0;
-  late IOWebSocketChannel _websocketIngame;
-  late StreamSubscription _broadcastIngame;
-  late IOWebSocketChannel _websocketBattle;
-  late StreamSubscription _broadcastBattle;
-  bool _disconnectIngame = false;
-  bool _disconnectBattle = false;
 
   String get language => _language;
   int get textSpeed => _textSpeed;
@@ -44,150 +38,6 @@ class Options with ChangeNotifier {
   String get token => _token;
   bool get remember => _remember;
   int get id => _id;
-  IOWebSocketChannel get websocketIngame => _websocketIngame;
-  StreamSubscription get broadcastIngame => _broadcastIngame;
-  IOWebSocketChannel get websocketBattle => _websocketBattle;
-  StreamSubscription get broadcastBattle => _broadcastBattle;
-  bool get disconnectIngame => _disconnectIngame;
-  bool get disconnectBattle => _disconnectBattle;
-
-  //Disconnect the websockets
-  void disconnectWebsockets(context) {
-    websocketDisconnectBattle(context);
-    websocketDisconnectIngame(context);
-  }
-
-  //--------------------------------------------------------
-
-  //Websocket Ingame Initialize
-  void websocketInitIngame(context) {
-    _disconnectIngame = false;
-    _websocketIngame = IOWebSocketChannel.connect(
-      'ws://${SaveDatas.getServerAddress()}:8081',
-    );
-
-    //Listen from the server
-    _broadcastIngame = _websocketIngame.stream.asBroadcastStream().listen((data) {},
-        onError: (error) => GlobalFunctions.errorDialog(
-            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
-  }
-
-  //Websocket Ingame Send Mensage
-  Future<String> websocketSendIngame(value, context) async {
-    if (_disconnectIngame) {
-      return "timeout";
-    }
-    _websocketIngame.sink.add(jsonEncode(value));
-    final result = await websocketListenIngame(context);
-    return result;
-  }
-
-  //Websocket Ingame Send Mensage
-  Future<void> websocketOnlySendIngame(value, context) async {
-    if (_disconnectIngame) {
-      return;
-    }
-    _websocketIngame.sink.add(jsonEncode(value));
-  }
-
-  //Websocket Ingame Receive Mensage
-  Future<String> websocketListenIngame(context) async {
-    String result = '';
-    int ticks = 0;
-    _broadcastIngame.onData((data) {
-      result = data;
-    });
-    //Latency waiter
-    while (true) {
-      //Result
-      if (result != '') {
-        return result;
-      }
-      await Future.delayed(const Duration(milliseconds: 1));
-      //Timeout
-      ticks += 1;
-      if (ticks > 200) {
-        return 'timeout';
-      }
-    }
-  }
-
-  //Websocket Ingame Disconnect
-  void websocketDisconnectIngame(context) async {
-    try {
-      _disconnectIngame = true;
-      _websocketIngame.sink.close();
-    } catch (_) {
-      return;
-    }
-  }
-
-  //--------------------------------------------------------
-
-  //Websocket Battle Initialize
-  void websocketInitBattle(context) {
-    _disconnectBattle = false;
-    _websocketBattle = IOWebSocketChannel.connect(
-      'ws://${SaveDatas.getServerAddress()}:8082',
-    );
-
-    //Listen from the server
-    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {},
-        onError: (error) => GlobalFunctions.errorDialog(
-            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
-  }
-
-  //Websocket Battle Send Mensage
-  Future<String> websocketSendBattle(value, context) async {
-    if (_disconnectBattle) {
-      return "timeout";
-    }
-    _websocketBattle.sink.add(jsonEncode(value));
-    final result = await websocketListenBattle(context);
-    return result;
-  }
-
-  //Websocket Battle Send Mensage
-  Future<void> websocketOnlySendBattle(value, context) async {
-    if (_disconnectBattle) {
-      return;
-    }
-    _websocketBattle.sink.add(jsonEncode(value));
-  }
-
-  //Websocket Battle Receive Mensage
-  Future<String> websocketListenBattle(context, [bool wait = false]) async {
-    String result = '';
-    int ticks = 0;
-    _broadcastBattle.onData((data) {
-      result = data;
-    });
-    //Latency waiter
-    while (true) {
-      //Result
-      if (result != '') {
-        return result;
-      }
-      await Future.delayed(const Duration(milliseconds: 1));
-      //Timeout
-      ticks += 1;
-      if (ticks > 2000 && !wait || _disconnectBattle) {
-        return 'timeout';
-      }
-    }
-  }
-
-  //Websocket Battle Disconnect
-  void websocketDisconnectBattle(context) async {
-    try {
-      _disconnectBattle = true;
-      _websocketBattle.sink.close();
-    } catch (_) {
-      return;
-    }
-  }
-
-  //--------------------------------------------------------
 
   void changeLanguage(value) {
     _language = value;
@@ -503,8 +353,7 @@ class GlobalFunctions {
                                       children: [
                                         //Conffeti Level Up
                                         Container(
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
+                                          decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
                                           width: 280,
                                           height: 220,
                                           child: ClipRRect(
@@ -710,6 +559,7 @@ class GlobalFunctions {
   static pauseDialog({
     required BuildContext context,
   }) {
+    final websocket = Provider.of<Websocket>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     showDialog(
@@ -752,7 +602,7 @@ class GlobalFunctions {
                       padding: const EdgeInsets.all(15.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          options.websocketDisconnectIngame(context);
+                          websocket.websocketDisconnectIngame(context);
                           gameplay.changeIsTalkable(false);
                           Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },
@@ -903,13 +753,10 @@ class GlobalFunctions {
                                                               context: context,
                                                               builder: (context) => FittedBox(
                                                                     child: AlertDialog(
-                                                                      shape: const RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                                                                       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                                       title: Text(
-                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}',
-                                                                                options.language) ??
-                                                                            'Language Error',
+                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}', options.language) ?? 'Language Error',
                                                                         style: TextStyle(color: Theme.of(context).primaryColor),
                                                                       ),
                                                                       content: SizedBox(
@@ -924,12 +771,8 @@ class GlobalFunctions {
                                                                                 child: Column(
                                                                                   children: [
                                                                                     Text(
-                                                                                      Language.Translate(
-                                                                                              'magics_${gameplay.playerDebuffs[index]['name']}_desc',
-                                                                                              options.language) ??
-                                                                                          'Language Error',
-                                                                                      style: TextStyle(
-                                                                                          color: Theme.of(context).primaryColor, fontSize: 20),
+                                                                                      Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}_desc', options.language) ?? 'Language Error',
+                                                                                      style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),
                                                                                     ),
                                                                                   ],
                                                                                 ),

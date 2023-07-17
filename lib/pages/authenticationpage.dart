@@ -584,11 +584,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                   const SizedBox(height: 15),
                                   //Login Button
                                   settings.isLoading
-                                      ? SizedBox(
+                                      ? const SizedBox(
                                           width: 310,
                                           height: 30,
                                           child: Row(
-                                            children: const [
+                                            children: [
                                               Spacer(),
                                               //Circular Progress Indicator
                                               SizedBox(
