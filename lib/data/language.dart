@@ -81,6 +81,7 @@ class Language {
     'authentication_register_sucess': 'Sucess',
     'authentication_register_sucess_account': 'Account Created',
     'authentication_invalidlogin': 'Invalid Session',
+    'authentication_lost_connection': 'You have lost connection to the servers.',
     //Main Menu
     'mainmenu_play': 'Play',
     'mainmenu_characters': 'Characters',
@@ -165,6 +166,7 @@ class Language {
     'battle_loot_exit': 'Exit',
     'battle_loot_selected': 'Selected',
     'battle_loot_experience': 'Experience:',
+    'battle_log_turn': ' attacking',
     'battle_log_enemyAttack1': 'You received ',
     'battle_log_enemyAttack2': ' damage from ',
     'battle_log_playerAttack1': 'You did ',
@@ -304,6 +306,7 @@ class Language {
     'authentication_register_sucess': 'Sucesso',
     'authentication_register_sucess_account': 'Conta Criada',
     'authentication_invalidlogin': 'Sessão Inválida',
+    'authentication_lost_connection': 'Conexão com o servidor foi perdida.',
     //Main Menu
     'mainmenu_play': 'Jogar',
     'mainmenu_characters': 'Personagens',
@@ -389,6 +392,7 @@ class Language {
     'battle_loot_experience': 'Expêriencia:',
     'battle_log_playerAttack1': 'Você causou ',
     'battle_log_playerAttack2': ' dano em ',
+    'battle_log_turn': ' atacando',
     'battle_log_enemyAttack1': 'Você recebeu ',
     'battle_log_enemyAttack2': ' dano de ',
     'battle_log_enemyDead': 'Você matou ',

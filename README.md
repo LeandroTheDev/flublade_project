@@ -15,7 +15,8 @@ Features:
 - http: ^0.13.5
 - web_socket_channel: ^2.4.0
 > Engine
-- bonfire: ^2.12.0
+- flame: ^1.8.1
+- flame_tiled: ^1.12.0
 
 # Wiki
 

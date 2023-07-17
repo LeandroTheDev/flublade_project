@@ -19,7 +19,6 @@ import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:bonfire/bonfire.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/io.dart';
 
@@ -36,8 +35,8 @@ class Options with ChangeNotifier {
   late StreamSubscription _broadcastIngame;
   late IOWebSocketChannel _websocketBattle;
   late StreamSubscription _broadcastBattle;
-  late GameController _gameController;
-  bool _disconnect = false;
+  bool _disconnectIngame = false;
+  bool _disconnectBattle = false;
 
   String get language => _language;
   int get textSpeed => _textSpeed;
@@ -49,19 +48,20 @@ class Options with ChangeNotifier {
   StreamSubscription get broadcastIngame => _broadcastIngame;
   IOWebSocketChannel get websocketBattle => _websocketBattle;
   StreamSubscription get broadcastBattle => _broadcastBattle;
-  GameController get gameController => _gameController;
-  bool get disconnect => _disconnect;
+  bool get disconnectIngame => _disconnectIngame;
+  bool get disconnectBattle => _disconnectBattle;
 
-  //Change Game Controller
-  void changeGameController(value) {
-    _gameController = value;
+  //Disconnect the websockets
+  void disconnectWebsockets(context) {
+    websocketDisconnectBattle(context);
+    websocketDisconnectIngame(context);
   }
 
   //--------------------------------------------------------
 
   //Websocket Ingame Initialize
   void websocketInitIngame(context) {
-    _disconnect = false;
+    _disconnectIngame = false;
     _websocketIngame = IOWebSocketChannel.connect(
       'ws://${SaveDatas.getServerAddress()}:8081',
     );
@@ -74,7 +74,7 @@ class Options with ChangeNotifier {
 
   //Websocket Ingame Send Mensage
   Future<String> websocketSendIngame(value, context) async {
-    if (_disconnect) {
+    if (_disconnectIngame) {
       return "timeout";
     }
     _websocketIngame.sink.add(jsonEncode(value));
@@ -84,7 +84,7 @@ class Options with ChangeNotifier {
 
   //Websocket Ingame Send Mensage
   Future<void> websocketOnlySendIngame(value, context) async {
-    if (_disconnect) {
+    if (_disconnectIngame) {
       return;
     }
     _websocketIngame.sink.add(jsonEncode(value));
@@ -114,15 +114,19 @@ class Options with ChangeNotifier {
 
   //Websocket Ingame Disconnect
   void websocketDisconnectIngame(context) async {
-    _disconnect = true;
-    _websocketIngame.sink.close();
+    try {
+      _disconnectIngame = true;
+      _websocketIngame.sink.close();
+    } catch (_) {
+      return;
+    }
   }
 
   //--------------------------------------------------------
 
   //Websocket Battle Initialize
   void websocketInitBattle(context) {
-    _disconnect = false;
+    _disconnectBattle = false;
     _websocketBattle = IOWebSocketChannel.connect(
       'ws://${SaveDatas.getServerAddress()}:8082',
     );
@@ -135,7 +139,7 @@ class Options with ChangeNotifier {
 
   //Websocket Battle Send Mensage
   Future<String> websocketSendBattle(value, context) async {
-    if (_disconnect) {
+    if (_disconnectBattle) {
       return "timeout";
     }
     _websocketBattle.sink.add(jsonEncode(value));
@@ -145,14 +149,14 @@ class Options with ChangeNotifier {
 
   //Websocket Battle Send Mensage
   Future<void> websocketOnlySendBattle(value, context) async {
-    if (_disconnect) {
+    if (_disconnectBattle) {
       return;
     }
     _websocketBattle.sink.add(jsonEncode(value));
   }
 
   //Websocket Battle Receive Mensage
-  Future<String> websocketListenBattle(context) async {
+  Future<String> websocketListenBattle(context, [bool wait = false]) async {
     String result = '';
     int ticks = 0;
     _broadcastBattle.onData((data) {
@@ -167,7 +171,7 @@ class Options with ChangeNotifier {
       await Future.delayed(const Duration(milliseconds: 1));
       //Timeout
       ticks += 1;
-      if (ticks > 200) {
+      if (ticks > 2000 && !wait || _disconnectBattle) {
         return 'timeout';
       }
     }
@@ -175,8 +179,12 @@ class Options with ChangeNotifier {
 
   //Websocket Battle Disconnect
   void websocketDisconnectBattle(context) async {
-    _disconnect = true;
-    _websocketBattle.sink.close();
+    try {
+      _disconnectBattle = true;
+      _websocketBattle.sink.close();
+    } catch (_) {
+      return;
+    }
   }
 
   //--------------------------------------------------------
@@ -479,7 +487,6 @@ class GlobalFunctions {
                       Navigator.pop(context);
                       //Level up dialog
                       if (levelUpDialog == false) {
-                        Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                       } else {
                         //Level up Dialog
                         showDialog(
@@ -536,7 +543,6 @@ class GlobalFunctions {
                                               child: ElevatedButton(
                                                 onPressed: () {
                                                   Navigator.pop(context);
-                                                  Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                                                 },
                                                 child: Center(
                                                   child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
@@ -576,7 +582,6 @@ class GlobalFunctions {
                       Navigator.pop(context);
                       //Level up dialog
                       if (levelUpDialog == false) {
-                        Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                       } else {
                         final characters = Provider.of<Gameplay>(context, listen: false).characters;
                         final characterClass = characters['character${gameplay.selectedCharacter}']['class'];
@@ -631,7 +636,6 @@ class GlobalFunctions {
                                           ElevatedButton(
                                             onPressed: () {
                                               Navigator.pop(context);
-                                              Provider.of<Gameplay>(context, listen: false).changeEnemyMove(true);
                                             },
                                             child: Center(
                                               child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
@@ -752,7 +756,7 @@ class GlobalFunctions {
                           gameplay.changeIsTalkable(false);
                           Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },
-                        child: Text(Language.Translate('pausemenu_disconnect', options.language) ?? 'Disconnect'),
+                        child: Text(Language.Translate('pausemenu_disconnectIngame', options.language) ?? 'Disconnect'),
                       ),
                     ),
                   ],
@@ -1018,7 +1022,6 @@ class Gameplay with ChangeNotifier {
 
   //Ingame Provider
   bool _isTalkable = false;
-  bool _enemysMove = true;
   List<String> _selectedTalk = [];
   String _selectedNPC = 'wizard';
   int _worldId = 0;
@@ -1050,7 +1053,6 @@ class Gameplay with ChangeNotifier {
   Map _enemiesInWorld = {};
 
   bool get isTalkable => _isTalkable;
-  bool get enemysMove => _enemysMove;
   int get worldId => _worldId;
   List<String> get selectedTalk => _selectedTalk;
   String get selectedNPC => _selectedNPC;
@@ -1183,11 +1185,6 @@ class Gameplay with ChangeNotifier {
     notifyListeners();
   }
 
-  //Change if the enemys will move
-  void changeEnemyMove(value) {
-    _enemysMove = value;
-  }
-
   //Add a line to battle log
   void addBattleLog(value, context) {
     final options = Provider.of<Options>(context, listen: false);
@@ -1313,8 +1310,12 @@ class Gameplay with ChangeNotifier {
     }
     //Enemy Stats
     if (stats == 'elife') {
-      _enemies['enemy$enemyNumber']['life'] = double.parse(value.toStringAsFixed(2));
-      notifyListeners();
+      if (value == "dead") {
+        _enemies['enemy$enemyNumber']['life'] = 0.0;
+      } else {
+        _enemies['enemy$enemyNumber']['life'] = double.parse(value.toStringAsFixed(2));
+        notifyListeners();
+      }
       return;
     } else if (stats == 'emana') {
       _enemies['enemy$enemyNumber']['mana'] = double.parse(value.toStringAsFixed(2));
@@ -1325,7 +1326,7 @@ class Gameplay with ChangeNotifier {
       notifyListeners();
       return;
     } else if (stats == 'earmor') {
-      _enemies['enemy$enemyNumber']['armor'] = double.parse(value.toStringAsFixed(2));
+      _enemies['enemy$enemyNumber']['armor'] = value;
       notifyListeners();
       return;
     } else if (stats == 'elevel') {
@@ -1366,8 +1367,10 @@ class Gameplay with ChangeNotifier {
       return;
     } else if (stats == 'ereset') {
       _enemies = {};
+      notifyListeners();
     } else if (stats == 'eid') {
       _enemies['enemy$enemyNumber']['id'] = int.parse(value.toString());
+      notifyListeners();
     }
   }
 
@@ -1513,71 +1516,71 @@ class Gameplay with ChangeNotifier {
         });
   }
 
-  //Load Tiles
-  static TileModel loadTiles(prop) {
-    late TileModelSprite sprite;
-    //Grass
-    if (prop.value == 0) {
-      sprite = TileModelSprite(
-        path: 'tilesets/overworld/grass.png',
-      );
-      return TileModel(
-        collisions: [],
-        x: prop.position.x,
-        y: prop.position.y,
-        sprite: sprite,
-        height: 32,
-        width: 32,
-      );
-    }
-    //Stone_down
-    if (prop.value == 1) {
-      sprite = TileModelSprite(
-        path: 'tilesets/overworld/stone_down.png',
-      );
-      return TileModel(
-        collisions: [
-          CollisionArea.rectangle(
-            size: Vector2(32, 32),
-            align: Vector2(0, 0),
-          ),
-        ],
-        x: prop.position.x,
-        y: prop.position.y,
-        sprite: sprite,
-        height: 32,
-        width: 32,
-      );
-    }
-    if (prop.value == 2) {
-      sprite = TileModelSprite(
-        path: 'tilesets/overworld/stone.png',
-      );
-      return TileModel(
-        collisions: [
-          CollisionArea.rectangle(
-            size: Vector2(32, 32),
-            align: Vector2(0, 0),
-          ),
-        ],
-        x: prop.position.x,
-        y: prop.position.y,
-        sprite: sprite,
-        height: 32,
-        width: 32,
-      );
-    }
-    //Null
-    sprite = TileModelSprite(
-      path: 'tilesets/overworld/grass.png',
-    );
-    return TileModel(
-      collisions: [],
-      x: prop.position.x,
-      y: prop.position.y,
-      sprite: sprite,
-      height: 32,
-      width: 32,
-    );
-  }
+//   //Load Tiles
+//   static TileModel loadTiles(prop) {
+//     late TileModelSprite sprite;
+//     //Grass
+//     if (prop.value == 0) {
+//       sprite = TileModelSprite(
+//         path: 'tilesets/overworld/grass.png',
+//       );
+//       return TileModel(
+//         collisions: [],
+//         x: prop.position.x,
+//         y: prop.position.y,
+//         sprite: sprite,
+//         height: 32,
+//         width: 32,
+//       );
+//     }
+//     //Stone_down
+//     if (prop.value == 1) {
+//       sprite = TileModelSprite(
+//         path: 'tilesets/overworld/stone_down.png',
+//       );
+//       return TileModel(
+//         collisions: [
+//           CollisionArea.rectangle(
+//             size: Vector2(32, 32),
+//             align: Vector2(0, 0),
+//           ),
+//         ],
+//         x: prop.position.x,
+//         y: prop.position.y,
+//         sprite: sprite,
+//         height: 32,
+//         width: 32,
+//       );
+//     }
+//     if (prop.value == 2) {
+//       sprite = TileModelSprite(
+//         path: 'tilesets/overworld/stone.png',
+//       );
+//       return TileModel(
+//         collisions: [
+//           CollisionArea.rectangle(
+//             size: Vector2(32, 32),
+//             align: Vector2(0, 0),
+//           ),
+//         ],
+//         x: prop.position.x,
+//         y: prop.position.y,
+//         sprite: sprite,
+//         height: 32,
+//         width: 32,
+//       );
+//     }
+//     //Null
+//     sprite = TileModelSprite(
+//       path: 'tilesets/overworld/grass.png',
+//     );
+//     return TileModel(
+//       collisions: [],
+//       x: prop.position.x,
+//       y: prop.position.y,
+//       sprite: sprite,
+//       height: 32,
+//       width: 32,
+//     );
+//   }
 }

@@ -3,14 +3,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flublade_project/data/gameplay/enemys.dart';
-import 'package:flublade_project/data/gameplay/npc.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bonfire/bonfire.dart';
 import 'package:http/http.dart' as http;
 
 class MySQL with ChangeNotifier {
@@ -480,112 +477,112 @@ class MySQLGameplay {
     }
     results.add(level);
     //Returning the NPCs
-    List<GameComponent> npc = await returnNPCs(jsonDecode(result['npc']));
-    results.add(npc);
+    // List<GameComponent> npc = await returnNPCs(jsonDecode(result['npc']));
+    // results.add(npc);
 
     //Returning player position
-    results.add(
-        Vector2(double.parse(jsonDecode(result['event'])['player']['positionx']), double.parse(jsonDecode(result['event'])['player']['positiony'])));
+    // results.add(
+    //     Vector2(double.parse(jsonDecode(result['event'])['player']['positionx']), double.parse(jsonDecode(result['event'])['player']['positiony'])));
     return results;
   }
 
   //Return NPCs
-  static Future<List<GameComponent>> returnNPCs(npcdb) async {
-    List<GameComponent> npc = [];
-    //Add NPCs to the gameplay
-    if (npcdb != {}) {
-      double positionx = double.parse(npcdb['npc0']['positionx']);
-      double positiony = double.parse(npcdb['npc0']['positiony']);
-      npc.add(NPC(Vector2(positionx, positiony), npcdb['npc0']));
-      int i = 1;
-      while (true) {
-        if (npcdb['npc$i'] != null) {
-          positionx = double.parse(npcdb['npc$i']['positionx']);
-          positiony = double.parse(npcdb['npc$i']['positiony']);
-          npc.add(NPC(Vector2(positionx, positiony), npcdb['npc$i']));
-        }
-        i++;
-        break;
-      }
-    }
-    return npc;
-  }
+  // static Future<List<GameComponent>> returnNPCs(npcdb) async {
+  //   List<GameComponent> npc = [];
+  //   //Add NPCs to the gameplay
+  //   if (npcdb != {}) {
+  //     double positionx = double.parse(npcdb['npc0']['positionx']);
+  //     double positiony = double.parse(npcdb['npc0']['positiony']);
+  //     npc.add(NPC(Vector2(positionx, positiony), npcdb['npc0']));
+  //     int i = 1;
+  //     while (true) {
+  //       if (npcdb['npc$i'] != null) {
+  //         positionx = double.parse(npcdb['npc$i']['positionx']);
+  //         positiony = double.parse(npcdb['npc$i']['positiony']);
+  //         npc.add(NPC(Vector2(positionx, positiony), npcdb['npc$i']));
+  //       }
+  //       i++;
+  //       break;
+  //     }
+  //   }
+  //   return npc;
+  // }
 
   //Return Enemys
-  static Future<List<Enemy>> returnEnemys(enemysdb) async {
-    List<Enemy> enemy = [];
-    //Add Enemys to the gameplay
-    if (enemysdb != {}) {
-      String name;
-      double life;
-      double mana;
-      double damage;
-      double armor;
-      int level;
-      double xp;
-      double positionx;
-      double positiony;
-      List buffs;
-      List skills;
-      //Transforming in MAP
-      name = enemysdb['enemy0']['name'].toString();
-      life = double.parse(enemysdb['enemy0']['life'].toString());
-      mana = double.parse(enemysdb['enemy0']['mana'].toString());
-      damage = double.parse(enemysdb['enemy0']['damage'].toString());
-      armor = double.parse(enemysdb['enemy0']['armor'].toString());
-      level = int.parse(enemysdb['enemy0']['level'].toString());
-      xp = double.parse(enemysdb['enemy0']['xp'].toString());
-      positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
-      positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
-      buffs = enemysdb['enemy0']['buffs'];
-      skills = enemysdb['enemy0']['skills'];
-      //Adding the first enemy
-      enemy.add(ENEMY(
-        id: 0,
-        position: Vector2(positionx, positiony),
-        name: name,
-        life: life,
-        mana: mana,
-        damage: damage,
-        armor: armor,
-        level: level,
-        xp: xp,
-        buffs: buffs,
-        skills: skills,
-      ));
-      int i = 1;
-      while (true) {
-        if (enemysdb['enemy$i'] != null) {
-          name = enemysdb['enemy$i']['name'].toString();
-          life = double.parse(enemysdb['enemy$i']['life'].toString());
-          mana = double.parse(enemysdb['enemy$i']['mana'].toString());
-          damage = double.parse(enemysdb['enemy$i']['damage'].toString());
-          armor = double.parse(enemysdb['enemy$i']['armor'].toString());
-          level = int.parse(enemysdb['enemy$i']['level'].toString());
-          xp = double.parse(enemysdb['enemy$i']['xp'].toString());
-          positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
-          positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
-          buffs = enemysdb['enemy$i']['buffs'];
-          skills = enemysdb['enemy$i']['skills'];
-          enemy.add(ENEMY(
-            id: i,
-            position: Vector2(positionx, positiony),
-            name: name,
-            life: life,
-            mana: mana,
-            damage: damage,
-            armor: armor,
-            level: level,
-            xp: xp,
-            buffs: buffs,
-            skills: skills,
-          ));
-        } else {
-          break;
-        }
-        i++;
-      }
-    }
-    return enemy;
-  }
+  // static Future<List<Enemy>> returnEnemys(enemysdb) async {
+  //   List<Enemy> enemy = [];
+  //   //Add Enemys to the gameplay
+  //   if (enemysdb != {}) {
+  //     String name;
+  //     double life;
+  //     double mana;
+  //     double damage;
+  //     double armor;
+  //     int level;
+  //     double xp;
+  //     double positionx;
+  //     double positiony;
+  //     List buffs;
+  //     List skills;
+  //     //Transforming in MAP
+  //     name = enemysdb['enemy0']['name'].toString();
+  //     life = double.parse(enemysdb['enemy0']['life'].toString());
+  //     mana = double.parse(enemysdb['enemy0']['mana'].toString());
+  //     damage = double.parse(enemysdb['enemy0']['damage'].toString());
+  //     armor = double.parse(enemysdb['enemy0']['armor'].toString());
+  //     level = int.parse(enemysdb['enemy0']['level'].toString());
+  //     xp = double.parse(enemysdb['enemy0']['xp'].toString());
+  //     positionx = double.parse(enemysdb['enemy0']['positionx'].toString());
+  //     positiony = double.parse(enemysdb['enemy0']['positiony'].toString());
+  //     buffs = enemysdb['enemy0']['buffs'];
+  //     skills = enemysdb['enemy0']['skills'];
+  //     //Adding the first enemy
+  //     enemy.add(ENEMY(
+  //       id: 0,
+  //       position: Vector2(positionx, positiony),
+  //       name: name,
+  //       life: life,
+  //       mana: mana,
+  //       damage: damage,
+  //       armor: armor,
+  //       level: level,
+  //       xp: xp,
+  //       buffs: buffs,
+  //       skills: skills,
+  //     ));
+  //     int i = 1;
+  //     while (true) {
+  //       if (enemysdb['enemy$i'] != null) {
+  //         name = enemysdb['enemy$i']['name'].toString();
+  //         life = double.parse(enemysdb['enemy$i']['life'].toString());
+  //         mana = double.parse(enemysdb['enemy$i']['mana'].toString());
+  //         damage = double.parse(enemysdb['enemy$i']['damage'].toString());
+  //         armor = double.parse(enemysdb['enemy$i']['armor'].toString());
+  //         level = int.parse(enemysdb['enemy$i']['level'].toString());
+  //         xp = double.parse(enemysdb['enemy$i']['xp'].toString());
+  //         positionx = double.parse(enemysdb['enemy$i']['positionx'].toString());
+  //         positiony = double.parse(enemysdb['enemy$i']['positiony'].toString());
+  //         buffs = enemysdb['enemy$i']['buffs'];
+  //         skills = enemysdb['enemy$i']['skills'];
+  //         enemy.add(ENEMY(
+  //           id: i,
+  //           position: Vector2(positionx, positiony),
+  //           name: name,
+  //           life: life,
+  //           mana: mana,
+  //           damage: damage,
+  //           armor: armor,
+  //           level: level,
+  //           xp: xp,
+  //           buffs: buffs,
+  //           skills: skills,
+  //         ));
+  //       } else {
+  //         break;
+  //       }
+  //       i++;
+  //     }
+  //   }
+  //   return enemy;
+  // }
 }

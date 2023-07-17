@@ -16,6 +16,17 @@ class MainMenu extends StatefulWidget {
 
 class _MainMenuState extends State<MainMenu> {
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 1)).then((value) {
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      gameplay.changeAlreadyInBattle(false);
+      gameplay.resetBattleLog();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
