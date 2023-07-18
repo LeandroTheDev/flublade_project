@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -11,13 +13,16 @@ import 'global.dart';
 
 class Engine extends FlameGame with ChangeNotifier {
   //Declaration
-  late final Flublade _gameController;
+  late Flublade _gameController;
+  late BuildContext _context;
 
   //Receive
   Flublade get gameController => _gameController;
+  BuildContext get context => _context;
 
   void initGameController(context) {
     _gameController = Flublade(context);
+    _context = context;
   }
 }
 
@@ -125,7 +130,9 @@ class Websocket with ChangeNotifier {
     );
 
     //Listen from the server
-    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {}, onError: (error) => GlobalFunctions.errorDialog(errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
+    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {},
+        onError: (error) => GlobalFunctions.errorDialog(
+            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
   }
 
   //Websocket Battle Send Mensage

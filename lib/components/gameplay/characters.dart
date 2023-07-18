@@ -1,26 +1,3 @@
-import 'package:flame/components.dart';
-import 'package:flublade_project/data/mysqldata.dart';
-import 'package:flutter/widgets.dart';
-
-class Player extends SpriteComponent {
-  final BuildContext context;
-
-  Player(this.context) : super(size: Vector2.all(16));
-
-  @override
-  Future<void> onLoad() async {
-    sprite = await Sprite.load('players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}_ingame_idleright.png');
-  }
-}
-
-
-
-
-
-
-
-
-
 //
 //
 //-----

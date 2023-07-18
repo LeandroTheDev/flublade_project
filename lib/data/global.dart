@@ -353,7 +353,8 @@ class GlobalFunctions {
                                       children: [
                                         //Conffeti Level Up
                                         Container(
-                                          decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
+                                          decoration: BoxDecoration(
+                                              color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
                                           width: 280,
                                           height: 220,
                                           child: ClipRRect(
@@ -753,10 +754,13 @@ class GlobalFunctions {
                                                               context: context,
                                                               builder: (context) => FittedBox(
                                                                     child: AlertDialog(
-                                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                      shape: const RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.all(Radius.circular(32.0))),
                                                                       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                                       title: Text(
-                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}', options.language) ?? 'Language Error',
+                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}',
+                                                                                options.language) ??
+                                                                            'Language Error',
                                                                         style: TextStyle(color: Theme.of(context).primaryColor),
                                                                       ),
                                                                       content: SizedBox(
@@ -771,8 +775,12 @@ class GlobalFunctions {
                                                                                 child: Column(
                                                                                   children: [
                                                                                     Text(
-                                                                                      Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}_desc', options.language) ?? 'Language Error',
-                                                                                      style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),
+                                                                                      Language.Translate(
+                                                                                              'magics_${gameplay.playerDebuffs[index]['name']}_desc',
+                                                                                              options.language) ??
+                                                                                          'Language Error',
+                                                                                      style: TextStyle(
+                                                                                          color: Theme.of(context).primaryColor, fontSize: 20),
                                                                                     ),
                                                                                   ],
                                                                                 ),
@@ -1358,72 +1366,4 @@ class Gameplay with ChangeNotifier {
           );
         });
   }
-
-//   //Load Tiles
-//   static TileModel loadTiles(prop) {
-//     late TileModelSprite sprite;
-//     //Grass
-//     if (prop.value == 0) {
-//       sprite = TileModelSprite(
-//         path: 'tilesets/overworld/grass.png',
-//       );
-//       return TileModel(
-//         collisions: [],
-//         x: prop.position.x,
-//         y: prop.position.y,
-//         sprite: sprite,
-//         height: 32,
-//         width: 32,
-//       );
-//     }
-//     //Stone_down
-//     if (prop.value == 1) {
-//       sprite = TileModelSprite(
-//         path: 'tilesets/overworld/stone_down.png',
-//       );
-//       return TileModel(
-//         collisions: [
-//           CollisionArea.rectangle(
-//             size: Vector2(32, 32),
-//             align: Vector2(0, 0),
-//           ),
-//         ],
-//         x: prop.position.x,
-//         y: prop.position.y,
-//         sprite: sprite,
-//         height: 32,
-//         width: 32,
-//       );
-//     }
-//     if (prop.value == 2) {
-//       sprite = TileModelSprite(
-//         path: 'tilesets/overworld/stone.png',
-//       );
-//       return TileModel(
-//         collisions: [
-//           CollisionArea.rectangle(
-//             size: Vector2(32, 32),
-//             align: Vector2(0, 0),
-//           ),
-//         ],
-//         x: prop.position.x,
-//         y: prop.position.y,
-//         sprite: sprite,
-//         height: 32,
-//         width: 32,
-//       );
-//     }
-//     //Null
-//     sprite = TileModelSprite(
-//       path: 'tilesets/overworld/grass.png',
-//     );
-//     return TileModel(
-//       collisions: [],
-//       x: prop.position.x,
-//       y: prop.position.y,
-//       sprite: sprite,
-//       height: 32,
-//       width: 32,
-//     );
-//   }
 }

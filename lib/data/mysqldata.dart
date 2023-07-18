@@ -468,11 +468,11 @@ class MySQLGameplay {
         }));
     result = jsonDecode(result.body);
     //Adding the tiles
-    List<List<double>> level = [];
+    List<List<int>> level = [];
     for (int i = 0; i <= result['level'].length - 1; i++) {
-      List<double> levelTile = [];
+      List<int> levelTile = [];
       result['level'][i] = json.decode(result['level'][i]).cast<int>().toList();
-      result['level'][i].forEach((int tile) => levelTile.add(double.parse(tile.toString())));
+      result['level'][i].forEach((int tile) => levelTile.add(tile));
       level.add(levelTile);
     }
     results.add(level);

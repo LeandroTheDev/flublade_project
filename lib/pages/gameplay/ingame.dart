@@ -2,7 +2,6 @@ import 'package:flame/game.dart';
 import 'package:flublade_project/components/interface.dart';
 import 'package:flublade_project/data/engine.dart';
 import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,34 +50,19 @@ class _InGameState extends State<InGame> {
   @override
   Widget build(BuildContext context) {
     final engine = Provider.of<Engine>(context, listen: false);
-    // final options = Provider.of<Options>(context, listen: false);
-    // final gameplay = Provider.of<Gameplay>(context, listen: false);
 
-    return FutureBuilder<List>(
-      //Level Load
-      future: MySQLGameplay.returnLevel(
-        context: context,
-        level: MySQL.returnInfo(context, returned: 'location'),
-      ),
-      builder: (context, future) {
-        if (future.hasData) {
-          return GameWidget(
-            //Game Controller
-            game: engine.gameController,
-            //Loading
-            loadingBuilder: (p0) => const Center(child: CircularProgressIndicator()),
-            //HUD
-            overlayBuilderMap: {
-              'IngameInterface': (context, game) {
-                return const IngameInterface();
-              }
-            },
-            initialActiveOverlays: const ["IngameInterface"],
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
+    return GameWidget(
+      //Game Controller
+      game: engine.gameController,
+      //Loading
+      loadingBuilder: (p0) => const Center(child: CircularProgressIndicator()),
+      //HUD
+      overlayBuilderMap: {
+        'IngameInterface': (context, game) {
+          return const IngameInterface();
         }
       },
+      initialActiveOverlays: const ["IngameInterface"],
     );
   }
 }
