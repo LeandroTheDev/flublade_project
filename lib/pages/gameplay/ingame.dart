@@ -1,6 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flublade_project/components/interface.dart';
-import 'package:flublade_project/data/engine.dart';
+import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/global.dart';
 
 import 'package:flutter/material.dart';

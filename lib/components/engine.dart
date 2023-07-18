@@ -3,25 +3,24 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flame/game.dart';
-import 'package:flublade_project/components/game.dart';
+import 'package:flublade_project/components/gameplay/game_engine.dart';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 
-import 'global.dart';
+import '../data/global.dart';
 
-class Engine extends FlameGame with ChangeNotifier {
+class Engine with ChangeNotifier {
   //Declaration
-  late Flublade _gameController;
+  late GameEngine _gameController;
   late BuildContext _context;
 
   //Receive
-  Flublade get gameController => _gameController;
+  GameEngine get gameController => _gameController;
   BuildContext get context => _context;
 
   void initGameController(context) {
-    _gameController = Flublade(context);
+    _gameController = GameEngine(context);
     _context = context;
   }
 }
@@ -130,9 +129,7 @@ class Websocket with ChangeNotifier {
     );
 
     //Listen from the server
-    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {},
-        onError: (error) => GlobalFunctions.errorDialog(
-            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
+    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {}, onError: (error) => GlobalFunctions.errorDialog(errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
   }
 
   //Websocket Battle Send Mensage

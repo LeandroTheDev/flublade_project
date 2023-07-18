@@ -1,8 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flame/components.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
 
-class Player extends SpriteComponent with HasGameRef, ChangeNotifier {
+//
+//  DOCS
+//
+// Player
+// ---------------
+// position -- variable that defines the player exact position (position.add() will increment the position like moving)
+//
+// joystick -- component receive from the game engine display a single joystick for moving the character
+// and receives parameters for joystick position
+
+class Player extends SpriteComponent with ChangeNotifier {
   //Declarations
   final BuildContext context;
   final JoystickComponent joystick;
@@ -11,15 +23,15 @@ class Player extends SpriteComponent with HasGameRef, ChangeNotifier {
   //Player Declaration
   Player(this.joystick, this.context)
       : super(
-          anchor: Anchor.center,
           size: Vector2.all(32.0),
         );
 
   @override
   Future<void> onLoad() async {
-    sprite = await Sprite.load(
-        'players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}_ingame_idleright.png');
-    position = gameRef.size / 2;
+    //Sprite
+    sprite = await Sprite.load('players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}_ingame_idleright.png');
+    //Initial Position
+    position = Vector2(1.0, 1.0);
   }
 
   @override

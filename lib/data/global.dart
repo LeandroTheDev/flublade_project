@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:flublade_project/components/character_creation.dart';
 import 'package:flublade_project/components/loot_widget.dart';
 import 'package:flublade_project/components/magic_widget.dart';
-import 'package:flublade_project/data/engine.dart';
+import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -353,8 +353,7 @@ class GlobalFunctions {
                                       children: [
                                         //Conffeti Level Up
                                         Container(
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
+                                          decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
                                           width: 280,
                                           height: 220,
                                           child: ClipRRect(
@@ -754,13 +753,10 @@ class GlobalFunctions {
                                                               context: context,
                                                               builder: (context) => FittedBox(
                                                                     child: AlertDialog(
-                                                                      shape: const RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                                                                       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                                       title: Text(
-                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}',
-                                                                                options.language) ??
-                                                                            'Language Error',
+                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}', options.language) ?? 'Language Error',
                                                                         style: TextStyle(color: Theme.of(context).primaryColor),
                                                                       ),
                                                                       content: SizedBox(
@@ -775,12 +771,8 @@ class GlobalFunctions {
                                                                                 child: Column(
                                                                                   children: [
                                                                                     Text(
-                                                                                      Language.Translate(
-                                                                                              'magics_${gameplay.playerDebuffs[index]['name']}_desc',
-                                                                                              options.language) ??
-                                                                                          'Language Error',
-                                                                                      style: TextStyle(
-                                                                                          color: Theme.of(context).primaryColor, fontSize: 20),
+                                                                                      Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}_desc', options.language) ?? 'Language Error',
+                                                                                      style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),
                                                                                     ),
                                                                                   ],
                                                                                 ),

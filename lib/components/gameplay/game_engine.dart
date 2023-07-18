@@ -4,15 +4,15 @@ import 'package:flame/sprite.dart';
 
 import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
-import 'package:flublade_project/data/engine.dart';
+import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-class Flublade extends FlameGame {
+class GameEngine extends FlameGame {
   final BuildContext context;
-  Flublade(this.context);
+  GameEngine(this.context);
 
   @override
   Future<void> onLoad() async {
@@ -46,7 +46,6 @@ class Flublade extends FlameGame {
       add(player);
       add(joystick);
     });
-
     //World Loading
     MySQLGameplay.returnLevel(context: context, level: MySQL.returnInfo(context, returned: 'location')).then((value) {
       final worldGeneration = WorldGeneration();
