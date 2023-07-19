@@ -36,13 +36,13 @@ class _InGameState extends State<InGame> {
   void initState() {
     super.initState();
     final engine = Provider.of<Engine>(context, listen: false);
-    final websocket = Provider.of<Websocket>(context, listen: false);
+    // final websocket = Provider.of<Websocket>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Reset Game State
     gameplay.usersHandle('clean');
     gameplay.enemyHandle('clean');
     //Init WebSocket
-    websocket.websocketInitIngame(context);
+    // websocket.websocketInitIngame(context);
     //Init gameController
     engine.initGameController(context);
   }

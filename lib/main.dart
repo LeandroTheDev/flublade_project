@@ -10,6 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
+///
+/// PLAY WITHOUT SERVER
+///
+/// player.dart -- change imageLocation to a const player image
+/// interface.dart -- comment xp bar
+/// game_engine.dart -- comment world generation and create a fake world [[[0,0,0,0,0,0],[0,0,0,0,0,0,0]]]
+/// ingame.dart -- comment websocketInitIngame
+
 void main() async {
   //SaveDatas Loading
   WidgetsFlutterBinding.ensureInitialized();

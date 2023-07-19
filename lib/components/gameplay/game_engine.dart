@@ -28,6 +28,7 @@ class GameEngine extends FlameGame {
 
       //Joystick Creation
       final joystick = JoystickComponent(
+        priority: 100,
         knob: SpriteComponent(
           sprite: sheet.getSpriteById(1),
           size: Vector2.all(100),
@@ -47,9 +48,23 @@ class GameEngine extends FlameGame {
       add(joystick);
     });
     //World Loading
-    MySQLGameplay.returnLevel(context: context, level: MySQL.returnInfo(context, returned: 'location')).then((value) {
-      final worldGeneration = WorldGeneration();
-      worldGeneration.generateWorld(value, engine.gameController);
-    });
+    // MySQLGameplay.returnLevel(context: context, level: MySQL.returnInfo(context, returned: 'location')).then((value) {
+    //   final worldGeneration = WorldGeneration();
+    //   worldGeneration.generateWorld(value, engine.gameController);
+    // });
+    //Test
+    final worldGeneration = WorldGeneration();
+    worldGeneration.generateWorld([
+      [
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      ]
+    ], engine.gameController);
   }
 }

@@ -3,6 +3,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flame/cache.dart';
+import 'package:flame/game.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
 
 import 'package:flutter/material.dart';
@@ -10,18 +12,21 @@ import 'package:web_socket_channel/io.dart';
 
 import '../data/global.dart';
 
-class Engine with ChangeNotifier {
+class Engine extends FlameGame with ChangeNotifier {
   //Declaration
   late GameEngine _gameController;
   late BuildContext _context;
+  late Images _imagesCache;
 
   //Receive
   GameEngine get gameController => _gameController;
   BuildContext get context => _context;
+  Images get imagesCache => _imagesCache;
 
   void initGameController(context) {
     _gameController = GameEngine(context);
     _context = context;
+    _imagesCache = images;
   }
 }
 

@@ -106,7 +106,7 @@ class WorldTile extends SpriteComponent with HasCollisionDetection, CollisionCal
       case "none":
         break;
       case "RectangleHitbox":
-        add(RectangleHitbox(size: Vector2(32.0, 32.0), isSolid: tileIsSolid));
+        add(RectangleHitbox(size: Vector2(32.0, 32.0), isSolid: tileIsSolid, anchor: Anchor.center));
         break;
     }
   }
