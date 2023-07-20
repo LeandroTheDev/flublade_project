@@ -10,13 +10,14 @@ import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-class GameEngine extends FlameGame {
+class GameEngine extends FlameGame with HasCollisionDetection {
   final BuildContext context;
   GameEngine(this.context);
 
   @override
   Future<void> onLoad() async {
     final engine = Provider.of<Engine>(context, listen: false);
+    debugMode = true;
     //Joystick and Player Creation
     //Load Sprite
     images.load('interface/joystick.png').then((value) {
@@ -41,7 +42,7 @@ class GameEngine extends FlameGame {
       );
 
       //Player Creation
-      final player = Player(joystick, context);
+      final player = Player(joystick, context, Vector2(32.0, 32.0));
 
       //Add Components
       add(player);

@@ -2,6 +2,7 @@
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flutter/material.dart';
 
@@ -19,16 +20,20 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
   //Engine Declarations
   final BuildContext context;
   final JoystickComponent joystick;
+  final Vector2 playerPosition;
   static const maxSpeed = 0.5;
 
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
   late final SpriteAnimation spriteRun;
-  bool spriteFacingRight = true;
+  JoystickDirection spriteUpdate = JoystickDirection.idle;
 
   //Player Declaration
-  Player(this.joystick, this.context)
-      : super(
+  Player(
+    this.joystick,
+    this.context,
+    this.playerPosition,
+  ) : super(
           size: Vector2.all(32.0),
         );
 
@@ -46,7 +51,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         loadedSprite,
         SpriteAnimationData.sequenced(
           amount: 1,
-          textureSize: Vector2(32.0, 32.0),
+          textureSize: Vector2(16.0, 16.0),
           stepTime: 0.1,
         ),
       );
@@ -57,16 +62,16 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
       spriteRun = SpriteAnimation.fromFrameData(
         loadedSprite,
         SpriteAnimationData.sequenced(
-          amount: 3,
-          textureSize: Vector2(32.0, 32.0),
+          amount: 4,
+          textureSize: Vector2(16.0, 16.0),
           stepTime: 0.1,
         ),
       );
     });
     //Initial Position
-    position = Vector2(34.0, 1.0);
+    position = playerPosition;
     //Create a collision circle
-    add(CircleHitbox(radius: 10, isSolid: true, anchor: Anchor.center));
+    add(CircleHitbox(radius: 20, anchor: Anchor.center, position: size / 2));
   }
 
   //Tick Update
@@ -76,56 +81,110 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
     //Moviment Handler
     if (true) {
       switch (joystick.direction) {
+        //Down
         case JoystickDirection.down:
+          //Moviment
           position.add(Vector2(0.0, maxSpeed));
-          if (!spriteFacingRight) {
-            animation = spriteRun.reversed();
-          } else {
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.down;
             animation = spriteRun;
           }
           break;
+        //Down Left
         case JoystickDirection.downLeft:
+          //Moviment
           position.add(Vector2(-(maxSpeed / 1.5), maxSpeed / 1.5));
-          spriteFacingRight = false;
-          animation = spriteRun.reversed();
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.downLeft;
+            animation = spriteRun;
+            if (!isFlippedHorizontally) {
+              flipHorizontally();
+              position = position + Vector2(32.0, 0.0);
+            }
+          }
           break;
+        //Downn Right
         case JoystickDirection.downRight:
+          //Moviment
           position.add(Vector2(maxSpeed / 1.5, maxSpeed / 1.5));
-          spriteFacingRight = true;
-          animation = spriteRun;
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.downRight;
+            animation = spriteRun;
+            if (isFlippedHorizontally) {
+              flipHorizontally();
+              position = position - Vector2(32.0, 0.0);
+            }
+          }
           break;
+        //Left
         case JoystickDirection.left:
+          //Moviment
           position.add(Vector2(-maxSpeed, 0.0));
-          spriteFacingRight = false;
-          animation = spriteRun.reversed();
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.left;
+            animation = spriteRun;
+            if (!isFlippedHorizontally) {
+              flipHorizontally();
+              position = position + Vector2(32.0, 0.0);
+            }
+          }
           break;
+        //Right
         case JoystickDirection.right:
+          //Moviment
           position.add(Vector2(maxSpeed, 0.0));
-          spriteFacingRight = true;
-          animation = spriteRun;
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.right;
+            animation = spriteRun;
+            if (isFlippedHorizontally) {
+              flipHorizontally();
+              position = position - Vector2(32.0, 0.0);
+            }
+          }
           break;
+        //Up
         case JoystickDirection.up:
+          //Moviment
           position.add(Vector2(0.0, -maxSpeed));
-          if (!spriteFacingRight) {
-            animation = spriteRun.reversed();
-          } else {
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.up;
             animation = spriteRun;
           }
           break;
         case JoystickDirection.upLeft:
+          //Moviment
           position.add(Vector2(-(maxSpeed / 1.5), -(maxSpeed / 1.5)));
-          spriteFacingRight = false;
-          animation = spriteRun.reversed();
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.upLeft;
+            animation = spriteRun;
+            if (!isFlippedHorizontally) {
+              flipHorizontally();
+              position = position + Vector2(32.0, 0.0);
+            }
+          }
           break;
         case JoystickDirection.upRight:
+          //Moviment
           position.add(Vector2(maxSpeed / 1.5, -(maxSpeed / 1.5)));
-          spriteFacingRight = true;
-          animation = spriteRun;
+          //Animation
+          if (spriteUpdate != joystick.direction) {
+            spriteUpdate = JoystickDirection.upRight;
+            animation = spriteRun;
+            if (isFlippedHorizontally) {
+              flipHorizontally();
+              position = position - Vector2(32.0, 0.0);
+            }
+          }
           break;
         case JoystickDirection.idle:
-          if (!spriteFacingRight) {
-            animation = spriteIdle.reversed();
-          } else {
+          if (spriteUpdate != joystick.direction) {
             animation = spriteIdle;
           }
           break;
@@ -133,10 +192,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
     }
   }
 
-  //Collision Detector
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    print("object");
     super.onCollisionStart(intersectionPoints, other);
-    print("player collided");
   }
 }
