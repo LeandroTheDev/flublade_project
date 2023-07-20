@@ -17,7 +17,7 @@ import 'package:flame/components.dart';
 // Desc: WorldTile is the component that will render on the screen the respective tile, have some paramaters that will
 // define the properties of tile.
 
-class WorldGeneration extends SpriteComponent with HasCollisionDetection {
+class WorldGeneration extends SpriteComponent {
   generateWorld(List<dynamic> worldData, gameController) {
     double tileSpaceHeight = 0.0;
     double tileSpaceWidth = 0.0;
@@ -27,8 +27,7 @@ class WorldGeneration extends SpriteComponent with HasCollisionDetection {
       for (int j = 0; j < worldData[0][i].length; j++) {
         gameController.add(WorldTile(
           worldTiles[worldData[0][i][j]]["tileSprite"].toString(),
-          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()),
-              double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
+          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()), double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
           Vector2(tileSpaceWidth, tileSpaceHeight),
           worldTiles[worldData[0][i][j]]["collisionType"],
           worldTiles[worldData[0][i][j]]["isSolid"],
@@ -71,7 +70,7 @@ class WorldGeneration extends SpriteComponent with HasCollisionDetection {
   ];
 }
 
-class WorldTile extends SpriteComponent with HasCollisionDetection, CollisionCallbacks {
+class WorldTile extends SpriteComponent {
   //Declaration
   final String tileSprite;
   final Vector2 tileSize;
@@ -107,14 +106,8 @@ class WorldTile extends SpriteComponent with HasCollisionDetection, CollisionCal
       case "none":
         break;
       case "RectangleHitbox":
-        add(RectangleHitbox(size: Vector2(32.0, 32.0), anchor: Anchor.center, position: size / 2));
+        add(RectangleHitbox(size: Vector2(32.0, 32.0), anchor: Anchor.center, position: size / 2, collisionType: CollisionType.passive));
         break;
     }
-  }
-
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    print('object');
-    super.onCollision(intersectionPoints, other);
   }
 }

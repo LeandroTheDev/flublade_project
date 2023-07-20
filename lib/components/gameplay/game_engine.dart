@@ -42,7 +42,7 @@ class GameEngine extends FlameGame with HasCollisionDetection {
       );
 
       //Player Creation
-      final player = Player(joystick, context, Vector2(32.0, 32.0));
+      final player = Player(joystick, context, Vector2(48.0, 20.0));
 
       //Add Components
       add(player);
@@ -57,10 +57,10 @@ class GameEngine extends FlameGame with HasCollisionDetection {
     final worldGeneration = WorldGeneration();
     worldGeneration.generateWorld([
       [
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],

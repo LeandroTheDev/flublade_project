@@ -15,8 +15,10 @@ import 'package:flutter/material.dart';
 //
 // joystick -- component receive from the game engine display a single joystick for moving the character
 // and receives parameters for joystick position
+//
+// Moviment Declarations (xP,xN) will say if player can move or not
 
-class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetection, CollisionCallbacks {
+class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
   final JoystickComponent joystick;
@@ -27,6 +29,12 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
   late final SpriteAnimation spriteIdle;
   late final SpriteAnimation spriteRun;
   JoystickDirection spriteUpdate = JoystickDirection.idle;
+
+  //Moviment Declarations
+  bool xNegative = true;
+  bool xPositive = true;
+  bool yNegative = true;
+  bool yPositive = true;
 
   //Player Declaration
   Player(
@@ -71,7 +79,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
     //Initial Position
     position = playerPosition;
     //Create a collision circle
-    add(CircleHitbox(radius: 20, anchor: Anchor.center, position: size / 2));
+    add(CircleHitbox(radius: 20, anchor: Anchor.center, position: size / 2, isSolid: true));
   }
 
   //Tick Update
@@ -84,7 +92,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         //Down
         case JoystickDirection.down:
           //Moviment
-          position.add(Vector2(0.0, maxSpeed));
+          yPositive ? position.add(Vector2(0.0, maxSpeed)) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.down;
@@ -94,7 +102,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         //Down Left
         case JoystickDirection.downLeft:
           //Moviment
-          position.add(Vector2(-(maxSpeed / 1.5), maxSpeed / 1.5));
+          xNegative ? position.add(Vector2(-(maxSpeed / 1.5), maxSpeed / 1.5)) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.downLeft;
@@ -108,7 +116,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         //Downn Right
         case JoystickDirection.downRight:
           //Moviment
-          position.add(Vector2(maxSpeed / 1.5, maxSpeed / 1.5));
+          xNegative ? position.add(Vector2(maxSpeed / 1.5, maxSpeed / 1.5)) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.downRight;
@@ -122,7 +130,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         //Left
         case JoystickDirection.left:
           //Moviment
-          position.add(Vector2(-maxSpeed, 0.0));
+          xNegative ? position.add(Vector2(-maxSpeed, 0.0)) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.left;
@@ -136,7 +144,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         //Right
         case JoystickDirection.right:
           //Moviment
-          position.add(Vector2(maxSpeed, 0.0));
+          xPositive ? position.add(Vector2(maxSpeed, 0.0)) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.right;
@@ -150,7 +158,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
         //Up
         case JoystickDirection.up:
           //Moviment
-          position.add(Vector2(0.0, -maxSpeed));
+          yNegative ? position.add(Vector2(0.0, -maxSpeed)) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.up;
@@ -159,7 +167,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
           break;
         case JoystickDirection.upLeft:
           //Moviment
-          position.add(Vector2(-(maxSpeed / 1.5), -(maxSpeed / 1.5)));
+          xPositive ? position.add(Vector2(-(maxSpeed / 1.5), -(maxSpeed / 1.5))) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.upLeft;
@@ -172,7 +180,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
           break;
         case JoystickDirection.upRight:
           //Moviment
-          position.add(Vector2(maxSpeed / 1.5, -(maxSpeed / 1.5)));
+          xPositive ? position.add(Vector2(maxSpeed / 1.5, -(maxSpeed / 1.5))) : null;
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.upRight;
@@ -194,7 +202,14 @@ class Player extends SpriteAnimationComponent with HasGameRef, HasCollisionDetec
 
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    print("object");
     super.onCollisionStart(intersectionPoints, other);
+    //Check World Collisions
+    if (other is WorldTile) {}
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    super.onCollisionEnd(other);
+    if (other is WorldTile) {}
   }
 }
