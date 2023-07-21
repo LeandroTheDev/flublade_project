@@ -6,6 +6,8 @@ import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
 
+import 'package:flublade_project/data/gameplay.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +19,7 @@ import 'package:http/http.dart' as http;
 /// interface.dart -- comment xp bar
 /// game_engine.dart -- comment world generation and create a fake world [[[0,0,0,0,0,0],[0,0,0,0,0,0,0]]]
 /// ingame.dart -- comment websocketInitIngame
+/// DEPRECATED
 
 void main() async {
   //SaveDatas Loading

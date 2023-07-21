@@ -206,10 +206,4 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     //Check World Collisions
     if (other is WorldTile) {}
   }
-
-  @override
-  void onCollisionEnd(PositionComponent other) {
-    super.onCollisionEnd(other);
-    if (other is WorldTile) {}
-  }
 }

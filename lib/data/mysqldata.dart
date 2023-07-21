@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/gameplay.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -82,13 +83,11 @@ class MySQL with ChangeNotifier {
           Navigator.pop(context);
           Navigator.pop(context);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
           return;
         }
         if (jsonDecode(result.body)['message'] == 'Invalid Login') {
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
           Navigator.pushReplacementNamed(context, '/authenticationpage');
           return;
         }
@@ -160,9 +159,7 @@ class MySQL with ChangeNotifier {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'),
-          headers: MySQL.headers,
-          body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -187,8 +184,7 @@ class MySQL with ChangeNotifier {
 
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'),
-          headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -242,20 +238,17 @@ class MySQL with ChangeNotifier {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'),
-          headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
     } catch (error) {
       //Connection Error
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
       return 'Connection Error';
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
     if (charactersdb['message'] == 'Invalid Login') {
       Navigator.pushNamed(context, '/authenticationpage');
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
       return 'Invalid Login';
     }
     gameplay.changeCharacters(jsonDecode(charactersdb['characters']));
@@ -281,17 +274,11 @@ class MySQL with ChangeNotifier {
               'isLevelUp': true,
             }));
         //Change Stats
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['strength'], stats: 'strength');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['agility'], stats: 'agility');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['intelligence'],
-            stats: 'intelligence');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['armor'], stats: 'armor');
-        gameplay.changeStats(
-            value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['skillpoint'], stats: 'skillpoint');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['strength'], stats: 'strength');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['agility'], stats: 'agility');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['intelligence'], stats: 'intelligence');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['armor'], stats: 'armor');
+        gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['skillpoint'], stats: 'skillpoint');
       } else {
         //Connection
         result = await http.post(Uri.http(mysql.serverAddress, '/updateCharacters'),
@@ -336,23 +323,17 @@ class MySQL with ChangeNotifier {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/removeCharacters'),
-          headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/removeCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
     } catch (error) {
       //Connection Error
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_register_problem_connection',
-          errorMsgContext: 'Failed to connect to the Servers',
-          context: context,
-          popUntil: '/charactercreation');
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/charactercreation');
       return;
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
     if (charactersdb['message'] == 'Invalid Login') {
       Navigator.pushNamed(context, '/authenticationpage');
-      GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
       return;
     }
     //Success
@@ -375,13 +356,11 @@ class MySQL with ChangeNotifier {
     if (returned == 'location') {
       final Map characters = gameplay.characters;
       //World Name
-      final String location = characters['character${gameplay.selectedCharacter}']['location']
-          .substring(0, characters['character${gameplay.selectedCharacter}']['location'].length - 3);
+      final String location = characters['character${gameplay.selectedCharacter}']['location'].substring(0, characters['character${gameplay.selectedCharacter}']['location'].length - 3);
       //World ID
       gameplay.changeWorldId(
         int.parse(
-          characters['character${gameplay.selectedCharacter}']['location']
-              .substring(characters['character${gameplay.selectedCharacter}']['location'].length - 3),
+          characters['character${gameplay.selectedCharacter}']['location'].substring(characters['character${gameplay.selectedCharacter}']['location'].length - 3),
         ),
       );
       return location;
@@ -397,8 +376,7 @@ class MySQL with ChangeNotifier {
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'),
-          headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';

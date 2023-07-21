@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/gameplay.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -159,20 +160,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             late final http.Response result;
                                             try {
                                               //Backend Work
-                                              result = await http.post(Uri.http(mysql.serverAddress, '/createAcc'),
-                                                  headers: MySQL.headers,
-                                                  body: jsonEncode({
-                                                    "username": registerUsername.text,
-                                                    "password": registerPassword.text,
-                                                    "language": options.language
-                                                  }));
+                                              result = await http.post(Uri.http(mysql.serverAddress, '/createAcc'), headers: MySQL.headers, body: jsonEncode({"username": registerUsername.text, "password": registerPassword.text, "language": options.language}));
                                               //No connection
                                             } catch (error) {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_connection',
-                                                  errorMsgContext: 'Failed to connect to the Servers',
-                                                  context: context);
+                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
                                               return;
                                             }
                                             //Account Rules Check
@@ -230,13 +222,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                         //Sucess Text
                                                         title: Text(
-                                                          Language.Translate('authentication_register_sucess', options.language) ??
-                                                              'Failed to connect to the Servers',
+                                                          Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
                                                           style: TextStyle(color: Theme.of(context).primaryColor),
                                                         ),
                                                         content: Text(
-                                                          Language.Translate('authentication_register_sucess_account', options.language) ??
-                                                              'Failed to connect to the Servers',
+                                                          Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
                                                           style: TextStyle(color: Theme.of(context).primaryColor),
                                                         ),
                                                         actions: [
@@ -377,10 +367,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   }));
                                             } catch (error) {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_connection_tryAddress',
-                                                  errorMsgContext: 'Failed to connect to the Servers',
-                                                  context: context);
+                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
                                               return;
                                             }
                                             if (jsonDecode(result.body)['message'] == 'Success') {
@@ -393,10 +380,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               });
                                             } else {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_connection_tryAddress',
-                                                  errorMsgContext: 'Failed to connect to the Servers',
-                                                  context: context);
+                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
                                               return;
                                             }
                                           },
@@ -448,8 +432,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(200),
                           ),
-                          child: Image.asset('assets/authentication_image.png',
-                              fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
+                          child: Image.asset('assets/authentication_image.png', fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
                         ),
                         //Auth
                         SizedBox(
@@ -612,8 +595,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               dynamic result;
                                               try {
                                                 //Credentials Check
-                                                result = await http.post(Uri.http(mysql.serverAddress, '/login'),
-                                                    headers: MySQL.headers, body: jsonEncode({"username": username.text, "password": password.text}));
+                                                result = await http.post(Uri.http(mysql.serverAddress, '/login'), headers: MySQL.headers, body: jsonEncode({"username": username.text, "password": password.text}));
                                               } catch (error) {
                                                 //Connection error
                                                 settings.changeIsLoading(value: false);

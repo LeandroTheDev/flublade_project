@@ -3,6 +3,7 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/gameplay.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -98,46 +99,26 @@ class CharacterSelection extends StatelessWidget {
                                       child: Text(
                                         '${Language.Translate('characters_create_class', options.language) ?? 'Class'}:  ${Language.Translate('characters_class_${characters['character$index']['class']}', options.language) ?? 'Language Error'}',
                                         maxLines: 1,
-                                        style: TextStyle(
-                                            fontFamily: 'Explora',
-                                            fontSize: 250,
-                                            fontWeight: FontWeight.bold,
-                                            color: Theme.of(context).primaryColor,
-                                            overflow: TextOverflow.ellipsis),
+                                        style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
                                       ),
                                     ),
                                     //Level
                                     Text(
                                       '${Language.Translate('characters_create_level', options.language) ?? 'Level'}:  ${characters['character$index']['level']}',
                                       maxLines: 1,
-                                      style: TextStyle(
-                                          fontFamily: 'Explora',
-                                          fontSize: 250,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).primaryColor,
-                                          overflow: TextOverflow.ellipsis),
+                                      style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
                                     ),
                                     //Gold
                                     Text(
                                       '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${returnGold(index)}',
                                       maxLines: 1,
-                                      style: TextStyle(
-                                          fontFamily: 'Explora',
-                                          fontSize: 250,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).primaryColor,
-                                          overflow: TextOverflow.ellipsis),
+                                      style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
                                     ),
                                     //Location
                                     Text(
                                       '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location'].substring(0, characters['character$index']['location'].length - 3)}', options.language) ?? 'Language Error'}',
                                       maxLines: 1,
-                                      style: TextStyle(
-                                          fontFamily: 'Explora',
-                                          fontSize: 250,
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).primaryColor,
-                                          overflow: TextOverflow.ellipsis),
+                                      style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
                                     ),
                                   ],
                                 ),

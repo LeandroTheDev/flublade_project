@@ -1,5 +1,6 @@
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/gameplay.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,9 +35,7 @@ class _LootWidgetState extends State<LootWidget> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: FittedBox(
-                    child: Text(Language.Translate('battle_loot_selected',
-                            Provider.of<Options>(context).language) ??
-                        'Selected'),
+                    child: Text(Language.Translate('battle_loot_selected', Provider.of<Options>(context).language) ?? 'Selected'),
                   ),
                 ),
               ),
@@ -44,8 +43,7 @@ class _LootWidgetState extends State<LootWidget> {
           )
         : TextButton(
             onPressed: () {
-              Provider.of<Gameplay>(context, listen: false)
-                  .addPlayerInventorySelected(widget.loots[widget.index]);
+              Provider.of<Gameplay>(context, listen: false).addPlayerInventorySelected(widget.loots[widget.index]);
               setState(() {
                 isPickup = true;
               });
@@ -67,18 +65,14 @@ class _LootWidgetState extends State<LootWidget> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Image.asset(
-                              settings.lootImage(
-                                  widget.loots[widget.index]['name']),
+                              settings.lootImage(widget.loots[widget.index]['name']),
                               fit: BoxFit.fill,
                             ),
                           )),
                       FittedBox(
                         child: Text(
                           widget.loots[widget.index]['quantity'].toString(),
-                          style: TextStyle(
-                              fontFamily: 'PressStart',
-                              fontSize: 10,
-                              color: Theme.of(context).primaryColor),
+                          style: TextStyle(fontFamily: 'PressStart', fontSize: 10, color: Theme.of(context).primaryColor),
                         ),
                       ),
                     ],
@@ -94,8 +88,7 @@ class _LootWidgetState extends State<LootWidget> {
                           child: Stack(
                             children: [
                               Text(
-                                settings.itemTier(
-                                    widget.loots[widget.index]['name']),
+                                settings.itemTier(widget.loots[widget.index]['name']),
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontFamily: 'PressStart',
@@ -108,8 +101,7 @@ class _LootWidgetState extends State<LootWidget> {
                                 ),
                               ),
                               Text(
-                                settings.itemTier(
-                                    widget.loots[widget.index]['name']),
+                                settings.itemTier(widget.loots[widget.index]['name']),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   letterSpacing: 1,
