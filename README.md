@@ -16,7 +16,7 @@ Features:
 - web_socket_channel: ^2.4.0
 > Engine
 - flame: ^1.8.1
-- flame_tiled: ^1.12.0
+- flutter_joystick: ^0.0.3
 
 # Wiki
 

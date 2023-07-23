@@ -6,6 +6,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/enemy.dart';
+import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/global.dart';
@@ -31,13 +32,20 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   final BuildContext context;
   final JoystickComponent joystick;
   final Vector2 playerPosition;
-  static const maxSpeed = 0.5;
   int timeoutHandle = 0;
+  late Vector2 cameraPosition;
+  late final GameEngine engine;
 
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
   late final SpriteAnimation spriteRun;
   JoystickDirection spriteUpdate = JoystickDirection.idle;
+
+  //Moviment Declarations
+  double defaultSpeed = 0.5;
+  double maxSpeed = 0.5;
+  JoystickDirection collisionDirection = JoystickDirection.idle;
+  int timeoutCollision = 0;
 
   //Player Declaration
   Player(
@@ -46,7 +54,16 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     this.playerPosition,
   ) : super(
           size: Vector2.all(32.0),
-        );
+          position: playerPosition,
+        ) {
+    cameraPosition = playerPosition;
+  }
+
+  @override
+  void onMount() {
+    super.onMount();
+    engine = Provider.of<GameEngine>(context, listen: false);
+  }
 
   //Loading
   @override
@@ -78,8 +95,6 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         ),
       );
     });
-    //Initial Position
-    position = playerPosition;
     //Create a collision circle
     add(CircleHitbox(radius: 20, anchor: Anchor.center, position: size / 2, isSolid: true));
   }
@@ -90,11 +105,24 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     super.update(dt);
     //Moviment Handler
     if (true) {
+      //Verify if Collided
+      timeoutCollision++;
+      if (timeoutCollision > 20) {
+        collisionDirection = JoystickDirection.idle;
+        maxSpeed = defaultSpeed;
+      } else {
+        if (joystick.direction == collisionDirection) {
+          maxSpeed = 0.0;
+          timeoutCollision = 0;
+        }
+      }
       switch (joystick.direction) {
         //Down
         case JoystickDirection.down:
           //Moviment
-          position.add(Vector2(0.0, maxSpeed));
+          final moviment = Vector2(0.0, maxSpeed);
+          position.add(moviment);
+          cameraPosition.add(moviment);
           animation = spriteRun;
           //Animation
           if (spriteUpdate != joystick.direction) {
@@ -104,7 +132,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         //Down Left
         case JoystickDirection.downLeft:
           //Moviment
-          position.add(Vector2(-(maxSpeed / 1.5), maxSpeed / 1.5));
+          final moviment = Vector2(-(maxSpeed / 1.5), maxSpeed / 1.5);
+          position.add(moviment);
+          cameraPosition.add(moviment);
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.downLeft;
@@ -118,7 +148,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         //Downn Right
         case JoystickDirection.downRight:
           //Moviment
-          position.add(Vector2(maxSpeed / 1.5, maxSpeed / 1.5));
+          final moviment = Vector2(maxSpeed / 1.5, maxSpeed / 1.5);
+          position.add(moviment);
+          cameraPosition.add(moviment);
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.downRight;
@@ -132,7 +164,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         //Left
         case JoystickDirection.left:
           //Moviment
-          position.add(Vector2(-maxSpeed, 0.0));
+          final moviment = Vector2(-maxSpeed, 0.0);
+          position.add(moviment);
+          cameraPosition.add(moviment);
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.left;
@@ -146,7 +180,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         //Right
         case JoystickDirection.right:
           //Moviment
-          position.add(Vector2(maxSpeed, 0.0));
+          final moviment = Vector2(maxSpeed, 0.0);
+          position.add(moviment);
+          cameraPosition.add(moviment);
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.right;
@@ -160,7 +196,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         //Up
         case JoystickDirection.up:
           //Moviment
-          position.add(Vector2(0.0, -maxSpeed));
+          final moviment = Vector2(0.0, -maxSpeed);
+          position.add(moviment);
+          cameraPosition.add(moviment);
           animation = spriteRun;
           //Animation
           if (spriteUpdate != joystick.direction) {
@@ -169,7 +207,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
           break;
         case JoystickDirection.upLeft:
           //Moviment
-          position.add(Vector2(-(maxSpeed / 1.5), -(maxSpeed / 1.5)));
+          final moviment = Vector2(-(maxSpeed / 1.5), -(maxSpeed / 1.5));
+          position.add(moviment);
+          cameraPosition.add(moviment);
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.upLeft;
@@ -182,7 +222,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
           break;
         case JoystickDirection.upRight:
           //Moviment
-          position.add(Vector2(maxSpeed / 1.5, -(maxSpeed / 1.5)));
+          final moviment = Vector2(maxSpeed / 1.5, -(maxSpeed / 1.5));
+          position.add(moviment);
+          cameraPosition.add(moviment);
           //Animation
           if (spriteUpdate != joystick.direction) {
             spriteUpdate = JoystickDirection.upRight;
@@ -359,41 +401,59 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         case JoystickDirection.down:
           //Moviment
           position.add(Vector2(0.0, -maxSpeed * speedMult));
+          collisionDirection = JoystickDirection.down;
+          timeoutCollision = 0;
           break;
         //Down Left
         case JoystickDirection.downLeft:
           //Moviment
           position.add(Vector2(maxSpeed / 1.5 * 2, -maxSpeed / 1.5 * speedMult));
+          collisionDirection = JoystickDirection.downLeft;
+          timeoutCollision = 0;
           break;
         //Downn Right
         case JoystickDirection.downRight:
           //Moviment
           position.add(Vector2(-maxSpeed / 1.5 * speedMult, -(maxSpeed / 1.5) * speedMult));
+          collisionDirection = JoystickDirection.downRight;
+          timeoutCollision = 0;
           break;
         //Left
         case JoystickDirection.left:
           //Moviment
           position.add(Vector2(maxSpeed * speedMult, 0.0));
+          collisionDirection = JoystickDirection.left;
+          timeoutCollision = 0;
           break;
         //Right
         case JoystickDirection.right:
           //Moviment
           position.add(Vector2(-maxSpeed * speedMult, 0.0));
+          collisionDirection = JoystickDirection.right;
+          timeoutCollision = 0;
           break;
         //Up
         case JoystickDirection.up:
           //Moviment
           position.add(Vector2(0.0, maxSpeed * speedMult));
+          collisionDirection = JoystickDirection.up;
+          timeoutCollision = 0;
           break;
         case JoystickDirection.upLeft:
           //Moviment
           position.add(Vector2(maxSpeed / 1.5 * speedMult, maxSpeed / 1.5 * speedMult));
+          collisionDirection = JoystickDirection.upLeft;
+          timeoutCollision = 0;
           break;
         case JoystickDirection.upRight:
           //Moviment
           position.add(Vector2(-(maxSpeed / 1.5) * speedMult, maxSpeed / 1.5 * speedMult));
+          collisionDirection = JoystickDirection.upRight;
+          timeoutCollision = 0;
           break;
         case JoystickDirection.idle:
+          collisionDirection = JoystickDirection.idle;
+          timeoutCollision = 0;
           break;
       }
     }

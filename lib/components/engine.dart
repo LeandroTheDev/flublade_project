@@ -24,7 +24,8 @@ class Engine extends FlameGame with ChangeNotifier {
   Images get imagesCache => _imagesCache;
 
   void initGameController(context) {
-    _gameController = GameEngine(context);
+    _gameController = GameEngine();
+    _gameController.setContext(context);
     _context = context;
     _imagesCache = images;
   }
@@ -134,7 +135,9 @@ class Websocket with ChangeNotifier {
     );
 
     //Listen from the server
-    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {}, onError: (error) => GlobalFunctions.errorDialog(errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
+    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {},
+        onError: (error) => GlobalFunctions.errorDialog(
+            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
   }
 
   //Websocket Battle Send Mensage

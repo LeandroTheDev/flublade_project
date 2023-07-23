@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 
@@ -17,7 +18,7 @@ import 'package:http/http.dart' as http;
 /// main.dart -- home: FlubladeProject() to Ingame()
 /// player.dart -- change imageLocation to a const player image
 /// interface.dart -- comment xp bar
-/// game_engine.dart -- comment world generation and create a fake world [[[0,0,0,0,0,0],[0,0,0,0,0,0,0]]]
+/// game_engine.dart -- comment world generation and create a fake world
 /// ingame.dart -- comment websocketInitIngame
 /// DEPRECATED
 
@@ -47,6 +48,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => Websocket(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GameEngine(),
         ),
       ],
       child: const FluBlade(),

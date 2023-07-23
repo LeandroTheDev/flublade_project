@@ -7,13 +7,30 @@ import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/mysqldata.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-class GameEngine extends FlameGame with HasCollisionDetection {
-  final BuildContext context;
-  GameEngine(this.context);
+class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
+  late BuildContext context;
+  final world = World();
+  late final CameraComponent cameraComponent;
+  GameEngine();
+
+  //Provider
+  Vector2 _joystickPosition = Vector2(0.0, 0.0);
+  get joystickPosition => _joystickPosition;
+
+  //Set Joystick Position
+  void setjoystickPosition(value) {
+    _joystickPosition = value;
+  }
+
+  //Set Context
+  void setContext(value) {
+    context = value;
+  }
 
   @override
   void onMount() async {
@@ -41,7 +58,6 @@ class GameEngine extends FlameGame with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     final engine = Provider.of<Engine>(context, listen: false);
-    debugMode = false;
     //Joystick and Player Creation
     //Load Sprite
     images.load('interface/joystick.png').then((value) {
@@ -71,25 +87,26 @@ class GameEngine extends FlameGame with HasCollisionDetection {
       //Add Components
       add(player);
       add(joystick);
+      camera.followVector2(player.cameraPosition);
     });
     //World Loading
-    // MySQLGameplay.returnLevel(context: context, level: MySQL.returnInfo(context, returned: 'location')).then((value) {
-    //   final worldGeneration = WorldGeneration();
-    //   worldGeneration.generateWorld(value, engine.gameController);
-    // });
-    //Test
-    final worldGeneration = WorldGeneration();
-    worldGeneration.generateWorld([
-      [
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      ]
-    ], engine.gameController);
+    MySQLGameplay.returnLevel(context: context, level: MySQL.returnInfo(context, returned: 'location')).then((value) {
+      final worldGeneration = WorldGeneration();
+      worldGeneration.generateWorld(value, engine.gameController);
+    });
+    // //Test
+    // final worldGeneration = WorldGeneration();
+    // worldGeneration.generateWorld([
+    //   [
+    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //   ]
+    // ], engine.gameController);
   }
 }
