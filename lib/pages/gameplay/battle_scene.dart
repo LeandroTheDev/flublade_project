@@ -30,6 +30,7 @@ class _BattleSceneState extends State<BattleScene> {
   bool isLoading = true;
   String oldEnemyStats = "{}";
   List actualEnemies = [];
+  List oldEnemies = [];
   int selectedEnemy = 0;
   bool enemyNotification = false;
   bool playerNotification = false;
@@ -94,7 +95,7 @@ class _BattleSceneState extends State<BattleScene> {
     if (isFighting == false || message != "updateBattle") {
       result = await websocket.websocketSendBattle({"message": message}, context);
     } else {
-      result = oldEnemyStats;
+      return;
     }
 
     //Check if updated
@@ -145,7 +146,9 @@ class _BattleSceneState extends State<BattleScene> {
         gameplay.changeStats(value: enemies[i]['skills'], stats: 'eskills', enemyNumber: id);
       }
       actualEnemies = enemies;
-      if (actualEnemies.length > 1) {
+      //Verify if new enemies join the battle
+      if (actualEnemies.length != oldEnemies.length && actualEnemies.length > 1) {
+        oldEnemies = actualEnemies;
         enemyNotification = true;
       }
     }
@@ -158,7 +161,8 @@ class _BattleSceneState extends State<BattleScene> {
         for (int i = 0; i < stats['battleLog'].length; i++) {
           gameplay.addBattleLog(stats['battleLog'][i], context);
           //Animation
-          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
           await Future.delayed(Duration(milliseconds: options.textSpeed));
         }
       }
@@ -242,7 +246,11 @@ class _BattleSceneState extends State<BattleScene> {
                                       border: selectedEnemy == index ? Border.all(color: Theme.of(context).primaryColor) : Border.all(),
                                       borderRadius: BorderRadius.circular(20),
                                       color: Theme.of(context).colorScheme.primary,
-                                      image: DecorationImage(image: ExactAssetImage("assets/images/enemys/infight/${actualEnemies[selectedEnemy]['name']}.png"), fit: BoxFit.cover),
+                                      image: DecorationImage(
+                                          image: actualEnemies[index]['life'] == "dead"
+                                              ? const ExactAssetImage("assets/images/enemys/gravestone.png")
+                                              : ExactAssetImage("assets/images/enemys/infight/${actualEnemies[index]['name']}.png"),
+                                          fit: actualEnemies[index]['life'] == "dead" ? BoxFit.fitHeight : BoxFit.cover),
                                     ),
                                   ),
                                 ),
@@ -472,7 +480,7 @@ class _BattleSceneState extends State<BattleScene> {
                                             Stack(
                                               children: [
                                                 Text(
-                                                  '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${actualEnemies[selectedEnemy]['life']}',
+                                                  '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${actualEnemies[selectedEnemy]['life'] == "dead" ? Language.Translate('response_dead', options.language) ?? 'Dead' : actualEnemies[selectedEnemy]['life']}',
                                                   style: TextStyle(
                                                     fontSize: 500,
                                                     fontFamily: 'PressStart',
@@ -485,7 +493,7 @@ class _BattleSceneState extends State<BattleScene> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${actualEnemies[selectedEnemy]['life']}',
+                                                  '${Language.Translate('battle_life', options.language) ?? 'Life'}: ${actualEnemies[selectedEnemy]['life'] == "dead" ? Language.Translate('response_dead', options.language) ?? 'Dead' : actualEnemies[selectedEnemy]['life']}',
                                                   style: const TextStyle(
                                                     fontSize: 500,
                                                     letterSpacing: 5,
@@ -708,7 +716,8 @@ class _BattleSceneState extends State<BattleScene> {
                                       //Battle Log
                                       Container(
                                         padding: const EdgeInsets.all(5),
-                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
+                                        decoration:
+                                            BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                                         width: screenSize.width * 0.6,
                                         height: screenSize.height * 0.1,
                                         child: FittedBox(

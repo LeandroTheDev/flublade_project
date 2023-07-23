@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
-import 'package:flublade_project/pages/gameplay/ingame.dart';
 
 import 'package:flublade_project/data/gameplay.dart';
 
@@ -15,6 +14,7 @@ import 'package:http/http.dart' as http;
 ///
 /// PLAY WITHOUT SERVER
 ///
+/// main.dart -- home: FlubladeProject() to Ingame()
 /// player.dart -- change imageLocation to a const player image
 /// interface.dart -- comment xp bar
 /// game_engine.dart -- comment world generation and create a fake world [[[0,0,0,0,0,0],[0,0,0,0,0,0,0]]]
@@ -71,7 +71,7 @@ class FluBlade extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
-      home: const InGame(),
+      home: const FlubladeProject(),
       routes: GlobalFunctions.routes,
     );
   }
@@ -145,7 +145,8 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context);
         } else {
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+          GlobalFunctions.errorDialog(
+              errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
         }
       } else {
         Navigator.of(context).pushReplacementNamed('/authenticationpage');

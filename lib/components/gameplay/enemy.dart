@@ -13,7 +13,6 @@ import 'package:provider/provider.dart';
 class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
-  bool alreadyInBattle = false;
   //Engine Animation Declarations
   int ticksDelays = 0;
   bool animationLoad = false;
@@ -21,7 +20,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
   //Info Declarations
   final int enemyID;
   final String enemyName;
-  final double enemyVisionRadius;
+  final double enemyCollideRadius;
 
   //Sprite Declarations
   late final SpriteAnimation spriteLeft;
@@ -29,7 +28,10 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
   late final SpriteAnimation spriteUp;
   late final SpriteAnimation spriteDown;
 
-  Enemy(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius);
+  Enemy(this.context, this.enemyID, this.enemyName, this.enemyCollideRadius)
+      : super(
+          size: Vector2.all(32.0),
+        );
 
   @override
   Future<void> onLoad() async {
@@ -69,7 +71,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
     });
     //Sprite Down
     gameRef.images.load("enemys/${enemyName}_sprite_down.png").then((loadedSprite) {
-      spriteUp = SpriteAnimation.fromFrameData(
+      spriteDown = SpriteAnimation.fromFrameData(
         loadedSprite,
         SpriteAnimationData.sequenced(
           amount: 1,
@@ -80,7 +82,7 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
     });
 
     //Touch Hibox
-    add(CircleHitbox(radius: enemyVisionRadius, anchor: Anchor.center, position: size / 2));
+    add(CircleHitbox(radius: enemyCollideRadius, anchor: Anchor.center, position: size / 2));
   }
 
   @override
@@ -88,12 +90,6 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
     super.update(dt);
     //Provider Declarations
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-
-    //Update enemy position
-    position = Vector2(
-      double.parse(gameplay.enemiesInWorld['enemy$enemyID']['positionX'].toString()),
-      double.parse(gameplay.enemiesInWorld['enemy$enemyID']['positionY'].toString()),
-    );
 
     //Animation
     if (ticksDelays >= 1) {
@@ -155,8 +151,10 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
     final websocket = Provider.of<Websocket>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
+    //Remove from world
+    gameplay.enemiesInWorld['enemy$enemyID']['isDead'] = true;
     //If not in battle
-    if (other is Player && !alreadyInBattle && !gameplay.alreadyInBattle) {
+    if (other is Player && !gameplay.alreadyInBattle) {
       gameplay.changeAlreadyInBattle(true);
       //Remove enemy from the world
       websocket.websocketOnlySendIngame({
@@ -165,7 +163,6 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
         'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
         'enemyID': enemyID,
       }, context);
-      alreadyInBattle = true;
       //Push to battle scene
       Navigator.push(
         context,
@@ -173,32 +170,27 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
       );
     }
     //If in battle
-    else if (other is Player && !alreadyInBattle) {
+    else if (other is Player && gameplay.alreadyInBattle) {
+      Future.delayed(const Duration(seconds: 1)).then((value) => {
+            //Remove enemy from the world
+            websocket.websocketOnlySendIngame({
+              'message': 'playerCollide',
+              'id': options.id,
+              'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+              'enemyID': enemyID,
+            }, context),
+            //Add enemy to the lobby
+            websocket.websocketOnlySendBattle({
+              'message': 'newEnemy',
+              'enemyID': enemyID,
+            }, context),
+          });
       gameplay.changeAlreadyInBattle(true);
-      //Fix if you collide to early
-      while (true) {
-        try {
-          //Remove enemy from the world
-          websocket.websocketOnlySendIngame({
-            'message': 'playerCollide',
-            'id': options.id,
-            'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-            'enemyID': enemyID,
-          }, context);
-          //Add enemy to the lobby
-          websocket.websocketOnlySendBattle({
-            'message': 'newEnemy',
-            'enemyID': enemyID,
-          }, context);
-          alreadyInBattle = true;
-          break;
-        } catch (_) {}
-      }
     }
   }
 }
 
-class EnemyVision extends PositionComponent with CollisionCallbacks {
+class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
 
@@ -208,14 +200,19 @@ class EnemyVision extends PositionComponent with CollisionCallbacks {
   final double enemyVisionRadius;
   final double enemyCollisionRadius;
 
-  EnemyVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius);
+  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size})
+      : super(size: size);
 
   @override
   Future<void> onLoad() async {
     //View HitBox
-    add(CircleHitbox(radius: enemyCollisionRadius, anchor: Anchor.center, position: size / 2));
+    add(CircleHitbox(radius: enemyVisionRadius, anchor: Anchor.center, position: size / 2));
+    add(CircleHitbox(radius: enemyVisionRadius / 2, anchor: Anchor.center, position: size / 2));
+
     //Enemy in Child
-    add(Enemy(context, enemyID, enemyName, enemyVisionRadius));
+    add(
+      Enemy(context, enemyID, enemyName, enemyCollisionRadius),
+    );
   }
 
   @override
@@ -228,38 +225,47 @@ class EnemyVision extends PositionComponent with CollisionCallbacks {
       removeFromParent();
       return;
     }
+    //Update enemy position
+    position = Vector2(
+      double.parse(gameplay.enemiesInWorld['enemy$enemyID']['positionX'].toString()),
+      double.parse(gameplay.enemiesInWorld['enemy$enemyID']['positionY'].toString()),
+    );
   }
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollisionStart(intersectionPoints, other);
-    final websocket = Provider.of<Websocket>(context, listen: false);
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    //Message The Server
-    websocket.websocketOnlySendIngame({
-      'message': 'enemyMoving',
-      'id': options.id,
-      'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-      'enemyID': enemyID,
-      'isSee': true,
-    }, context);
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is Player) {
+      final websocket = Provider.of<Websocket>(context, listen: false);
+      final options = Provider.of<Options>(context, listen: false);
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      //Message The Server
+      websocket.websocketOnlySendIngame({
+        'message': 'enemyMoving',
+        'id': options.id,
+        'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+        'enemyID': enemyID,
+        'isSee': true,
+      }, context);
+    }
   }
 
   @override
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
-    //Provider Declaration
-    final websocket = Provider.of<Websocket>(context, listen: false);
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    //Message The Server
-    websocket.websocketOnlySendIngame({
-      'message': 'enemyMoving',
-      'id': options.id,
-      'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-      'enemyID': enemyID,
-      'isSee': false,
-    }, context);
+    if (other is Player) {
+      //Provider Declaration
+      final websocket = Provider.of<Websocket>(context, listen: false);
+      final options = Provider.of<Options>(context, listen: false);
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      //Message The Server
+      websocket.websocketOnlySendIngame({
+        'message': 'enemyMoving',
+        'id': options.id,
+        'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
+        'enemyID': enemyID,
+        'isSee': false,
+      }, context);
+    }
   }
 }

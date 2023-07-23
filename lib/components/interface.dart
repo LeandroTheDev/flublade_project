@@ -52,35 +52,35 @@ class _IngameInterfaceState extends State<IngameInterface> {
                         ),
                       ),
                       //Xp Bar
-                      // Container(
-                      //   padding: const EdgeInsets.all(5),
-                      //   decoration: BoxDecoration(
-                      //     borderRadius: BorderRadius.circular(20),
-                      //   ),
-                      //   width: screenSize.width * 0.6,
-                      //   height: screenSize.height * 0.1,
-                      //   child: FittedBox(
-                      //       child: Stack(
-                      //     children: [
-                      //       Padding(
-                      //         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-                      //         child: Container(
-                      //           decoration: const BoxDecoration(color: Colors.purple),
-                      //           width: ((gameplay.playerXP / settings.levelCaps[gameplay.playerLevel.toString()]) * 100) * 5.74,
-                      //           height: 90,
-                      //         ),
-                      //       ),
-                      //       SizedBox(
-                      //         width: 600,
-                      //         height: 100,
-                      //         child: Image.asset(
-                      //           'assets/images/interface/xpBar.png',
-                      //           fit: BoxFit.fill,
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   )),
-                      // ),
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        width: screenSize.width * 0.6,
+                        height: screenSize.height * 0.1,
+                        child: FittedBox(
+                            child: Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                              child: Container(
+                                decoration: const BoxDecoration(color: Colors.purple),
+                                width: ((gameplay.playerXP / settings.levelCaps[gameplay.playerLevel.toString()]) * 100) * 5.74,
+                                height: 90,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 600,
+                              height: 100,
+                              child: Image.asset(
+                                'assets/images/interface/xpBar.png',
+                                fit: BoxFit.fill,
+                              ),
+                            ),
+                          ],
+                        )),
+                      ),
                       // Pause Button
                       TextButton(
                         onPressed: () {
