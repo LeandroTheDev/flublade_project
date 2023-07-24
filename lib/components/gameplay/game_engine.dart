@@ -14,8 +14,6 @@ import 'package:provider/provider.dart';
 
 class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
   late BuildContext context;
-  final world = World();
-  late final CameraComponent cameraComponent;
   GameEngine();
 
   //Provider
@@ -61,32 +59,12 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
     //Joystick and Player Creation
     //Load Sprite
     images.load('interface/joystick.png').then((value) {
-      final sheet = SpriteSheet.fromColumnsAndRows(
-        image: value,
-        columns: 6,
-        rows: 1,
-      );
-
-      //Joystick Creation
-      final joystick = JoystickComponent(
-        priority: 100,
-        knob: SpriteComponent(
-          sprite: sheet.getSpriteById(1),
-          size: Vector2.all(100),
-        ),
-        background: SpriteComponent(
-          sprite: sheet.getSpriteById(0),
-          size: Vector2.all(150),
-        ),
-        margin: const EdgeInsets.only(left: 40, bottom: 40),
-      );
-
       //Player Creation
-      final player = Player(joystick, context, Vector2(48.0, 180.0));
+      final player = Player(context, Vector2(48.0, 180.0));
 
       //Add Components
       add(player);
-      add(joystick);
+      //Camera
       camera.followVector2(player.cameraPosition);
     });
     //World Loading

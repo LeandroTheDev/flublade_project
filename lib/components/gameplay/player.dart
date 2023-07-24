@@ -30,7 +30,6 @@ import 'package:provider/provider.dart';
 class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
-  final JoystickComponent joystick;
   final Vector2 playerPosition;
   int timeoutHandle = 0;
   late Vector2 cameraPosition;
@@ -39,17 +38,17 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
   late final SpriteAnimation spriteRun;
-  JoystickDirection spriteUpdate = JoystickDirection.idle;
 
   //Moviment Declarations
+  String lastDirection = 'left';
   double defaultSpeed = 0.5;
   double maxSpeed = 0.5;
-  JoystickDirection collisionDirection = JoystickDirection.idle;
+  //left,right,up,down
+  List<bool> collisionDirection = [false, false, false, false];
   int timeoutCollision = 0;
 
   //Player Declaration
   Player(
-    this.joystick,
     this.context,
     this.playerPosition,
   ) : super(
@@ -105,141 +104,53 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     super.update(dt);
     //Moviment Handler
     if (true) {
+      //Moviment Speed
+      double xSpeed = maxSpeed;
+      double ySpeed = maxSpeed;
       //Verify if Collided
       timeoutCollision++;
       if (timeoutCollision > 20) {
-        collisionDirection = JoystickDirection.idle;
+        //Reset Collision
+        collisionDirection = [false, false, false, false];
         maxSpeed = defaultSpeed;
       } else {
-        if (joystick.direction == collisionDirection) {
-          maxSpeed = 0.0;
-          timeoutCollision = 0;
+        //X Collision Check
+        if (engine.joystickPosition[0] < 0 && collisionDirection[0]) {
+          xSpeed = 0.0;
+        }
+        if (engine.joystickPosition[0] > 0 && collisionDirection[1]) {
+          xSpeed = 0.0;
+        }
+        //Y Collision Check
+        if (engine.joystickPosition[1] < 0 && collisionDirection[2]) {
+          ySpeed = 0.0;
+        }
+        if (engine.joystickPosition[1] > 0 && collisionDirection[3]) {
+          ySpeed = 0.0;
         }
       }
-      switch (joystick.direction) {
-        //Down
-        case JoystickDirection.down:
-          //Moviment
-          final moviment = Vector2(0.0, maxSpeed);
-          position.add(moviment);
-          cameraPosition.add(moviment);
+      //Check joystick moviment
+      if (!(engine.joystickPosition[0] == 0.0 && engine.joystickPosition[1] == 0.0)) {
+        final moviment = Vector2(engine.joystickPosition[0] * xSpeed, engine.joystickPosition[1] * ySpeed);
+        position.add(moviment);
+        cameraPosition.add(moviment);
+
+        //Run Animation
+        final actualDirection = engine.joystickPosition[0] < 0 ? 'left' : 'right';
+        if (actualDirection != lastDirection) {
           animation = spriteRun;
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.down;
+          if (!isFlippedHorizontally) {
+            flipHorizontally();
+            position = position + Vector2(32.0, 0.0);
+          } else {
+            flipHorizontally();
+            position = position + Vector2(-32.0, 0.0);
           }
-          break;
-        //Down Left
-        case JoystickDirection.downLeft:
-          //Moviment
-          final moviment = Vector2(-(maxSpeed / 1.5), maxSpeed / 1.5);
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.downLeft;
-            animation = spriteRun;
-            if (!isFlippedHorizontally) {
-              flipHorizontally();
-              position = position + Vector2(32.0, 0.0);
-            }
-          }
-          break;
-        //Downn Right
-        case JoystickDirection.downRight:
-          //Moviment
-          final moviment = Vector2(maxSpeed / 1.5, maxSpeed / 1.5);
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.downRight;
-            animation = spriteRun;
-            if (isFlippedHorizontally) {
-              flipHorizontally();
-              position = position - Vector2(32.0, 0.0);
-            }
-          }
-          break;
-        //Left
-        case JoystickDirection.left:
-          //Moviment
-          final moviment = Vector2(-maxSpeed, 0.0);
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.left;
-            animation = spriteRun;
-            if (!isFlippedHorizontally) {
-              flipHorizontally();
-              position = position + Vector2(32.0, 0.0);
-            }
-          }
-          break;
-        //Right
-        case JoystickDirection.right:
-          //Moviment
-          final moviment = Vector2(maxSpeed, 0.0);
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.right;
-            animation = spriteRun;
-            if (isFlippedHorizontally) {
-              flipHorizontally();
-              position = position - Vector2(32.0, 0.0);
-            }
-          }
-          break;
-        //Up
-        case JoystickDirection.up:
-          //Moviment
-          final moviment = Vector2(0.0, -maxSpeed);
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          animation = spriteRun;
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.up;
-          }
-          break;
-        case JoystickDirection.upLeft:
-          //Moviment
-          final moviment = Vector2(-(maxSpeed / 1.5), -(maxSpeed / 1.5));
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.upLeft;
-            animation = spriteRun;
-            if (!isFlippedHorizontally) {
-              flipHorizontally();
-              position = position + Vector2(32.0, 0.0);
-            }
-          }
-          break;
-        case JoystickDirection.upRight:
-          //Moviment
-          final moviment = Vector2(maxSpeed / 1.5, -(maxSpeed / 1.5));
-          position.add(moviment);
-          cameraPosition.add(moviment);
-          //Animation
-          if (spriteUpdate != joystick.direction) {
-            spriteUpdate = JoystickDirection.upRight;
-            animation = spriteRun;
-            if (isFlippedHorizontally) {
-              flipHorizontally();
-              position = position - Vector2(32.0, 0.0);
-            }
-          }
-          break;
-        case JoystickDirection.idle:
-          if (spriteUpdate != joystick.direction) {
-            animation = spriteIdle;
-          }
-          break;
+        }
+        //Idle Animation
+        else {
+          animation = spriteIdle;
+        }
       }
     }
     //Connection
@@ -248,12 +159,24 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
       final options = Provider.of<Options>(context, listen: false);
       final websocket = Provider.of<Websocket>(context, listen: false);
 
+      //Direction Translate
+      late final String direction;
+      if (engine.joystickPosition[0] < 0.0) {
+        direction = 'Direction.left';
+      }
+      if (engine.joystickPosition[0] > 0.0) {
+        direction = 'Direction.right';
+      }
+      if (engine.joystickPosition[0] == 0.0) {
+        direction = 'Direction.idle';
+      }
+
       final websocketMessage = await websocket.websocketSendIngame({
         'message': 'playersPosition',
         'id': options.id,
         'positionX': position[0],
         'positionY': position[1],
-        'direction': joystick.direction.toString(),
+        'direction': direction,
         'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
         'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
       }, context);
@@ -391,71 +314,79 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   }
 
   @override
-  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollisionStart(intersectionPoints, other);
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
     //Check World Collisions
     if (other is WorldTile) {
-      const speedMult = 2;
-      switch (joystick.direction) {
-        //Down
-        case JoystickDirection.down:
-          //Moviment
-          position.add(Vector2(0.0, -maxSpeed * speedMult));
-          collisionDirection = JoystickDirection.down;
-          timeoutCollision = 0;
-          break;
-        //Down Left
-        case JoystickDirection.downLeft:
-          //Moviment
-          position.add(Vector2(maxSpeed / 1.5 * 2, -maxSpeed / 1.5 * speedMult));
-          collisionDirection = JoystickDirection.downLeft;
-          timeoutCollision = 0;
-          break;
-        //Downn Right
-        case JoystickDirection.downRight:
-          //Moviment
-          position.add(Vector2(-maxSpeed / 1.5 * speedMult, -(maxSpeed / 1.5) * speedMult));
-          collisionDirection = JoystickDirection.downRight;
-          timeoutCollision = 0;
-          break;
-        //Left
-        case JoystickDirection.left:
-          //Moviment
-          position.add(Vector2(maxSpeed * speedMult, 0.0));
-          collisionDirection = JoystickDirection.left;
-          timeoutCollision = 0;
-          break;
-        //Right
-        case JoystickDirection.right:
-          //Moviment
-          position.add(Vector2(-maxSpeed * speedMult, 0.0));
-          collisionDirection = JoystickDirection.right;
-          timeoutCollision = 0;
-          break;
-        //Up
-        case JoystickDirection.up:
-          //Moviment
-          position.add(Vector2(0.0, maxSpeed * speedMult));
-          collisionDirection = JoystickDirection.up;
-          timeoutCollision = 0;
-          break;
-        case JoystickDirection.upLeft:
-          //Moviment
-          position.add(Vector2(maxSpeed / 1.5 * speedMult, maxSpeed / 1.5 * speedMult));
-          collisionDirection = JoystickDirection.upLeft;
-          timeoutCollision = 0;
-          break;
-        case JoystickDirection.upRight:
-          //Moviment
-          position.add(Vector2(-(maxSpeed / 1.5) * speedMult, maxSpeed / 1.5 * speedMult));
-          collisionDirection = JoystickDirection.upRight;
-          timeoutCollision = 0;
-          break;
-        case JoystickDirection.idle:
-          collisionDirection = JoystickDirection.idle;
-          timeoutCollision = 0;
-          break;
-      }
+      //Add Collisions
+      collisionDirection = [
+        engine.joystickPosition[0] < 0,
+        engine.joystickPosition[0] > 0,
+        engine.joystickPosition[1] < 0,
+        engine.joystickPosition[1] > 0,
+      ];
+      timeoutCollision = 0;
+      // const speedMult = 2;
+      // switch (joystick.direction) {
+      //   //Down
+      //   case JoystickDirection.down:
+      //     //Moviment
+      //     position.add(Vector2(0.0, -maxSpeed * speedMult));
+      //     collisionDirection = JoystickDirection.down;
+      //     timeoutCollision = 0;
+      //     break;
+      //   //Down Left
+      //   case JoystickDirection.downLeft:
+      //     //Moviment
+      //     position.add(Vector2(maxSpeed / 1.5 * 2, -maxSpeed / 1.5 * speedMult));
+      //     collisionDirection = JoystickDirection.downLeft;
+      //     timeoutCollision = 0;
+      //     break;
+      //   //Downn Right
+      //   case JoystickDirection.downRight:
+      //     //Moviment
+      //     position.add(Vector2(-maxSpeed / 1.5 * speedMult, -(maxSpeed / 1.5) * speedMult));
+      //     collisionDirection = JoystickDirection.downRight;
+      //     timeoutCollision = 0;
+      //     break;
+      //   //Left
+      //   case JoystickDirection.left:
+      //     //Moviment
+      //     position.add(Vector2(maxSpeed * speedMult, 0.0));
+      //     collisionDirection = JoystickDirection.left;
+      //     timeoutCollision = 0;
+      //     break;
+      //   //Right
+      //   case JoystickDirection.right:
+      //     //Moviment
+      //     position.add(Vector2(-maxSpeed * speedMult, 0.0));
+      //     collisionDirection = JoystickDirection.right;
+      //     timeoutCollision = 0;
+      //     break;
+      //   //Up
+      //   case JoystickDirection.up:
+      //     //Moviment
+      //     position.add(Vector2(0.0, maxSpeed * speedMult));
+      //     collisionDirection = JoystickDirection.up;
+      //     timeoutCollision = 0;
+      //     break;
+      //   case JoystickDirection.upLeft:
+      //     //Moviment
+      //     position.add(Vector2(maxSpeed / 1.5 * speedMult, maxSpeed / 1.5 * speedMult));
+      //     collisionDirection = JoystickDirection.upLeft;
+      //     timeoutCollision = 0;
+      //     break;
+      //   case JoystickDirection.upRight:
+      //     //Moviment
+      //     position.add(Vector2(-(maxSpeed / 1.5) * speedMult, maxSpeed / 1.5 * speedMult));
+      //     collisionDirection = JoystickDirection.upRight;
+      //     timeoutCollision = 0;
+      //     break;
+      //   case JoystickDirection.idle:
+      //     collisionDirection = JoystickDirection.idle;
+      //     timeoutCollision = 0;
+      //     break;
+      // }
     }
   }
 }
