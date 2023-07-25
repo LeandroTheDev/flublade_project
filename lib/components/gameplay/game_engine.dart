@@ -1,6 +1,4 @@
-import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flame/sprite.dart';
 
 import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
@@ -72,14 +70,14 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
       final worldGeneration = WorldGeneration();
       worldGeneration.generateWorld(value, engine.gameController);
     });
-    // //Test
+    //Test
     // final worldGeneration = WorldGeneration();
     // worldGeneration.generateWorld([
     //   [
+    //     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    //     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],

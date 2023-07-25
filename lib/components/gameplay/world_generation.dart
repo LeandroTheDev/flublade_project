@@ -27,16 +27,17 @@ class WorldGeneration extends SpriteComponent {
       for (int j = 0; j < worldData[0][i].length; j++) {
         gameController.add(WorldTile(
           worldTiles[worldData[0][i][j]]["tileSprite"].toString(),
-          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()), double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
+          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()),
+              double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
           Vector2(tileSpaceWidth, tileSpaceHeight),
           worldTiles[worldData[0][i][j]]["collisionType"],
           worldTiles[worldData[0][i][j]]["isSolid"],
         ));
         //Add Width Spacer
-        tileSpaceWidth += 32.0;
+        tileSpaceWidth += 31.0;
       }
       //Add Height Spacer
-      tileSpaceHeight += 32.0;
+      tileSpaceHeight += 31.0;
       //Reset Width Spacer
       tileSpaceWidth = 0.0;
     }
