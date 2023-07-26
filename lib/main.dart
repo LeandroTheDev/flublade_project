@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 ///
 /// main.dart -- home: FlubladeProject() to Ingame()
 /// player.dart -- change imageLocation to a const player image
+/// player.dart -- comment player update -> connection
 /// interface.dart -- comment xp bar
 /// game_engine.dart -- comment world generation and create a fake world
 /// ingame.dart -- comment websocketInitIngame
@@ -149,8 +150,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context);
         } else {
           Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
         }
       } else {
         Navigator.of(context).pushReplacementNamed('/authenticationpage');

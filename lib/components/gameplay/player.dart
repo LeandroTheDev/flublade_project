@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flame/collisions.dart';
@@ -229,11 +230,10 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
             //Add if not exist
             if (add && users[i]['positionX'] != null && users[i]['positionY'] != null) {
               idAdd.add(users[i]['id']);
-              // final positionX = double.parse(users[i]['positionX'].toString());
-              // final positionY = double.parse(users[i]['positionY'].toString());
+              final positionX = double.parse(users[i]['positionX'].toString());
+              final positionY = double.parse(users[i]['positionY'].toString());
               if (users[i]['id'] != options.id) {
-                // gameRef
-                //     .add(UserClient(users[i]['id'].toString(), Vector2(positionX, positionY), JoystickDirection.right, users[i]['class'], context));
+                gameRef.add(PlayerClient(users[i]['id'].toString(), Vector2(positionX, positionY), context));
               }
             }
           }
@@ -332,6 +332,88 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         false,
         false,
       ];
+    }
+  }
+}
+
+class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
+  //Engine Declarations
+  final String id;
+  final BuildContext context;
+
+  //Animation Declarations
+  String lastAnimation = 'Direction.left';
+  bool animationLoad = false;
+
+  PlayerClient(
+    this.id,
+    Vector2 playerPosition,
+    this.context,
+  ) : super(position: playerPosition);
+
+  @override
+  Future<void> onLoad() async {
+    //SPRITE HERE
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    //Verify if the user is alive
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    List users = [];
+    gameplay.usersInWorld.forEach((key, value) => users.add(value));
+    bool remove = true;
+    for (int i = 0; i < users.length; i++) {
+      if (id == users[i]['id'].toString()) {
+        remove = false;
+      }
+    }
+    //Check is player disconnected
+    if (!remove) {
+      //Animation Handle
+      if (true) {
+        switch (gameplay.usersInWorld[id]['direction']) {
+          case 'Direction.left':
+            {
+              if (!animationLoad) {
+                //PLACE ANIMATION HERE
+                Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+                animationLoad = true;
+                lastAnimation = 'Direction.left';
+              }
+              return;
+            }
+          case 'Direction.right':
+            {
+              if (!animationLoad) {
+                //PLACE ANIMATION HERE
+                Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+                animationLoad = true;
+                lastAnimation = 'Direction.right';
+              }
+              return;
+            }
+          case 'Direction.idle':
+            {
+              if (lastAnimation == 'Direction.left') {
+                //PLACE ANIMATION HERE
+              } else {
+                //PLACE ANIMATION HERE
+              }
+              return;
+            }
+        }
+      }
+
+      //Update player posistion
+      position = Vector2(
+        double.parse(Provider.of<Gameplay>(context, listen: false).usersInWorld[id]['positionX'].toString()),
+        double.parse(Provider.of<Gameplay>(context, listen: false).usersInWorld[id]['positionY'].toString()),
+      );
+    } else {
+      removeFromParent();
     }
   }
 }
