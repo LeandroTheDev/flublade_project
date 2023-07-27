@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:async';
+import 'dart:async' as dart;
 import 'dart:convert';
 
 import 'package:flame/collisions.dart';
@@ -21,18 +21,24 @@ import 'package:provider/provider.dart';
 //
 // Player
 // ---------------
-// position -- variable that defines the player exact position (position.add() will increment the position like moving)
+// Player will be the main character that client will control;
+// this also controls the update from connections.
 //
-// joystick -- component receive from the game engine display a single joystick for moving the character
-// and receives parameters for joystick position
 //
-// Moviment Declarations (xP,xN) will say if player can move or not
+// PlayerClient
+// ---------------
+// This is the others players connected in the world.
+//
+//
+// PlayerEquipment
+// ---------------
+// Receive from Player or PlayerClient equipment infos;
+// this is a component to create the sprite armor for the respective equipped item.
 
 class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
   final Vector2 playerPosition;
-  int timeoutHandle = 0;
   late Vector2 cameraPosition;
   late final GameEngine engine;
 
@@ -69,7 +75,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   @override
   Future<void> onLoad() async {
     //Define the player on top of everthing
-    priority = 99;
+    priority = 100;
 
     final imageLocation = 'players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}';
     //Idle Sprite
@@ -97,58 +103,10 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     });
     //Create a collision circle
     add(CircleHitbox(radius: 16, anchor: Anchor.center, position: size / 2, isSolid: true));
-  }
 
-  //Tick Update
-  @override
-  void update(double dt) async {
-    super.update(dt);
-    //Moviment Handler
-    if (true) {
-      //Moviment Speed
-      double xSpeed = maxSpeed;
-      double ySpeed = maxSpeed;
-      //X Collision Check
-      if (engine.joystickPosition[0] < 0 && collisionDirection[0]) {
-        xSpeed = 0.0;
-      }
-      if (engine.joystickPosition[0] > 0 && collisionDirection[1]) {
-        xSpeed = 0.0;
-      }
-      //Y Collision Check
-      if (engine.joystickPosition[1] < 0 && collisionDirection[2]) {
-        ySpeed = 0.0;
-      }
-      if (engine.joystickPosition[1] > 0 && collisionDirection[3]) {
-        ySpeed = 0.0;
-      }
-      //Check joystick moviment
-      if (!(engine.joystickPosition[0] == 0.0 && engine.joystickPosition[1] == 0.0)) {
-        animation = spriteRun;
-        final moviment = Vector2(engine.joystickPosition[0] * xSpeed, engine.joystickPosition[1] * ySpeed);
-        position.add(moviment);
-        cameraPosition.add(moviment);
-
-        //Run Animation
-        final actualDirection = engine.joystickPosition[0] > 0 ? 'left' : 'right';
-        if (actualDirection != lastDirection) {
-          lastDirection = actualDirection;
-          if (!isFlippedHorizontally) {
-            flipHorizontally();
-            position = position + Vector2(32.0, 0.0);
-          } else {
-            flipHorizontally();
-            position = position + Vector2(-32.0, 0.0);
-          }
-        }
-      }
-      //Idle Animation
-      else {
-        animation = spriteIdle;
-      }
-    }
-    //Connection
-    if (true) {
+    int timeoutHandle = 0;
+    dart.Timer.periodic(const Duration(milliseconds: 50), (timer) async {
+      //Connection
       final gameplay = Provider.of<Gameplay>(context, listen: false);
       final options = Provider.of<Options>(context, listen: false);
       final websocket = Provider.of<Websocket>(context, listen: false);
@@ -176,9 +134,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
       }, context);
       //Loading Check
       if (websocketMessage == "OK" || websocketMessage == "timeout") {
-        timeoutHandle += 1;
-        if (timeoutHandle >= 300 && timeoutHandle < 900) {
-          timeoutHandle = 1000;
+        if (timeoutHandle > 100) {
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
           websocket.disconnectWebsockets(context);
           GlobalFunctions.errorDialog(
@@ -190,14 +146,13 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         }
         return;
       }
-      timeoutHandle = 0;
       //Result
       final players = jsonDecode(websocketMessage);
-      players.remove("enemy");
       final enemy = jsonDecode(websocketMessage)['enemy'];
 
       //Update Users
       if (players != {}) {
+        players.remove("enemy");
         //Store old Values
         List oldUsers = [];
         gameplay.usersInWorld.forEach((key, value) => oldUsers.add(value));
@@ -303,6 +258,56 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
           } catch (_) {}
         }
       }
+    });
+  }
+
+  //Tick Update
+  @override
+  void update(double dt) async {
+    super.update(dt);
+    //Moviment Handler
+    if (true) {
+      //Moviment Speed
+      double xSpeed = maxSpeed;
+      double ySpeed = maxSpeed;
+      //X Collision Check
+      if (engine.joystickPosition[0] < 0 && collisionDirection[0]) {
+        xSpeed = 0.0;
+      }
+      if (engine.joystickPosition[0] > 0 && collisionDirection[1]) {
+        xSpeed = 0.0;
+      }
+      //Y Collision Check
+      if (engine.joystickPosition[1] < 0 && collisionDirection[2]) {
+        ySpeed = 0.0;
+      }
+      if (engine.joystickPosition[1] > 0 && collisionDirection[3]) {
+        ySpeed = 0.0;
+      }
+      //Check joystick moviment
+      if (!(engine.joystickPosition[0] == 0.0 && engine.joystickPosition[1] == 0.0)) {
+        animation = spriteRun;
+        final moviment = Vector2(engine.joystickPosition[0] * xSpeed, engine.joystickPosition[1] * ySpeed);
+        position.add(moviment);
+        cameraPosition.add(moviment);
+
+        //Run Animation
+        final actualDirection = engine.joystickPosition[0] > 0 ? 'left' : 'right';
+        if (actualDirection != lastDirection) {
+          lastDirection = actualDirection;
+          if (!isFlippedHorizontally) {
+            flipHorizontally();
+            position = position + Vector2(32.0, 0.0);
+          } else {
+            flipHorizontally();
+            position = position + Vector2(-32.0, 0.0);
+          }
+        }
+      }
+      //Idle Animation
+      else {
+        animation = spriteIdle;
+      }
     }
   }
 
@@ -338,8 +343,8 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
 
 class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
   //Engine Declarations
-  final String id;
   final BuildContext context;
+  final String id;
 
   //Animation Declarations
   String lastAnimation = 'Direction.left';
@@ -353,6 +358,7 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
 
   @override
   Future<void> onLoad() async {
+    priority = 50;
     //SPRITE HERE
   }
 
@@ -416,4 +422,8 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
       removeFromParent();
     }
   }
+}
+
+class PlayerEquipment extends SpriteAnimationComponent {
+  PlayerEquipment();
 }

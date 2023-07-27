@@ -63,6 +63,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
       //Add Components
       add(player);
       //Camera
+      // ignore: deprecated_member_use
       camera.followVector2(player.cameraPosition);
     });
     //World Loading
