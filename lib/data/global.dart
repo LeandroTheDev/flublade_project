@@ -9,6 +9,8 @@ import 'package:flublade_project/components/magic_widget.dart';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/data/settings.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
 import 'package:flublade_project/pages/gameplay/ingame.dart';
 import 'package:flublade_project/pages/gameplay/inventory.dart';
@@ -24,139 +26,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../pages/gameplay/magics.dart';
-
-class Options with ChangeNotifier {
-  String _language = 'en_US';
-  int _textSpeed = 700;
-  String _username = '';
-  String _token = '';
-  bool _remember = false;
-  int _id = 0;
-
-  String get language => _language;
-  int get textSpeed => _textSpeed;
-  String get username => _username;
-  String get token => _token;
-  bool get remember => _remember;
-  int get id => _id;
-
-  void changeLanguage(value) {
-    _language = value;
-  }
-
-  void changeTextSpeed(value) {
-    _textSpeed = value;
-  }
-
-  void changeUsername(value) {
-    _username = value;
-  }
-
-  void changeToken(value) {
-    _token = value;
-  }
-
-  void changeRemember({value}) {
-    if (value == null) {
-      _remember = !_remember;
-      notifyListeners();
-      return;
-    }
-    if (value) {
-      _remember = value;
-      notifyListeners();
-    } else if (!value) {
-      _remember = value;
-      notifyListeners();
-    }
-  }
-
-  void changeId(value) {
-    _id = value;
-  }
-}
-
-class Settings with ChangeNotifier {
-  bool _isLoading = false;
-  Map _baseAtributes = {};
-  Map _levelCaps = {};
-  Map _skillsId = {};
-  Map _itemsId = {};
-
-  bool get isLoading => _isLoading;
-  Map get baseAtributes => _baseAtributes;
-  Map get levelCaps => _levelCaps;
-  Map get skillsId => _skillsId;
-  Map get itemsId => _itemsId;
-
-  void changeIsLoading({value}) {
-    if (value == null) {
-      _isLoading = !_isLoading;
-      notifyListeners();
-    } else if (value) {
-      _isLoading = true;
-      notifyListeners();
-    } else {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  //Change Items Id
-  void changeItemsId(Map value) {
-    _itemsId = value;
-  }
-
-  //Translate equip index
-  List translateEquipsIndex(equipIndex) {
-    return [0];
-  }
-
-  //Change Base Atributes
-  void changeBaseAtributes(Map value) {
-    _baseAtributes = value;
-  }
-
-  //Change Level Caps
-  void changeLevelCaps(Map value) {
-    _levelCaps = value;
-  }
-
-  //Change Skills Id
-  void changeSkillsId(Map value) {
-    _skillsId = value;
-  }
-
-  //Returns the Loot/Item Image
-  String lootImage(itemName) {
-    if (itemName.contains('%')) {
-      itemName = itemName.substring(0, itemName.length - 3);
-      return itemsId[itemName]['image'];
-    }
-    return itemsId[itemName]['image'];
-  }
-
-  //Returns the tier
-  String itemTier(itemName, {addPlus = false}) {
-    if (itemName.contains('%')) {
-      final tier = int.parse(itemName.substring(itemName.length - 2));
-      if (addPlus) {
-        return '+${tier.toString()}';
-      }
-      return tier.toString();
-    }
-    return '';
-  }
-
-  //Returns the item name without Tier
-  String tierCheck(itemName) {
-    if (itemName.contains('%')) {
-      itemName = itemName.substring(0, itemName.length - 3);
-      return itemName;
-    }
-    return itemName;
-  }
-}
 
 class SaveDatas {
   static late SharedPreferences _preferences;
@@ -328,7 +197,7 @@ class GlobalFunctions {
                   //Take All
                   ElevatedButton(
                     onPressed: () async {
-                      MySQL.loadingWidget(context: context, language: options.language);
+                      GlobalFunctions.loadingWidget(context: context, language: options.language);
                       //Add items
                       gameplay.addInventoryItem(loots);
                       //Update All Stats
@@ -421,7 +290,7 @@ class GlobalFunctions {
                       //Add items
                       if (gameplay.playerInventorySelected.isNotEmpty) {
                         //Loading
-                        MySQL.loadingWidget(context: context, language: options.language);
+                        GlobalFunctions.loadingWidget(context: context, language: options.language);
                         //Add Items
                         gameplay.addInventoryItem(gameplay.playerInventorySelected);
                         //Update All Stats
@@ -808,6 +677,31 @@ class GlobalFunctions {
                           ),
                         ),
                 ],
+              ),
+            ),
+          );
+        });
+  }
+
+  //Loading
+  static void loadingWidget({required BuildContext context, required String language}) {
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Language Text
+              title: Text(
+                Language.Translate('authentication_register_loading', language) ?? 'Loading',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              content: const Padding(
+                padding: EdgeInsets.all(50.0),
+                child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()),
               ),
             ),
           );

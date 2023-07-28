@@ -4,8 +4,8 @@ import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/options.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +18,21 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
   Vector2 _joystickPosition = Vector2(0.0, 0.0);
   get joystickPosition => _joystickPosition;
 
+  Map _equipmentsLoaded = {};
+  get equipmentsLoaded => _equipmentsLoaded;
+
+  //Equipments handle
+  void equipmentsHandle({equipmentClass, handle, equip}) {
+    //Verify if equipment class is already referenced
+    if (_equipmentsLoaded[equipmentClass] == null) {
+      _equipmentsLoaded[equipmentClass] = {};
+    }
+    switch (handle) {
+      case 'add':
+        _equipmentsLoaded[equipmentClass].add(equip);
+    }
+  }
+
   //Set Joystick Position
   void setjoystickPosition(value) {
     _joystickPosition = value;
@@ -27,6 +42,12 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier {
   void setContext(value) {
     context = value;
   }
+
+  //Reset All Ingame Equipment
+
+  //Reset Specific Ingame Equipment
+
+  //Reset Player Ingame Equipment
 
   @override
   void onMount() async {

@@ -1,10 +1,9 @@
-import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ItemWidget extends StatelessWidget {
-  const ItemWidget(
-      {required this.itemName, required this.itemQuantity, super.key});
+  const ItemWidget({required this.itemName, required this.itemQuantity, super.key});
   final String itemName;
   final String itemQuantity;
 
@@ -78,10 +77,7 @@ class ItemWidget extends StatelessWidget {
             FittedBox(
               child: Text(
                 itemQuantity,
-                style: TextStyle(
-                    fontFamily: 'PressStart',
-                    fontSize: 20,
-                    color: Theme.of(context).primaryColor),
+                style: TextStyle(fontFamily: 'PressStart', fontSize: 20, color: Theme.of(context).primaryColor),
               ),
             ),
           ],

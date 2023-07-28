@@ -6,6 +6,8 @@ import 'package:flublade_project/components/item_widget.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/data/settings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -84,7 +86,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                             height: 50,
                             child: ElevatedButton(
                               onPressed: () async {
-                                MySQL.loadingWidget(context: context, language: Provider.of<Options>(context, listen: false).language);
+                                GlobalFunctions.loadingWidget(context: context, language: Provider.of<Options>(context, listen: false).language);
                                 await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
                                     headers: MySQL.headers,
                                     body: jsonEncode({
@@ -338,7 +340,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                 onPressed: () async {
                                                                   final selectedIndex = settings.itemsId[settings.tierCheck(itemName)]['equip'][index];
                                                                   //Loading Widget
-                                                                  MySQL.loadingWidget(context: context, language: options.language);
+                                                                  GlobalFunctions.loadingWidget(context: context, language: options.language);
                                                                   //Equipped item variable
                                                                   final equipped = gameplay.playerInventory[itemName];
                                                                   //Add Equip Stats
@@ -378,7 +380,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                         } else {
                                           final selectedIndex = settings.itemsId[settings.tierCheck(itemName)]['equip'][0];
                                           //Loading Widget
-                                          MySQL.loadingWidget(context: context, language: options.language);
+                                          GlobalFunctions.loadingWidget(context: context, language: options.language);
                                           //Equipped item variable
                                           final equipped = gameplay.playerInventory[itemName];
                                           //Add Equip Stats

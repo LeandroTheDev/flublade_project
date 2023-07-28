@@ -5,7 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/data/gameplay.dart';
-import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/pages/gameplay/battle_scene.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +13,9 @@ import 'package:provider/provider.dart';
 class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
+  late final Websocket websocket;
+  late final Options options;
+  late final Gameplay gameplay;
   //Engine Animation Declarations
   int ticksDelays = 0;
   bool animationLoad = false;
@@ -32,6 +35,15 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
       : super(
           size: Vector2.all(32.0),
         );
+
+  @override
+  void onMount() {
+    super.onMount();
+    //Provider Declarations
+    websocket = Provider.of<Websocket>(context, listen: false);
+    options = Provider.of<Options>(context, listen: false);
+    gameplay = Provider.of<Gameplay>(context, listen: false);
+  }
 
   @override
   Future<void> onLoad() async {
@@ -147,10 +159,6 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
-    //Provider Declarations
-    final websocket = Provider.of<Websocket>(context, listen: false);
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Remove from world
     gameplay.enemiesInWorld['enemy$enemyID']['isDead'] = true;
     //If not in battle
@@ -200,8 +208,7 @@ class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   final double enemyVisionRadius;
   final double enemyCollisionRadius;
 
-  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size})
-      : super(size: size);
+  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size}) : super(size: size);
 
   @override
   Future<void> onLoad() async {

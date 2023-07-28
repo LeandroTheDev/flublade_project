@@ -12,6 +12,7 @@ import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   final Vector2 playerPosition;
   late Vector2 cameraPosition;
   late final GameEngine engine;
+  late final Gameplay gameplay;
+  late final Options options;
+  late final Websocket websocket;
 
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
@@ -69,6 +73,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   void onMount() {
     super.onMount();
     engine = Provider.of<GameEngine>(context, listen: false);
+    gameplay = Provider.of<Gameplay>(context, listen: false);
+    options = Provider.of<Options>(context, listen: false);
+    websocket = Provider.of<Websocket>(context, listen: false);
   }
 
   //Loading
@@ -103,14 +110,11 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     });
     //Create a collision circle
     add(CircleHitbox(radius: 16, anchor: Anchor.center, position: size / 2, isSolid: true));
+    add(PlayerEquipment('leather_helmet', Player));
 
+    //Connection Signal
     int timeoutHandle = 0;
     dart.Timer.periodic(const Duration(milliseconds: 50), (timer) async {
-      //Connection
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
-      final options = Provider.of<Options>(context, listen: false);
-      final websocket = Provider.of<Websocket>(context, listen: false);
-
       //Direction Translate
       late final String direction;
       if (engine.joystickPosition[0] < 0.0) {
@@ -261,7 +265,6 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     });
   }
 
-  //Tick Update
   @override
   void update(double dt) async {
     super.update(dt);
@@ -425,5 +428,18 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
 }
 
 class PlayerEquipment extends SpriteAnimationComponent {
-  PlayerEquipment();
+  //Engine Declarations
+  final equipmentName;
+  final equipmentClass;
+
+  PlayerEquipment(this.equipmentName, this.equipmentClass)
+      : super(
+          anchor: Anchor.center,
+          size: Vector2.all(32.0),
+        );
+
+  @override
+  Future<void> onLoad() async {
+    position = size / 2;
+  }
 }

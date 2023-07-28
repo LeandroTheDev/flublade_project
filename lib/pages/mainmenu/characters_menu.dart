@@ -2,6 +2,7 @@ import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/options.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -87,7 +88,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
                               context: context,
                             );
                           } else {
-                            MySQL.loadingWidget(context: context, language: options.language);
+                            GlobalFunctions.loadingWidget(context: context, language: options.language);
                             await MySQL.removeCharacters(
                               index: index,
                               context: context,

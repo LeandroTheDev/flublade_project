@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -117,6 +118,9 @@ class Gameplay with ChangeNotifier {
   Map get usersInWorld => _usersInWorld;
   Map get enemiesInWorld => _enemiesInWorld;
 
+  //------
+  //Ingame
+  //------
   //Change already in battle
   void changeAlreadyInBattle(bool value) {
     _alreadyInBattle = value;
@@ -153,51 +157,9 @@ class Gameplay with ChangeNotifier {
     }
   }
 
-  //Change Selected Skill
-  void changePlayerSelectedSkill(value) {
-    _playerSelectedSkill = value;
-  }
-
-  //Remove Specific Item in inventory
-  void removeSpecificItemInventory(itemName, context) {
-    final settings = Provider.of<Settings>(context, listen: false);
-    //Base Function for removing item name from inventory
-    removingFunction(removedItem) {
-      //If already have quantity
-      if (playerInventory[removedItem]['quantity'] > 1) {
-        //Remove 1 quantity
-        playerInventory[removedItem]['quantity'] = playerInventory[removedItem]['quantity'] - 1;
-      } else {
-        playerInventory.remove(removedItem);
-      }
-    }
-
-    final equip = settings.translateEquipsIndex(settings.itemsId[settings.tierCheck(itemName)]['equip']);
-    if (_playerEquips[equip[0]] != 'none') {
-      addSpecificItemInventory(_playerEquips[equip[0]]);
-      removingFunction(itemName);
-    } else {
-      removingFunction(itemName);
-    }
-  }
-
   //Change world id
   void changeWorldId(value) {
     _worldId = value;
-  }
-
-  //Add Specific Item in inventory
-  void addSpecificItemInventory(item) {
-    //Test if already have in inventory
-    try {
-      if (playerInventory[item['name']]['quantity'] >= 1) {
-        //Add 1 quantity
-        playerInventory[item['name']]['quantity'] = playerInventory[item['name']]['quantity'] + 1;
-      }
-      //Add to the inventory if doesnt exist
-    } catch (error) {
-      _playerInventory[item['name']] = item;
-    }
   }
 
   //Change the talk text
@@ -219,7 +181,123 @@ class Gameplay with ChangeNotifier {
     notifyListeners();
   }
 
-  //Add a line to battle log
+  //Show Text Talk Dialog
+  static void showTalkText(context) {
+    final screenSize = MediaQuery.of(context).size;
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    int index = 0;
+    showModalBottomSheet<void>(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(50.0),
+          ),
+        ),
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) => GestureDetector(
+              onTap: () {
+                //Change index
+                if (index < gameplay.selectedTalk.length - 1) {
+                  //Update
+                  setState(() {
+                    index++;
+                  });
+                }
+              },
+              child: SizedBox(
+                width: screenSize.width,
+                height: screenSize.height * 0.25,
+                child: FittedBox(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                              child: Stack(
+                            children: [
+                              //Profile Image
+                              Padding(
+                                padding: const EdgeInsets.all(2.5),
+                                child: SizedBox(
+                                  width: 28,
+                                  height: 38,
+                                  child: Image.asset(
+                                    'assets/images/interface/profileimage.png',
+                                  ),
+                                ),
+                              ),
+                              //Npc Image
+                              Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: SizedBox(
+                                    width: 17.5,
+                                    height: 26,
+                                    child: Image.asset(
+                                      'assets/images/npc/${gameplay.selectedNPC}.png',
+                                      fit: BoxFit.fill,
+                                    ),
+                                  )),
+                            ],
+                          )),
+                          //Board
+                          Stack(
+                            children: [
+                              //Board Image
+                              SizedBox(
+                                width: 70,
+                                height: screenSize.height * 0.05,
+                                child: Image.asset(
+                                  'assets/images/interface/boardtext.png',
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                              //Board Text
+                              Container(
+                                padding: const EdgeInsets.only(top: 5, left: 6),
+                                width: 65,
+                                height: 33,
+                                child: SingleChildScrollView(
+                                  child: Text(
+                                    Language.Translate(gameplay.selectedTalk[index], options.language) ?? 'Language Error',
+                                    style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
+                                  ),
+                                ),
+                              ),
+                              gameplay.selectedTalk.length > 1
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(top: 35.0, left: 58),
+                                      child: Text(
+                                        '${index + 1}/${gameplay.selectedTalk.length}',
+                                        style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+//------
+//Battle
+//------
+//Change Selected Skill
+  void changePlayerSelectedSkill(value) {
+    _playerSelectedSkill = value;
+  }
+
+//Add a line to battle log
   void addBattleLog(value, context) {
     final options = Provider.of<Options>(context, listen: false);
     String result = '';
@@ -234,23 +312,13 @@ class Gameplay with ChangeNotifier {
     notifyListeners();
   }
 
-  //Reset Battle Log
+//Reset Battle Log
   void resetBattleLog() {
     _battleLog = [];
     notifyListeners();
   }
 
-  //Reset Selected Inventory
-  void resetPlayerInventorySelected() {
-    _playerInventorySelected = [];
-  }
-
-  //Change Player Inventory
-  void changePlayerInventory(Map value) {
-    _playerInventory = value;
-  }
-
-  //Change Player Stats or Enemy Stats
+//Change Player Stats or Enemy Stats
   void changeStats({required value, required String stats, int enemyNumber = -1}) {
     //Player Stats
     if (stats == 'life') {
@@ -408,12 +476,62 @@ class Gameplay with ChangeNotifier {
     }
   }
 
-  //Add Selected playerInventorySelected
+//------
+//Inventory
+//------
+//Remove Specific Item in inventory
+  void removeSpecificItemInventory(itemName, context) {
+    final settings = Provider.of<Settings>(context, listen: false);
+    //Base Function for removing item name from inventory
+    removingFunction(removedItem) {
+      //If already have quantity
+      if (playerInventory[removedItem]['quantity'] > 1) {
+        //Remove 1 quantity
+        playerInventory[removedItem]['quantity'] = playerInventory[removedItem]['quantity'] - 1;
+      } else {
+        playerInventory.remove(removedItem);
+      }
+    }
+
+    final equip = settings.translateEquipsIndex(settings.itemsId[settings.tierCheck(itemName)]['equip']);
+    if (_playerEquips[equip[0]] != 'none') {
+      addSpecificItemInventory(_playerEquips[equip[0]]);
+      removingFunction(itemName);
+    } else {
+      removingFunction(itemName);
+    }
+  }
+
+//Add Specific Item in inventory
+  void addSpecificItemInventory(item) {
+    //Test if already have in inventory
+    try {
+      if (playerInventory[item['name']]['quantity'] >= 1) {
+        //Add 1 quantity
+        playerInventory[item['name']]['quantity'] = playerInventory[item['name']]['quantity'] + 1;
+      }
+      //Add to the inventory if doesnt exist
+    } catch (error) {
+      _playerInventory[item['name']] = item;
+    }
+  }
+
+//Reset Selected Inventory
+  void resetPlayerInventorySelected() {
+    _playerInventorySelected = [];
+  }
+
+//Change Player Inventory
+  void changePlayerInventory(Map value) {
+    _playerInventory = value;
+  }
+
+//Add Selected playerInventorySelected
   void addPlayerInventorySelected(value) {
     _playerInventorySelected.add(value);
   }
 
-  //Add Items to invetory
+//Add Items to invetory
   Map addInventoryItem(List items) {
     bool jumpClear = false;
     for (int i = 0; i <= items.length - 1; i++) {
@@ -435,118 +553,5 @@ class Gameplay with ChangeNotifier {
       } catch (_) {}
     }
     return _playerInventory;
-  }
-
-  //Change Skills
-  void changePlayerSkills(value) {
-    _playerSkills = value;
-  }
-
-  //Show Text Talk Dialog
-  static void showTalkText(context) {
-    final screenSize = MediaQuery.of(context).size;
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    int index = 0;
-    showModalBottomSheet<void>(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(50.0),
-          ),
-        ),
-        isScrollControlled: true,
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) => GestureDetector(
-              onTap: () {
-                //Change index
-                if (index < gameplay.selectedTalk.length - 1) {
-                  //Update
-                  setState(() {
-                    index++;
-                  });
-                }
-              },
-              child: SizedBox(
-                width: screenSize.width,
-                height: screenSize.height * 0.25,
-                child: FittedBox(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                              child: Stack(
-                            children: [
-                              //Profile Image
-                              Padding(
-                                padding: const EdgeInsets.all(2.5),
-                                child: SizedBox(
-                                  width: 28,
-                                  height: 38,
-                                  child: Image.asset(
-                                    'assets/images/interface/profileimage.png',
-                                  ),
-                                ),
-                              ),
-                              //Npc Image
-                              Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    width: 17.5,
-                                    height: 26,
-                                    child: Image.asset(
-                                      'assets/images/npc/${gameplay.selectedNPC}.png',
-                                      fit: BoxFit.fill,
-                                    ),
-                                  )),
-                            ],
-                          )),
-                          //Board
-                          Stack(
-                            children: [
-                              //Board Image
-                              SizedBox(
-                                width: 70,
-                                height: screenSize.height * 0.05,
-                                child: Image.asset(
-                                  'assets/images/interface/boardtext.png',
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                              //Board Text
-                              Container(
-                                padding: const EdgeInsets.only(top: 5, left: 6),
-                                width: 65,
-                                height: 33,
-                                child: SingleChildScrollView(
-                                  child: Text(
-                                    Language.Translate(gameplay.selectedTalk[index], options.language) ?? 'Language Error',
-                                    style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              ),
-                              gameplay.selectedTalk.length > 1
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(top: 35.0, left: 58),
-                                      child: Text(
-                                        '${index + 1}/${gameplay.selectedTalk.length}',
-                                        style: TextStyle(fontSize: 5, color: Theme.of(context).primaryColor),
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
   }
 }

@@ -6,6 +6,8 @@ import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/mysqldata.dart';
 import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/data/settings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -156,7 +158,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         child: ElevatedButton(
                                           onPressed: () async {
                                             //Loading Widget
-                                            MySQL.loadingWidget(context: context, language: options.language);
+                                            GlobalFunctions.loadingWidget(context: context, language: options.language);
                                             late final http.Response result;
                                             try {
                                               //Backend Work
@@ -357,7 +359,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                           onPressed: () async {
                                             dynamic result;
                                             mysql.changeServerAddress(serverAddress.text);
-                                            MySQL.loadingWidget(context: context, language: options.language);
+                                            GlobalFunctions.loadingWidget(context: context, language: options.language);
                                             //Try connection
                                             try {
                                               result = await http.post(Uri.http(mysql.serverAddress, '/gameplayStats'),
