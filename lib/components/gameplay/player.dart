@@ -1,19 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:async' as dart;
-import 'dart:convert';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flublade_project/components/engine.dart';
-import 'package:flublade_project/components/gameplay/enemy.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/gameplay.dart';
-import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/mysql.dart';
 import 'package:flublade_project/data/options.dart';
-import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -111,158 +105,6 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     //Create a collision circle
     add(CircleHitbox(radius: 16, anchor: Anchor.center, position: size / 2, isSolid: true));
     add(PlayerEquipment('leather_helmet', Player));
-
-    //Connection Signal
-    int timeoutHandle = 0;
-    dart.Timer.periodic(const Duration(milliseconds: 50), (timer) async {
-      //Direction Translate
-      late final String direction;
-      if (engine.joystickPosition[0] < 0.0) {
-        direction = 'Direction.left';
-      }
-      if (engine.joystickPosition[0] > 0.0) {
-        direction = 'Direction.right';
-      }
-      if (engine.joystickPosition[0] == 0.0) {
-        direction = 'Direction.idle';
-      }
-
-      final websocketMessage = await websocket.websocketSendIngame({
-        'message': 'playersPosition',
-        'id': options.id,
-        'positionX': position[0],
-        'positionY': position[1],
-        'direction': direction,
-        'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-        'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
-      }, context);
-      //Loading Check
-      if (websocketMessage == "OK" || websocketMessage == "timeout") {
-        if (timeoutHandle > 100) {
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
-          websocket.disconnectWebsockets(context);
-          GlobalFunctions.errorDialog(
-            errorMsgTitle: 'authentication_lost_connection',
-            errorMsgContext: 'You have lost connection to the servers.',
-            context: context,
-          );
-          return;
-        }
-        return;
-      }
-      //Result
-      final players = jsonDecode(websocketMessage);
-      final enemy = jsonDecode(websocketMessage)['enemy'];
-
-      //Update Users
-      if (players != {}) {
-        players.remove("enemy");
-        //Store old Values
-        List oldUsers = [];
-        gameplay.usersInWorld.forEach((key, value) => oldUsers.add(value));
-
-        //Clean
-        gameplay.usersHandle('replace', players);
-
-        //Load New Values
-        List users = [];
-        gameplay.usersInWorld.forEach((key, value) => users.add(value));
-        List idRemove = [];
-        List idAdd = [];
-        //Add Function
-        if (oldUsers.length != users.length) {
-          //Sweep Users
-          for (int i = 0; i < users.length; i++) {
-            bool add = true;
-            //Add Sweep
-            if (oldUsers.length < users.length) {
-              for (int j = 0; j < oldUsers.length; j++) {
-                //If already exist
-                if (users[i]['id'] == oldUsers[j]['id']) {
-                  add = false;
-                  break;
-                }
-              }
-            } else {
-              add = false;
-            }
-            //Add if not exist
-            if (add && users[i]['positionX'] != null && users[i]['positionY'] != null) {
-              idAdd.add(users[i]['id']);
-              final positionX = double.parse(users[i]['positionX'].toString());
-              final positionY = double.parse(users[i]['positionY'].toString());
-              if (users[i]['id'] != options.id) {
-                gameRef.add(PlayerClient(users[i]['id'].toString(), Vector2(positionX, positionY), context));
-              }
-            }
-          }
-          //Sweep Old Users
-          for (int i = 0; i < oldUsers.length; i++) {
-            //Find if no longer online
-            bool remove = true;
-            for (int j = 0; j < users.length; j++) {
-              if (oldUsers[i]['id'] == users[j]['id']) {
-                remove = false;
-                break;
-              }
-            }
-            //Remove if no longer online
-            if (remove) {
-              idRemove.add(oldUsers[i]['id']);
-            }
-          }
-        }
-      }
-      //Update Enemies
-      if (enemy != {} && enemy != null) {
-        //Store old Values
-        List oldEnemies = [];
-        gameplay.enemiesInWorld.forEach((key, value) => oldEnemies.add(value));
-
-        //Clean
-        gameplay.enemyHandle('replace', enemy);
-
-        //Load New Values
-        List enemies = [];
-        gameplay.enemiesInWorld.forEach((key, value) => enemies.add(value));
-
-        //Add Function
-        if (oldEnemies.length != enemies.length) {
-          try {
-            //Sweep enemies
-            for (int i = 0; i < enemies.length; i++) {
-              bool add = true;
-              //Add Sweep
-              if (oldEnemies.length < enemies.length) {
-                for (int j = 0; j < oldEnemies.length; j++) {
-                  //If already exist
-                  if (enemies[i]['id'] == oldEnemies[j]['id']) {
-                    add = false;
-                    break;
-                  }
-                }
-              } else {
-                add = false;
-              }
-              //Add if not exist
-              if (add && enemies[i]['positionX'] != null && enemies[i]['positionY'] != null) {
-                //Add
-                gameRef.add(
-                  EnemyWithVision(
-                    context,
-                    int.parse(enemies[i]['id'].toString()),
-                    enemies[i]['name'],
-                    80.0,
-                    20.0,
-                    size: Vector2.all(32.0),
-                  ),
-                );
-              }
-            }
-          } catch (_) {}
-        }
-      }
-    });
   }
 
   @override
@@ -312,6 +154,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         animation = spriteIdle;
       }
     }
+    engine.changePlayerPosition(position);
   }
 
   @override

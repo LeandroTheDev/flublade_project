@@ -4,7 +4,7 @@ import 'dart:convert';
 
 import 'package:flublade_project/components/item_widget.dart';
 import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/mysql.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';

@@ -12,7 +12,7 @@ import 'package:flublade_project/data/gameplay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/mysqldata.dart';
+import '../../data/mysql.dart';
 
 class BattleScene extends StatefulWidget {
   final int enemyID;

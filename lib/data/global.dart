@@ -8,7 +8,7 @@ import 'package:flublade_project/components/loot_widget.dart';
 import 'package:flublade_project/components/magic_widget.dart';
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysqldata.dart';
+import 'package:flublade_project/data/mysql.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
