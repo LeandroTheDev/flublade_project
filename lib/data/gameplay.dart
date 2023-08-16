@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
-import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -289,15 +288,15 @@ class Gameplay with ChangeNotifier {
         });
   }
 
-//------
-//Battle
-//------
-//Change Selected Skill
+  //------
+  //Battle
+  //------
+  //Change Selected Skill
   void changePlayerSelectedSkill(value) {
     _playerSelectedSkill = value;
   }
 
-//Add a line to battle log
+  //Add a line to battle log
   void addBattleLog(value, context) {
     final options = Provider.of<Options>(context, listen: false);
     String result = '';
@@ -312,13 +311,13 @@ class Gameplay with ChangeNotifier {
     notifyListeners();
   }
 
-//Reset Battle Log
+  //Reset Battle Log
   void resetBattleLog() {
     _battleLog = [];
     notifyListeners();
   }
 
-//Change Player Stats or Enemy Stats
+  //Change Player Stats or Enemy Stats
   void changeStats({required value, required String stats, int enemyNumber = -1}) {
     //Player Stats
     if (stats == 'life') {
@@ -476,31 +475,9 @@ class Gameplay with ChangeNotifier {
     }
   }
 
-//------
-//Inventory
-//------
-//Remove Specific Item in inventory
-  void removeSpecificItemInventory(itemName, context) {
-    final settings = Provider.of<Settings>(context, listen: false);
-    //Base Function for removing item name from inventory
-    removingFunction(removedItem) {
-      //If already have quantity
-      if (playerInventory[removedItem]['quantity'] > 1) {
-        //Remove 1 quantity
-        playerInventory[removedItem]['quantity'] = playerInventory[removedItem]['quantity'] - 1;
-      } else {
-        playerInventory.remove(removedItem);
-      }
-    }
-
-    final equip = settings.translateEquipsIndex(settings.itemsId[settings.tierCheck(itemName)]['equip']);
-    if (_playerEquips[equip[0]] != 'none') {
-      addSpecificItemInventory(_playerEquips[equip[0]]);
-      removingFunction(itemName);
-    } else {
-      removingFunction(itemName);
-    }
-  }
+  //------
+  //Inventory
+  //------
 
 //Add Specific Item in inventory
   void addSpecificItemInventory(item) {

@@ -33,6 +33,18 @@ class Settings with ChangeNotifier {
 
   //Translate equip index
   List translateEquipsIndex(equipIndex) {
+    //Documentation
+    //0 Helmet
+    //1 ??
+    //2 ??
+    //3 Amulet
+    //4 Left Gloves
+    //5 Right Gloves
+    //6 Chest Plate
+    //7 Leggings
+    //8 Boots
+    //9 Left Weapon
+    //10 Right Weapon
     return [0];
   }
 

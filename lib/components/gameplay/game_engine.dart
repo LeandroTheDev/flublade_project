@@ -47,22 +47,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   int _msLag = 0;
   get msLag => _msLag;
 
-  //TO DO
-  // Map _equipmentsLoaded = {};
-  // get equipmentsLoaded => _equipmentsLoaded;
-
-  // // Equipments handle TO DO
-  // void equipmentsHandle({equipmentClass, handle, equip}) {
-  //   //Verify if equipment class is already referenced
-  //   if (_equipmentsLoaded[equipmentClass] == null) {
-  //     _equipmentsLoaded[equipmentClass] = {};
-  //   }
-  //   switch (handle) {
-  //     case 'add':
-  //       _equipmentsLoaded[equipmentClass].add(equip);
-  //   }
-  // }
-
   //-----
   // PROVIDER FUNCTIONS
   //-----
@@ -123,10 +107,9 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
           if (!_pauseConnection) {
             //Ping Delay Declaration
             int connectionDelay = 0;
-            dart.Timer.periodic(const Duration(milliseconds: 1), (timer) {
+            final connetionTimer = dart.Timer.periodic(const Duration(milliseconds: 1), (timer) {
               connectionDelay++;
             });
-
             //Direction Translate
             late final String direction;
             if (engine.joystickPosition[0] < 0.0) {
@@ -143,8 +126,8 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             final websocketMessage = await websocket.websocketSendIngame({
               'message': 'playersPosition',
               'id': options.id,
-              'positionX': position[0],
-              'positionY': position[1],
+              'positionX': _position[0],
+              'positionY': _position[1],
               'direction': direction,
               'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
               'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
@@ -152,6 +135,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
 
             //Loading Check
             if (websocketMessage == "OK" || websocketMessage == "timeout") {
+              timeoutHandle++;
               if (timeoutHandle > 100) {
                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
                 websocket.disconnectWebsockets(context);
@@ -279,6 +263,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             }
 
             //Ping Delay Update
+            connetionTimer.cancel();
             _msLag = connectionDelay;
           }
         });

@@ -17,7 +17,7 @@ import 'package:provider/provider.dart';
 // Player
 // ---------------
 // Player will be the main character that client will control;
-// this also controls the update from connections.
+//
 //
 //
 // PlayerClient
@@ -51,6 +51,9 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   double maxSpeed = 0.5;
   //left,right,up,down
   List<bool> collisionDirection = [false, false, false, false];
+
+  //Equipment Declarations
+  List loadedEquipments = [];
 
   //Player Declaration
   Player(
@@ -104,7 +107,6 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     });
     //Create a collision circle
     add(CircleHitbox(radius: 16, anchor: Anchor.center, position: size / 2, isSolid: true));
-    add(PlayerEquipment('leather_helmet', Player));
   }
 
   @override
@@ -154,7 +156,16 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         animation = spriteIdle;
       }
     }
+    //Change Player Position
     engine.changePlayerPosition(position);
+
+    //Verify Equipments Update
+    if (loadedEquipments != gameplay.playerEquips) {
+      List newEquipments = [];
+      for (int i = 0; i < gameplay.playerEquips.length; i++) {
+        //Add
+      }
+    }
   }
 
   @override
@@ -177,6 +188,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
     if (other == lastCollision) {
+      //Disable All Collisions
       collisionDirection = [
         false,
         false,
@@ -273,9 +285,9 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
 class PlayerEquipment extends SpriteAnimationComponent {
   //Engine Declarations
   final equipmentName;
-  final equipmentClass;
+  final equipmentFatherID;
 
-  PlayerEquipment(this.equipmentName, this.equipmentClass)
+  PlayerEquipment(this.equipmentName, this.equipmentFatherID)
       : super(
           anchor: Anchor.center,
           size: Vector2.all(32.0),
