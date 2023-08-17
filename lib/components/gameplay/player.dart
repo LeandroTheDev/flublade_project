@@ -53,7 +53,32 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   List<bool> collisionDirection = [false, false, false, false];
 
   //Equipment Declarations
-  List loadedEquipments = [];
+  List<PlayerEquipment> loadedEquipments = [
+    PlayerEquipment("none", "0"),
+    PlayerEquipment("none", "1"),
+    PlayerEquipment("none", "2"),
+    PlayerEquipment("none", "3"),
+    PlayerEquipment("none", "4"),
+    PlayerEquipment("none", "5"),
+    PlayerEquipment("none", "6"),
+    PlayerEquipment("none", "7"),
+    PlayerEquipment("none", "8"),
+    PlayerEquipment("none", "9"),
+    PlayerEquipment("none", "10"),
+  ];
+  List<String> loadedEquipmentsNames = [
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+    "none",
+  ];
 
   //Player Declaration
   Player(
@@ -156,14 +181,25 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         animation = spriteIdle;
       }
     }
+
     //Change Player Position
     engine.changePlayerPosition(position);
 
     //Verify Equipments Update
-    if (loadedEquipments != gameplay.playerEquips) {
-      List newEquipments = [];
+    if (loadedEquipmentsNames != gameplay.playerEquips) {
       for (int i = 0; i < gameplay.playerEquips.length; i++) {
-        //Add
+        //Update
+        loadedEquipmentsNames[i] = gameplay.playerEquips[i];
+
+        //Verify if the armor is already displayed
+        if (loadedEquipments[i].equipmentName != gameplay.playerEquips[i]) {
+          //Remove
+          loadedEquipments[i].removeFromParent();
+          //Update
+          loadedEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i.toString());
+          //Add
+          add(loadedEquipments[i]);
+        }
       }
     }
   }
