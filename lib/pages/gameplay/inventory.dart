@@ -36,7 +36,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
     //Equiped Item Image
     String showItem({required int index, required String defaultImage}) {
       if (gameplay.playerEquips[index] != 'none') {
-        return settings.itemsId[settings.tierCheck(gameplay.playerEquips[index]['name'])]['image'];
+        return settings.itemsId[Settings.tierCheck(gameplay.playerEquips[index]['name'])]['image'];
       }
       return defaultImage;
     }
@@ -53,7 +53,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Unequip item Text
                 title: Text(
-                  '${Language.Translate('response_unequip', options.language) ?? 'Unequip item'} ${Language.Translate('items_${settings.tierCheck(item['name'])}', options.language) ?? 'Item Name'} ${settings.itemTier(item['name'], addPlus: true)}',
+                  '${Language.Translate('response_unequip', options.language) ?? 'Unequip item'} ${Language.Translate('items_${Settings.tierCheck(item['name'])}', options.language) ?? 'Item Name'} ${Settings.itemTier(item['name'], addPlus: true)}',
                   style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 40),
                 ),
                 //Desc & Buttons
@@ -180,14 +180,14 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                     ),
                   ),
                   //Damage Text
-                  settings.itemsId[settings.tierCheck(itemName)]['damage'] != null
+                  settings.itemsId[Settings.tierCheck(itemName)]['damage'] != null
                       ? Container(
                           height: screenSize.height * 0.06,
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.centerLeft,
                           child: FittedBox(
                             child: Text(
-                              '${Language.Translate('response_damage', options.language) ?? 'Damage'}: ${settings.itemsId[gameplay.playerEquips[settings.translateEquipsIndex(settings.itemsId[settings.tierCheck(itemName)]['equip'])[0]]]['damage']}',
+                              '${Language.Translate('response_damage', options.language) ?? 'Damage'}: ${settings.itemsId[gameplay.playerEquips[settings.translateEquipsIndex(settings.itemsId[Settings.tierCheck(itemName)]['equip'])[0]]]['damage']}',
                               style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 200),
                             ),
                           ),
@@ -211,14 +211,14 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                     ),
                   ),
                   //Damage Text
-                  settings.itemsId[settings.tierCheck(itemName)]['damage'] != null
+                  settings.itemsId[Settings.tierCheck(itemName)]['damage'] != null
                       ? Container(
                           height: screenSize.height * 0.06,
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.centerLeft,
                           child: FittedBox(
                             child: Text(
-                              '${Language.Translate('response_damage', options.language) ?? 'Damage'}: ${settings.itemsId[settings.tierCheck(itemName)]['damage']}',
+                              '${Language.Translate('response_damage', options.language) ?? 'Damage'}: ${settings.itemsId[Settings.tierCheck(itemName)]['damage']}',
                               style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 200),
                             ),
                           ),
@@ -234,10 +234,10 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
     void showItemInfo(String itemName) async {
       //Translate the item name
       String itemTranslation;
-      if (Language.Translate('items_${settings.tierCheck(itemName)}_desc', 'en_US') == null) {
+      if (Language.Translate('items_${Settings.tierCheck(itemName)}_desc', 'en_US') == null) {
         itemTranslation = itemName.substring(0, itemName.length - 2);
       } else {
-        itemTranslation = settings.tierCheck(itemName);
+        itemTranslation = Settings.tierCheck(itemName);
       }
 
       showDialog(
@@ -250,7 +250,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 //Title
                 title: Text(
-                  '${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${settings.itemTier(itemName, addPlus: true)}',
+                  '${Language.Translate('items_$itemTranslation', options.language) ?? 'Item Name'} ${Settings.itemTier(itemName, addPlus: true)}',
                   style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 40),
                 ),
                 //Desc & Buttons
@@ -303,13 +303,13 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                         child: Row(
                           children: [
                             //Equip
-                            settings.itemsId[settings.tierCheck(itemName)]['equip'] != 'none'
+                            settings.itemsId[Settings.tierCheck(itemName)]['equip'] != 'none'
                                 ? SizedBox(
                                     width: 200,
                                     height: 50,
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        if (settings.itemsId[settings.tierCheck(itemName)]['equip'].length > 1) {
+                                        if (settings.itemsId[Settings.tierCheck(itemName)]['equip'].length > 1) {
                                           showDialog(
                                               barrierColor: const Color.fromARGB(167, 0, 0, 0),
                                               context: context,
@@ -320,7 +320,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                     //Equip Text
                                                     title: Text(
-                                                      '${Language.Translate('response_equip', options.language) ?? 'Equip'} ${Language.Translate('items_${settings.tierCheck(itemName)}', options.language) ?? 'Language Error'} ${settings.itemTier(itemName, addPlus: true)}',
+                                                      '${Language.Translate('response_equip', options.language) ?? 'Equip'} ${Language.Translate('items_${Settings.tierCheck(itemName)}', options.language) ?? 'Language Error'} ${Settings.itemTier(itemName, addPlus: true)}',
                                                       style: TextStyle(color: Theme.of(context).primaryColor),
                                                     ),
                                                     content: SizedBox(
@@ -330,7 +330,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                         child: ListView.builder(
                                                           scrollDirection: Axis.horizontal,
                                                           shrinkWrap: true,
-                                                          itemCount: settings.itemsId[settings.tierCheck(itemName)]['equip'].length,
+                                                          itemCount: settings.itemsId[Settings.tierCheck(itemName)]['equip'].length,
                                                           itemBuilder: (context, index) => SizedBox(
                                                             width: 100,
                                                             height: 50,
@@ -338,7 +338,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                               padding: const EdgeInsets.all(8.0),
                                                               child: ElevatedButton(
                                                                 onPressed: () async {
-                                                                  final selectedIndex = settings.itemsId[settings.tierCheck(itemName)]['equip'][index];
+                                                                  final selectedIndex = settings.itemsId[Settings.tierCheck(itemName)]['equip'][index];
                                                                   //Loading Widget
                                                                   GlobalFunctions.loadingWidget(context: context, language: options.language);
                                                                   //Equipped item variable
@@ -364,7 +364,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                 },
                                                                 child: FittedBox(
                                                                   child: Text(
-                                                                    Language.Translate('response_equipmentIndex_${settings.itemsId[settings.tierCheck(itemName)]['equip'][index]}', options.language) ?? 'Language Error',
+                                                                    Language.Translate('response_equipmentIndex_${settings.itemsId[Settings.tierCheck(itemName)]['equip'][index]}', options.language) ?? 'Language Error',
                                                                     style: const TextStyle(fontSize: 99),
                                                                   ),
                                                                 ),
@@ -378,7 +378,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                 );
                                               });
                                         } else {
-                                          final selectedIndex = settings.itemsId[settings.tierCheck(itemName)]['equip'][0];
+                                          final selectedIndex = settings.itemsId[Settings.tierCheck(itemName)]['equip'][0];
                                           //Loading Widget
                                           GlobalFunctions.loadingWidget(context: context, language: options.language);
                                           //Equipped item variable
@@ -410,7 +410,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                   )
                                 : const SizedBox(),
                             //Spacer
-                            settings.itemsId[settings.tierCheck(itemName)]['equip'] != 'none' ? const SizedBox(width: 50) : const SizedBox(),
+                            settings.itemsId[Settings.tierCheck(itemName)]['equip'] != 'none' ? const SizedBox(width: 50) : const SizedBox(),
                             //Back
                             SizedBox(
                               width: 200,
@@ -429,8 +429,8 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                         ),
                       ),
                       //Compare
-                      settings.itemsId[settings.tierCheck(itemName)]['equip'] != 'none'
-                          ? gameplay.playerEquips[settings.itemsId[settings.tierCheck(itemName)]['equip'][0]] != 'none'
+                      settings.itemsId[Settings.tierCheck(itemName)]['equip'] != 'none'
+                          ? gameplay.playerEquips[settings.itemsId[Settings.tierCheck(itemName)]['equip'][0]] != 'none'
                               //Enabled Button
                               ? Padding(
                                   padding: const EdgeInsets.only(top: 30.0),
@@ -760,7 +760,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                         ),
                                       ),
                                       //Tier
-                                      settings.itemTier(returnEquipName(9)) == '0'
+                                      Settings.itemTier(returnEquipName(9)) == '0'
                                           ? const SizedBox()
                                           : Align(
                                               alignment: Alignment.topRight,
@@ -769,7 +769,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                 child: Stack(
                                                   children: [
                                                     Text(
-                                                      settings.itemTier(returnEquipName(9)),
+                                                      Settings.itemTier(returnEquipName(9)),
                                                       style: TextStyle(
                                                         fontSize: 20,
                                                         fontFamily: 'PressStart',
@@ -782,7 +782,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                       ),
                                                     ),
                                                     Text(
-                                                      settings.itemTier(returnEquipName(9)),
+                                                      Settings.itemTier(returnEquipName(9)),
                                                       style: const TextStyle(
                                                         fontSize: 20,
                                                         letterSpacing: 5,
@@ -825,7 +825,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                         ),
                                       ),
                                       //Tier
-                                      settings.itemTier(returnEquipName(10)) == '0'
+                                      Settings.itemTier(returnEquipName(10)) == '0'
                                           ? const SizedBox()
                                           : Align(
                                               alignment: Alignment.topRight,
@@ -834,7 +834,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                 child: Stack(
                                                   children: [
                                                     Text(
-                                                      settings.itemTier(returnEquipName(10)),
+                                                      Settings.itemTier(returnEquipName(10)),
                                                       style: TextStyle(
                                                         fontSize: 20,
                                                         fontFamily: 'PressStart',
@@ -847,7 +847,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                       ),
                                                     ),
                                                     Text(
-                                                      settings.itemTier(returnEquipName(10)),
+                                                      Settings.itemTier(returnEquipName(10)),
                                                       style: const TextStyle(
                                                         fontSize: 20,
                                                         letterSpacing: 5,

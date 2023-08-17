@@ -11,7 +11,7 @@ class ItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     const itemColor = Colors.grey;
     final settings = Provider.of<Settings>(context, listen: false);
-    final itemTier = settings.itemTier(itemName);
+    final itemTier = Settings.itemTier(itemName);
 
     return FittedBox(
       child: Container(

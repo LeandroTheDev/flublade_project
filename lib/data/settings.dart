@@ -1,3 +1,4 @@
+import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 class Settings with ChangeNotifier {
@@ -6,12 +7,33 @@ class Settings with ChangeNotifier {
   Map _levelCaps = {};
   Map _skillsId = {};
   Map _itemsId = {};
+  final Map _equipmentSettings = {
+    "none": {
+      "size": Vector2.all(0.0),
+      "position": Vector2.all(0.0),
+      "textureSize": Vector2.all(0.0),
+      "idleAmount": 1,
+      "idleStep": 0.1,
+      "runAmount": 1,
+      "runStep": 0.1,
+    },
+    "leather_helmet": {
+      "size": Vector2.all(32.0),
+      "position": Vector2.all(16.0),
+      "textureSize": Vector2.all(0.0),
+      "idleAmount": 1,
+      "idleStep": 0.1,
+      "runAmount": 1,
+      "runStep": 0.1,
+    }
+  };
 
   bool get isLoading => _isLoading;
   Map get baseAtributes => _baseAtributes;
   Map get levelCaps => _levelCaps;
   Map get skillsId => _skillsId;
   Map get itemsId => _itemsId;
+  Map get equipmentSettings => _equipmentSettings;
 
   void changeIsLoading({value}) {
     if (value == null) {
@@ -67,13 +89,13 @@ class Settings with ChangeNotifier {
   String lootImage(itemName) {
     if (itemName.contains('%')) {
       itemName = itemName.substring(0, itemName.length - 3);
-      return itemsId[itemName]['image'];
+      return _itemsId[itemName]['image'];
     }
-    return itemsId[itemName]['image'];
+    return _itemsId[itemName]['image'];
   }
 
   //Returns the tier
-  String itemTier(itemName, {addPlus = false}) {
+  static String itemTier(itemName, {addPlus = false}) {
     if (itemName.contains('%')) {
       final tier = int.parse(itemName.substring(itemName.length - 2));
       if (addPlus) {
@@ -85,7 +107,7 @@ class Settings with ChangeNotifier {
   }
 
   //Returns the item name without Tier
-  String tierCheck(itemName) {
+  static String tierCheck(itemName) {
     if (itemName.contains('%')) {
       itemName = itemName.substring(0, itemName.length - 3);
       return itemName;

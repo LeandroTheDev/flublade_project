@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Gameplay with ChangeNotifier {
+  //All Classes
   static Map classes = {
     0: 'assets/characters/archer.png',
     1: 'assets/characters/assassin.png',
@@ -21,46 +22,26 @@ class Gameplay with ChangeNotifier {
     11: 'assets/characters/witch.png',
   };
 
-  static String returnClassInfo(int index, String language) {
-    Map classesInfo = {
-      0: 'characters_class_archer_info',
-      1: 'characters_class_assassin_info',
-      2: 'characters_class_bard_info',
-      3: 'characters_class_beastmaster_info',
-      4: 'characters_class_berserk_info',
-      5: 'characters_class_druid_info',
-      6: 'characters_class_mage_info',
-      7: 'characters_class_paladin_info',
-      8: 'characters_class_priest_info',
-      9: 'characters_class_trickmagician_info',
-      10: 'characters_class_weaponsmith_info',
-      11: 'characters_class_witch_info',
-    };
-    return Language.Translate(classesInfo[index], language) ?? 'Language Error';
-  }
-
   //System Provider
   Map _characters = {};
   int _selectedCharacter = 0;
-
-  Map get characters => _characters;
-  int get selectedCharacter => _selectedCharacter;
-
-  void changeCharacters(Map value) {
-    _characters = value;
-  }
-
-  void changeSelectedCharacter(int value) {
-    _selectedCharacter = value;
-  }
-
-  //Ingame Provider
   bool _isTalkable = false;
   List<String> _selectedTalk = [];
   String _selectedNPC = 'wizard';
   int _worldId = 0;
   List<String> _battleLog = [];
   String _location = '';
+
+  Map get characters => _characters;
+  int get selectedCharacter => _selectedCharacter;
+  bool get isTalkable => _isTalkable;
+  int get worldId => _worldId;
+  List<String> get selectedTalk => _selectedTalk;
+  String get selectedNPC => _selectedNPC;
+  List<String> get battleLog => _battleLog;
+  String get location => _location;
+
+  //Players Provider
   double _playerLife = 0;
   double _playerMana = 0;
   double _playerGold = 0;
@@ -80,18 +61,6 @@ class Gameplay with ChangeNotifier {
   Map _playerSkills = {};
   String _playerSelectedSkill = 'basicAttack';
 
-  Map _enemies = {};
-  bool _alreadyInBattle = false;
-
-  Map _usersInWorld = {};
-  Map _enemiesInWorld = {};
-
-  bool get isTalkable => _isTalkable;
-  int get worldId => _worldId;
-  List<String> get selectedTalk => _selectedTalk;
-  String get selectedNPC => _selectedNPC;
-  List<String> get battleLog => _battleLog;
-  String get location => _location;
   double get playerLife => _playerLife;
   double get playerMana => _playerMana;
   double get playerGold => _playerGold;
@@ -111,6 +80,13 @@ class Gameplay with ChangeNotifier {
   String get playerSelectedSkill => _playerSelectedSkill;
   List get playerDebuffs => _playerDebuffs;
 
+  //Enemy Provider
+  Map _enemies = {};
+  bool _alreadyInBattle = false;
+
+  Map _usersInWorld = {};
+  Map _enemiesInWorld = {};
+
   Map get enemies => _enemies;
   bool get alreadyInBattle => _alreadyInBattle;
 
@@ -118,8 +94,19 @@ class Gameplay with ChangeNotifier {
   Map get enemiesInWorld => _enemiesInWorld;
 
   //------
-  //Ingame
+  //System
   //------
+
+  //Change Players Profile Characters
+  void changeCharacters(Map value) {
+    _characters = value;
+  }
+
+  //Change the Selected Character
+  void changeSelectedCharacter(int value) {
+    _selectedCharacter = value;
+  }
+
   //Change already in battle
   void changeAlreadyInBattle(bool value) {
     _alreadyInBattle = value;
@@ -291,6 +278,7 @@ class Gameplay with ChangeNotifier {
   //------
   //Battle
   //------
+
   //Change Selected Skill
   void changePlayerSelectedSkill(value) {
     _playerSelectedSkill = value;

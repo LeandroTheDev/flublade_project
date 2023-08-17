@@ -8,6 +8,7 @@ import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/mysql.dart';
 import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -39,6 +40,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   late final Gameplay gameplay;
   late final Options options;
   late final Websocket websocket;
+  late final Settings settings;
 
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
@@ -53,19 +55,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   List<bool> collisionDirection = [false, false, false, false];
 
   //Equipment Declarations
-  List<PlayerEquipment> loadedEquipments = [
-    PlayerEquipment("none", "0"),
-    PlayerEquipment("none", "1"),
-    PlayerEquipment("none", "2"),
-    PlayerEquipment("none", "3"),
-    PlayerEquipment("none", "4"),
-    PlayerEquipment("none", "5"),
-    PlayerEquipment("none", "6"),
-    PlayerEquipment("none", "7"),
-    PlayerEquipment("none", "8"),
-    PlayerEquipment("none", "9"),
-    PlayerEquipment("none", "10"),
-  ];
+  late List<PlayerEquipment> loadedEquipments;
   List<String> loadedEquipmentsNames = [
     "none",
     "none",
@@ -98,9 +88,22 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     gameplay = Provider.of<Gameplay>(context, listen: false);
     options = Provider.of<Options>(context, listen: false);
     websocket = Provider.of<Websocket>(context, listen: false);
+    settings = Provider.of<Settings>(context, listen: false);
+    loadedEquipments = [
+      PlayerEquipment("none", 0, context),
+      PlayerEquipment("none", 1, context),
+      PlayerEquipment("none", 2, context),
+      PlayerEquipment("none", 3, context),
+      PlayerEquipment("none", 4, context),
+      PlayerEquipment("none", 5, context),
+      PlayerEquipment("none", 6, context),
+      PlayerEquipment("none", 7, context),
+      PlayerEquipment("none", 8, context),
+      PlayerEquipment("none", 9, context),
+      PlayerEquipment("none", 10, context),
+    ];
   }
 
-  //Loading
   @override
   Future<void> onLoad() async {
     //Define the player on top of everthing
@@ -196,7 +199,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
           //Remove
           loadedEquipments[i].removeFromParent();
           //Update
-          loadedEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i.toString());
+          loadedEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i, context);
           //Add
           add(loadedEquipments[i]);
         }
@@ -318,19 +321,57 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
   }
 }
 
-class PlayerEquipment extends SpriteAnimationComponent {
+class PlayerEquipment extends SpriteAnimationComponent with HasGameRef {
   //Engine Declarations
-  final equipmentName;
-  final equipmentFatherID;
+  final String equipmentName;
+  late final String equipmentNameWithoutTier;
+  final int equipmentFatherID;
+  final BuildContext context;
+  late final Settings settings;
 
-  PlayerEquipment(this.equipmentName, this.equipmentFatherID)
+  //Sprite Declarations
+  late final SpriteAnimation spriteIdle;
+  late final SpriteAnimation spriteRun;
+
+  PlayerEquipment(this.equipmentName, this.equipmentFatherID, this.context)
       : super(
           anchor: Anchor.center,
-          size: Vector2.all(32.0),
+          //Pickup size by configuration
+          size: Provider.of<Settings>(context, listen: false).equipmentSettings[Settings.tierCheck(equipmentName)]["size"],
         );
 
   @override
+  void onMount() {
+    super.onMount();
+    settings = Provider.of<Settings>(context, listen: false);
+    equipmentNameWithoutTier = Settings.tierCheck(equipmentName);
+  }
+
+  @override
   Future<void> onLoad() async {
-    position = size / 2;
+    position = settings.equipmentSettings[equipmentNameWithoutTier]["position"];
+    //Idle Sprite
+    gameRef.images.load('items/$equipmentNameWithoutTier.png').then((loadedSprite) {
+      spriteIdle = SpriteAnimation.fromFrameData(
+        loadedSprite,
+        SpriteAnimationData.sequenced(
+          amount: settings.equipmentSettings[equipmentNameWithoutTier]["idleAmount"],
+          textureSize: settings.equipmentSettings[equipmentNameWithoutTier]["textureSize"],
+          stepTime: settings.equipmentSettings[equipmentNameWithoutTier]["idleStep"],
+        ),
+      );
+      animation = spriteIdle;
+    });
+    //Run Sprite
+    gameRef.images.load('items/$equipmentNameWithoutTier.png').then((loadedSprite) {
+      spriteRun = SpriteAnimation.fromFrameData(
+        loadedSprite,
+        SpriteAnimationData.sequenced(
+          amount: settings.equipmentSettings[equipmentNameWithoutTier]["runAmount"],
+          textureSize: settings.equipmentSettings[equipmentNameWithoutTier]["textureSize"],
+          stepTime: settings.equipmentSettings[equipmentNameWithoutTier]["runStep"],
+        ),
+      );
+    });
   }
 }

@@ -80,7 +80,7 @@ class _LootWidgetState extends State<LootWidget> {
                   ),
                 ),
                 //Tier
-                settings.itemTier(widget.loots[widget.index]['name']) == '0'
+                Settings.itemTier(widget.loots[widget.index]['name']) == '0'
                     ? const SizedBox()
                     : Align(
                         alignment: Alignment.topRight,
@@ -89,7 +89,7 @@ class _LootWidgetState extends State<LootWidget> {
                           child: Stack(
                             children: [
                               Text(
-                                settings.itemTier(widget.loots[widget.index]['name']),
+                                Settings.itemTier(widget.loots[widget.index]['name']),
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontFamily: 'PressStart',
@@ -102,7 +102,7 @@ class _LootWidgetState extends State<LootWidget> {
                                 ),
                               ),
                               Text(
-                                settings.itemTier(widget.loots[widget.index]['name']),
+                                Settings.itemTier(widget.loots[widget.index]['name']),
                                 style: const TextStyle(
                                   fontSize: 10,
                                   letterSpacing: 1,
