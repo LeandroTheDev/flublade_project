@@ -31,7 +31,7 @@ import 'package:provider/provider.dart';
 // Receive from Player or PlayerClient equipment infos;
 // this is a component to create the sprite armor for the respective equipped item.
 
-class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks {
+class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks, ChangeNotifier {
   //Engine Declarations
   final BuildContext context;
   final Vector2 playerPosition;
@@ -55,26 +55,12 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
   List<bool> collisionDirection = [false, false, false, false];
 
   //Equipment Declarations
-  late List<PlayerEquipment> loadedEquipments;
-  List<String> loadedEquipmentsNames = [
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-    "none",
-  ];
+  late List<PlayerEquipment> loadedIngameEquipments;
+  late List loadedEquipment;
 
   //Player Declaration
-  Player(
-    this.context,
-    this.playerPosition,
-  ) : super(
+  Player(this.context, this.playerPosition)
+      : super(
           size: Vector2.all(32.0),
           position: playerPosition,
         ) {
@@ -89,7 +75,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     options = Provider.of<Options>(context, listen: false);
     websocket = Provider.of<Websocket>(context, listen: false);
     settings = Provider.of<Settings>(context, listen: false);
-    loadedEquipments = [
+    loadedIngameEquipments = [
       PlayerEquipment("none", 0, context),
       PlayerEquipment("none", 1, context),
       PlayerEquipment("none", 2, context),
@@ -102,6 +88,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
       PlayerEquipment("none", 9, context),
       PlayerEquipment("none", 10, context),
     ];
+    loadedEquipment = gameplay.playerEquips;
   }
 
   @override
@@ -185,23 +172,20 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
       }
     }
 
-    //Change Player Position
-    engine.changePlayerPosition(position);
-
     //Verify Equipments Update
-    if (loadedEquipmentsNames != gameplay.playerEquips) {
+    if (loadedEquipment != gameplay.playerEquips) {
       for (int i = 0; i < gameplay.playerEquips.length; i++) {
         //Update
-        loadedEquipmentsNames[i] = gameplay.playerEquips[i];
+        loadedEquipment[i] = gameplay.playerEquips[i];
 
         //Verify if the armor is already displayed
-        if (loadedEquipments[i].equipmentName != gameplay.playerEquips[i]) {
+        if (loadedIngameEquipments[i].equipmentName != gameplay.playerEquips[i]) {
           //Remove
-          loadedEquipments[i].removeFromParent();
+          loadedIngameEquipments[i].removeFromParent();
           //Update
-          loadedEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i, context);
+          loadedIngameEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i, context);
           //Add
-          add(loadedEquipments[i]);
+          add(loadedIngameEquipments[i]);
         }
       }
     }

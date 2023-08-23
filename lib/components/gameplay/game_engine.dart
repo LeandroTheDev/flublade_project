@@ -26,6 +26,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   late final Gameplay gameplay;
   late final Options options;
   late final Websocket websocket;
+  bool isLoaded = false;
 
   //-----
   // PROVIDER VARIABLES
@@ -35,9 +36,8 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   Vector2 _joystickPosition = Vector2(0.0, 0.0);
   get joystickPosition => _joystickPosition;
 
-  //Player World Position
-  Vector2 _position = Vector2(0.0, 0.0);
-  get position => _position;
+  //Player in the world
+  late Player player;
 
   //Ingame Connection Variables
   bool _pauseConnection = false;
@@ -59,11 +59,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   //Close Connection
   void closeConnection() {
     _connection.cancel();
-  }
-
-  //Change Player Position Variable
-  void changePlayerPosition(Vector2 value) {
-    _position = value;
   }
 
   //Set Joystick Position
@@ -104,7 +99,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
         //Connection Repeater
         int timeoutHandle = 0;
         _connection = dart.Timer.periodic(const Duration(milliseconds: 50), (timer) async {
-          if (!_pauseConnection) {
+          if (!_pauseConnection && isLoaded) {
             //Ping Delay Declaration
             int connectionDelay = 0;
             final connetionTimer = dart.Timer.periodic(const Duration(milliseconds: 1), (timer) {
@@ -121,13 +116,13 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             if (engine.joystickPosition[0] == 0.0) {
               direction = 'Direction.idle';
             }
-
+            // print(_playerPosition);
             //Server Signal
             final websocketMessage = await websocket.websocketSendIngame({
               'message': 'playersPosition',
               'id': options.id,
-              'positionX': _position[0],
-              'positionY': _position[1],
+              'positionX': player.position[0],
+              'positionY': player.position[1],
               'direction': direction,
               'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
               'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
@@ -137,14 +132,19 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             if (websocketMessage == "OK" || websocketMessage == "timeout") {
               timeoutHandle++;
               if (timeoutHandle > 100) {
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
-                websocket.disconnectWebsockets(context);
-                GlobalFunctions.errorDialog(
-                  errorMsgTitle: 'authentication_lost_connection',
-                  errorMsgContext: 'You have lost connection to the servers.',
-                  context: context,
-                );
-                return;
+                if (_connection.isActive) {
+                  try {
+                    closeConnection();
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
+                    websocket.disconnectWebsockets(context);
+                    GlobalFunctions.errorDialog(
+                      errorMsgTitle: 'authentication_lost_connection',
+                      errorMsgContext: 'You have lost connection to the servers.',
+                      context: context,
+                    );
+                    return;
+                  } catch (_) {}
+                }
               }
               return;
             }
@@ -276,8 +276,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   @override
   Future<void> onLoad() async {
     //Player Creation
-    final player = Player(context, Vector2(48.0, 180.0));
-
+    player = Player(context, Vector2(48.0, 180.0));
     //Add Components
     add(player);
     //Camera
@@ -288,19 +287,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
       final worldGeneration = WorldGeneration();
       worldGeneration.generateWorld(value, baseEngine.gameController);
     });
-    //Test
-    // final worldGeneration = WorldGeneration();
-    // worldGeneration.generateWorld([
-    //   [
-    //     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    //   ]
-    // ], engine.gameController);
+    isLoaded = true;
   }
 }

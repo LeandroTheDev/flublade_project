@@ -208,13 +208,14 @@ class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   final double enemyVisionRadius;
   final double enemyCollisionRadius;
 
-  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size}) : super(size: size);
+  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size})
+      : super(size: size);
 
   @override
   Future<void> onLoad() async {
     //View HitBox
     add(CircleHitbox(radius: enemyVisionRadius, anchor: Anchor.center, position: size / 2));
-    add(CircleHitbox(radius: enemyVisionRadius / 2, anchor: Anchor.center, position: size / 2));
+    add(CircleHitbox(radius: enemyVisionRadius * 0.7, anchor: Anchor.center, position: size / 2));
 
     //Enemy in Child
     add(
