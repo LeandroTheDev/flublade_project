@@ -78,7 +78,7 @@ class Websocket with ChangeNotifier {
   //Websocket Ingame Send Mensage
   Future<String> websocketSendIngame(value, context) async {
     if (_disconnectIngame) {
-      return "timeout";
+      return "disconnected";
     }
     _websocketIngame.sink.add(jsonEncode(value));
     final result = await websocketListenIngame(context);
@@ -143,7 +143,7 @@ class Websocket with ChangeNotifier {
   //Websocket Battle Send Mensage
   Future<String> websocketSendBattle(value, context) async {
     if (_disconnectBattle) {
-      return "timeout";
+      return "disconnected";
     }
     _websocketBattle.sink.add(jsonEncode(value));
     final result = await websocketListenBattle(context);

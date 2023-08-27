@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -159,10 +160,10 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
-    //Remove from world
-    gameplay.enemiesInWorld['enemy$enemyID']['isDead'] = true;
     //If not in battle
     if (other is Player && !gameplay.alreadyInBattle) {
+      //Remove from world
+      gameplay.enemiesInWorld['enemy$enemyID']['isDead'] = true;
       gameplay.changeAlreadyInBattle(true);
       //Remove enemy from the world
       websocket.websocketOnlySendIngame({
@@ -179,6 +180,8 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
     }
     //If in battle
     else if (other is Player && gameplay.alreadyInBattle) {
+      //Remove from world
+      gameplay.enemiesInWorld['enemy$enemyID']['isDead'] = true;
       Future.delayed(const Duration(seconds: 1)).then((value) => {
             //Remove enemy from the world
             websocket.websocketOnlySendIngame({
@@ -201,21 +204,35 @@ class Enemy extends SpriteAnimationComponent with HasGameRef, CollisionCallbacks
 class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   //Engine Declarations
   final BuildContext context;
+  late final Websocket websocket;
+  late final Options options;
+  late final Gameplay gameplay;
+  int collisionQuantity = 0;
 
   //Info Declarations
   final int enemyID;
   final String enemyName;
   final double enemyVisionRadius;
   final double enemyCollisionRadius;
+  int indexChasing = -1;
 
   EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size})
       : super(size: size);
+
+  @override
+  void onMount() {
+    super.onMount();
+    websocket = Provider.of<Websocket>(context, listen: false);
+    options = Provider.of<Options>(context, listen: false);
+    gameplay = Provider.of<Gameplay>(context, listen: false);
+  }
 
   @override
   Future<void> onLoad() async {
     //View HitBox
     add(CircleHitbox(radius: enemyVisionRadius, anchor: Anchor.center, position: size / 2));
     add(CircleHitbox(radius: enemyVisionRadius * 0.7, anchor: Anchor.center, position: size / 2));
+    add(CircleHitbox(radius: enemyVisionRadius * 0.4, anchor: Anchor.center, position: size / 2));
 
     //Enemy in Child
     add(
@@ -244,17 +261,49 @@ class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (other is Player) {
-      final websocket = Provider.of<Websocket>(context, listen: false);
-      final options = Provider.of<Options>(context, listen: false);
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      //Error Treatment
+      try {
+        //Verify if is wrong id and throw error
+        if (gameplay.enemiesChasing[indexChasing] != enemyID) {
+          throw Exception("different_id");
+        }
+      } catch (e) {
+        //Verify if is wrong id
+        if (e.toString().contains("different_id")) {
+          //Fix wrong id
+          gameplay.updateSpecificEnemiesChasing(indexChasing, enemyID);
+        } else {
+          final newIndex = gameplay.findSpecificEnemiesChasing(enemyID);
+          //Verify if is in wrong index
+          if (newIndex >= 0) {
+            //Fix wrong index
+            indexChasing = newIndex;
+          } else {
+            //Unkown Error Remove Enemy
+            removeFromParent();
+          }
+        }
+      }
       //Message The Server
       websocket.websocketOnlySendIngame({
         'message': 'enemyMoving',
         'id': options.id,
         'location': gameplay.characters['character${gameplay.selectedCharacter}']['location'],
-        'enemyID': enemyID,
+        'enemyID': jsonEncode(gameplay.enemiesChasing),
         'isSee': true,
       }, context);
+    }
+  }
+
+  @override
+  void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollisionStart(intersectionPoints, other);
+    if (other is Player) {
+      //Add enemy into chasing array
+      if (collisionQuantity == 0) {
+        indexChasing = gameplay.addEnemiesChasing(enemyID);
+      }
+      collisionQuantity++;
     }
   }
 
@@ -262,10 +311,11 @@ class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
     if (other is Player) {
-      //Provider Declaration
-      final websocket = Provider.of<Websocket>(context, listen: false);
-      final options = Provider.of<Options>(context, listen: false);
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      collisionQuantity--;
+      //Remove enemy from chasing array
+      if (collisionQuantity == 0) {
+        gameplay.removeSpecificEnemiesChasing(indexChasing);
+      }
       //Message The Server
       websocket.websocketOnlySendIngame({
         'message': 'enemyMoving',

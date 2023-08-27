@@ -120,6 +120,7 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
         ),
       );
     });
+
     //Create a collision circle
     add(CircleHitbox(radius: 16, anchor: Anchor.center, position: size / 2, isSolid: true));
   }
@@ -173,22 +174,22 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     }
 
     //Verify Equipments Update
-    if (loadedEquipment != gameplay.playerEquips) {
-      for (int i = 0; i < gameplay.playerEquips.length; i++) {
-        //Update
-        loadedEquipment[i] = gameplay.playerEquips[i];
+    // if (loadedEquipment != gameplay.playerEquips) {
+    //   for (int i = 0; i < gameplay.playerEquips.length; i++) {
+    //     //Update
+    //     loadedEquipment[i] = gameplay.playerEquips[i];
 
-        //Verify if the armor is already displayed
-        if (loadedIngameEquipments[i].equipmentName != gameplay.playerEquips[i]) {
-          //Remove
-          loadedIngameEquipments[i].removeFromParent();
-          //Update
-          loadedIngameEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i, context);
-          //Add
-          add(loadedIngameEquipments[i]);
-        }
-      }
-    }
+    //     //Verify if the armor is already displayed
+    //     if (loadedIngameEquipments[i].equipmentName != gameplay.playerEquips[i]) {
+    //       //Remove
+    //       loadedIngameEquipments[i].removeFromParent();
+    //       //Update
+    //       loadedIngameEquipments[i] = PlayerEquipment(gameplay.playerEquips[i], i, context);
+    //       //Add
+    //       add(loadedIngameEquipments[i]);
+    //     }
+    //   }
+    // }
   }
 
   @override
@@ -226,72 +227,109 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
   //Engine Declarations
   final BuildContext context;
   final String id;
+  late final Gameplay gameplay;
+
+  //Sprite Declarations
+  late final SpriteAnimation spriteIdle;
+  late final SpriteAnimation spriteRun;
 
   //Animation Declarations
-  String lastAnimation = 'Direction.left';
+  late String lastAnimation;
   bool animationLoad = false;
 
   PlayerClient(
     this.id,
     Vector2 playerPosition,
     this.context,
-  ) : super(position: playerPosition);
+  ) : super(position: playerPosition, size: Vector2.all(32.0));
+
+  @override
+  void onMount() {
+    super.onMount();
+    gameplay = Provider.of<Gameplay>(context, listen: false);
+  }
 
   @override
   Future<void> onLoad() async {
     priority = 50;
     //SPRITE HERE
+    final imageLocation = 'players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}';
+    //Idle Sprite
+    gameRef.images.load('${imageLocation}_ingame_idleright.png').then((loadedSprite) {
+      spriteIdle = SpriteAnimation.fromFrameData(
+        loadedSprite,
+        SpriteAnimationData.sequenced(
+          amount: 1,
+          textureSize: Vector2(16.0, 16.0),
+          stepTime: 0.1,
+        ),
+      );
+      animation = spriteIdle;
+    });
+    //Run Sprite
+    gameRef.images.load('${imageLocation}_ingame_runright.png').then((loadedSprite) {
+      spriteRun = SpriteAnimation.fromFrameData(
+        loadedSprite,
+        SpriteAnimationData.sequenced(
+          amount: 4,
+          textureSize: Vector2(16.0, 16.0),
+          stepTime: 0.1,
+        ),
+      );
+    });
+    //First Direction
+    lastAnimation = Provider.of<Gameplay>(context, listen: false).usersInWorld[id]['direction'];
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-
-    //Verify if the user is alive
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    List users = [];
-    gameplay.usersInWorld.forEach((key, value) => users.add(value));
-    bool remove = true;
-    for (int i = 0; i < users.length; i++) {
-      if (id == users[i]['id'].toString()) {
-        remove = false;
-      }
+    Vector2 newPosition =
+        Vector2(double.parse(gameplay.usersInWorld[id]['positionX'].toString()), double.parse(gameplay.usersInWorld[id]['positionY'].toString()));
+    //Check if disconnected
+    if (gameplay.usersInWorld[id] == null) {
+      removeFromParent();
+      return;
     }
-    //Check is player disconnected
-    if (!remove) {
-      //Animation Handle
-      if (true) {
-        switch (gameplay.usersInWorld[id]['direction']) {
-          case 'Direction.left':
-            {
-              if (!animationLoad) {
-                //PLACE ANIMATION HERE
-                Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
-                animationLoad = true;
-                lastAnimation = 'Direction.left';
+    //Animation Handle
+    if (true) {
+      switch (gameplay.usersInWorld[id]['direction']) {
+        case 'Direction.left':
+          {
+            if (!animationLoad) {
+              //PLACE ANIMATION HERE
+              if (lastAnimation != 'Direction.left') {
+                flipHorizontally();
               }
-              return;
+              position = newPosition;
+              animation = spriteRun;
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = 'Direction.left';
             }
-          case 'Direction.right':
-            {
-              if (!animationLoad) {
-                //PLACE ANIMATION HERE
-                Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
-                animationLoad = true;
-                lastAnimation = 'Direction.right';
+            return;
+          }
+        case 'Direction.right':
+          {
+            if (!animationLoad) {
+              //PLACE ANIMATION HERE
+              if (lastAnimation != 'Direction.right') {
+                flipHorizontally();
               }
-              return;
+              position = newPosition;
+              animation = spriteRun;
+              Future.delayed(const Duration(milliseconds: 400)).then((value) => animationLoad = false);
+              animationLoad = true;
+              lastAnimation = 'Direction.right';
             }
-          case 'Direction.idle':
-            {
-              if (lastAnimation == 'Direction.left') {
-                //PLACE ANIMATION HERE
-              } else {
-                //PLACE ANIMATION HERE
-              }
-              return;
-            }
-        }
+            return;
+          }
+        case 'Direction.idle':
+          {
+            position = newPosition;
+            animation = spriteIdle;
+            return;
+          }
       }
 
       //Update player posistion
@@ -299,8 +337,6 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
         double.parse(Provider.of<Gameplay>(context, listen: false).usersInWorld[id]['positionX'].toString()),
         double.parse(Provider.of<Gameplay>(context, listen: false).usersInWorld[id]['positionY'].toString()),
       );
-    } else {
-      removeFromParent();
     }
   }
 }

@@ -83,12 +83,14 @@ class Gameplay with ChangeNotifier {
   //Enemy Provider
   Map _enemies = {};
   bool _alreadyInBattle = false;
+  List _enemiesChasing = [];
 
   Map _usersInWorld = {};
   Map _enemiesInWorld = {};
 
   Map get enemies => _enemies;
   bool get alreadyInBattle => _alreadyInBattle;
+  List get enemiesChasing => _enemiesChasing;
 
   Map get usersInWorld => _usersInWorld;
   Map get enemiesInWorld => _enemiesInWorld;
@@ -96,6 +98,38 @@ class Gameplay with ChangeNotifier {
   //------
   //System
   //------
+
+  //Add New Enemy into List
+  int addEnemiesChasing(value) {
+    _enemiesChasing.add(value);
+    return _enemiesChasing.length - 1;
+  }
+
+  //Remove Enemy by Index
+  void removeSpecificEnemiesChasing(value) {
+    try {
+      //Remove Value
+      _enemiesChasing.removeAt(value);
+    } catch (e) {
+      _enemiesChasing = [];
+    }
+  }
+
+  //Update Enemy ID by Index
+  void updateSpecificEnemiesChasing(valueIndex, valueID) {
+    _enemiesChasing[valueIndex] = valueID;
+  }
+
+  //Find Enemy by ID
+  int findSpecificEnemiesChasing(value) {
+    //Sweep List
+    for (int i = 0; i < _enemiesChasing.length; i++) {
+      if (_enemiesChasing[i] == value) {
+        return i;
+      }
+    }
+    return -1;
+  }
 
   //Change Players Profile Characters
   void changeCharacters(Map value) {

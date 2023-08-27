@@ -19,14 +19,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, HasGameRef {
-  //Variable Declarations
+  //Engine Declarations
   late final BuildContext context;
   late final Engine baseEngine;
   late final GameEngine engine;
   late final Gameplay gameplay;
   late final Options options;
   late final Websocket websocket;
-  bool isLoaded = false;
+  bool engineLoaded = false;
 
   //-----
   // PROVIDER VARIABLES
@@ -40,8 +40,8 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   late Player player;
 
   //Ingame Connection Variables
-  bool _pauseConnection = false;
-  get pauseConnection => _pauseConnection;
+  bool _stopConnection = false;
+  get pauseConnection => _stopConnection;
   late dart.Timer _connection;
   get connection => _connection;
   int _msLag = 0;
@@ -52,8 +52,8 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
   //-----
 
   //Change Pause Ingame Connection
-  void changePauseIngameConnection(bool value) {
-    _pauseConnection = value;
+  void changeStopIngameConnection(bool value) {
+    _stopConnection = value;
   }
 
   //Close Connection
@@ -98,8 +98,11 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
       ).then((value) {
         //Connection Repeater
         int timeoutHandle = 0;
-        _connection = dart.Timer.periodic(const Duration(milliseconds: 50), (timer) async {
-          if (!_pauseConnection && isLoaded) {
+        bool waitConnectionSignal = false;
+        _connection = dart.Timer.periodic(const Duration(milliseconds: 1), (timer) async {
+          //Signal to the server and update the game
+          if ((!_stopConnection && engineLoaded) && !waitConnectionSignal) {
+            waitConnectionSignal = true;
             //Ping Delay Declaration
             int connectionDelay = 0;
             final connetionTimer = dart.Timer.periodic(const Duration(milliseconds: 1), (timer) {
@@ -128,10 +131,10 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
               'class': gameplay.characters['character${gameplay.selectedCharacter}']['class'],
             }, context);
 
-            //Loading Check
+            //Lost Connection Check
             if (websocketMessage == "OK" || websocketMessage == "timeout") {
               timeoutHandle++;
-              if (timeoutHandle > 100) {
+              if (timeoutHandle > 500) {
                 if (_connection.isActive) {
                   try {
                     closeConnection();
@@ -146,6 +149,13 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
                   } catch (_) {}
                 }
               }
+              waitConnectionSignal = false;
+              return;
+            }
+            //Disconnection Check
+            else if (websocketMessage == "disconnected") {
+              closeConnection();
+              websocket.disconnectWebsockets(context);
               return;
             }
 
@@ -265,6 +275,11 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             //Ping Delay Update
             connetionTimer.cancel();
             _msLag = connectionDelay;
+            waitConnectionSignal = false;
+          }
+          //Cancels the Repeater
+          else if (_stopConnection) {
+            _connection.cancel();
           }
         });
       });
@@ -287,6 +302,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
       final worldGeneration = WorldGeneration();
       worldGeneration.generateWorld(value, baseEngine.gameController);
     });
-    isLoaded = true;
+    engineLoaded = true;
   }
 }

@@ -122,6 +122,8 @@ class _BattleSceneState extends State<BattleScene> {
       }
       return;
     }
+    //Check if is disconnected
+    else if (result == "disconnected") {}
     timeoutHandle = 0;
 
     //Update old stats for next update
@@ -162,7 +164,8 @@ class _BattleSceneState extends State<BattleScene> {
         for (int i = 0; i < stats['battleLog'].length; i++) {
           gameplay.addBattleLog(stats['battleLog'][i], context);
           //Animation
-          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
           await Future.delayed(Duration(milliseconds: options.textSpeed));
         }
       }
@@ -246,7 +249,11 @@ class _BattleSceneState extends State<BattleScene> {
                                       border: selectedEnemy == index ? Border.all(color: Theme.of(context).primaryColor) : Border.all(),
                                       borderRadius: BorderRadius.circular(20),
                                       color: Theme.of(context).colorScheme.primary,
-                                      image: DecorationImage(image: actualEnemies[index]['life'] == "dead" ? const ExactAssetImage("assets/images/enemys/gravestone.png") : ExactAssetImage("assets/images/enemys/infight/${actualEnemies[index]['name']}.png"), fit: actualEnemies[index]['life'] == "dead" ? BoxFit.fitHeight : BoxFit.cover),
+                                      image: DecorationImage(
+                                          image: actualEnemies[index]['life'] == "dead"
+                                              ? const ExactAssetImage("assets/images/enemys/gravestone.png")
+                                              : ExactAssetImage("assets/images/enemys/infight/${actualEnemies[index]['name']}.png"),
+                                          fit: actualEnemies[index]['life'] == "dead" ? BoxFit.fitHeight : BoxFit.cover),
                                     ),
                                   ),
                                 ),
@@ -712,7 +719,8 @@ class _BattleSceneState extends State<BattleScene> {
                                       //Battle Log
                                       Container(
                                         padding: const EdgeInsets.all(5),
-                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
+                                        decoration:
+                                            BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                                         width: screenSize.width * 0.6,
                                         height: screenSize.height * 0.1,
                                         child: FittedBox(
