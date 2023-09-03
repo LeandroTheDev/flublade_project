@@ -624,7 +624,7 @@ class _BattleSceneState extends State<BattleScene> {
                                               ),
                                               child: Padding(
                                                 padding: const EdgeInsets.all(8.0),
-                                                child: Image.asset("assets/images/interface/enemy_button.png"),
+                                                child: Image.asset("assets/images/interface/enemyButton.png"),
                                               ),
                                             ),
                                             enemyNotification

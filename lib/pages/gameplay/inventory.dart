@@ -338,7 +338,8 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                               padding: const EdgeInsets.all(8.0),
                                                               child: ElevatedButton(
                                                                 onPressed: () async {
-                                                                  final selectedIndex = settings.itemsId[Settings.tierCheck(itemName)]['equip'][index];
+                                                                  final selectedIndex =
+                                                                      settings.itemsId[Settings.tierCheck(itemName)]['equip'][index];
                                                                   //Loading Widget
                                                                   GlobalFunctions.loadingWidget(context: context, language: options.language);
                                                                   //Equipped item variable
@@ -364,7 +365,10 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                 },
                                                                 child: FittedBox(
                                                                   child: Text(
-                                                                    Language.Translate('response_equipmentIndex_${settings.itemsId[Settings.tierCheck(itemName)]['equip'][index]}', options.language) ?? 'Language Error',
+                                                                    Language.Translate(
+                                                                            'response_equipmentIndex_${settings.itemsId[Settings.tierCheck(itemName)]['equip'][index]}',
+                                                                            options.language) ??
+                                                                        'Language Error',
                                                                     style: const TextStyle(fontSize: 99),
                                                                   ),
                                                                 ),
@@ -502,7 +506,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                         child: SizedBox(
                           height: 40,
                           width: 40,
-                          child: Image.asset('assets/images/interface/equip_button.png'),
+                          child: Image.asset('assets/images/interface/equipButton.png'),
                         ),
                       ),
                       TextButton(

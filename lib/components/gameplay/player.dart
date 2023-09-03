@@ -246,6 +246,8 @@ class PlayerClientSprite extends SpriteAnimationComponent with HasGameRef {
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
   late final SpriteAnimation spriteRun;
+  late final SpriteComponent inBattleSprite;
+  bool isBattle = false;
   String lastDirection = 'Direction.right';
 
   PlayerClientSprite(this.context, this.clientID) : super(size: Vector2.all(32));
@@ -282,6 +284,10 @@ class PlayerClientSprite extends SpriteAnimationComponent with HasGameRef {
         ),
       );
     });
+    //Battle Image
+    gameRef.images.load('interface/inBattle.png').then((loadedSprite) {
+      inBattleSprite = SpriteComponent(sprite: Sprite(loadedSprite), size: Vector2.all(32));
+    });
   }
 
   @override
@@ -291,6 +297,15 @@ class PlayerClientSprite extends SpriteAnimationComponent with HasGameRef {
       removeFromParent();
       return;
     }
+    //Check if Client is in Battle
+    if (gameplay.usersInWorld[clientID]['battleID'] > -1 && isBattle == false) {
+      isBattle = true;
+      add(inBattleSprite);
+    } else if (gameplay.usersInWorld[clientID]['battleID'] < 0 && isBattle == true) {
+      isBattle = false;
+      remove(inBattleSprite);
+    }
+
     //Check joystick moviment
     animation = spriteRun;
     //Run Animation
