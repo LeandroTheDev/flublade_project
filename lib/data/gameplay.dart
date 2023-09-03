@@ -131,6 +131,11 @@ class Gameplay with ChangeNotifier {
     return -1;
   }
 
+  //Remove All Elements in Enemies Chasing
+  void cleanEnemiesChasing() {
+    _enemiesChasing = [];
+  }
+
   //Change Players Profile Characters
   void changeCharacters(Map value) {
     _characters = value;

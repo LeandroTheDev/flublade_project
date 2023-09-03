@@ -477,6 +477,7 @@ class GlobalFunctions {
                         onPressed: () {
                           websocket.websocketDisconnectIngame(context);
                           gameplay.changeIsTalkable(false);
+                          gameplay.cleanEnemiesChasing();
                           engine.changeStopIngameConnection(true);
                           Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
                         },

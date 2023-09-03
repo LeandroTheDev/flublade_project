@@ -99,6 +99,7 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
         //Connection Repeater
         int timeoutHandle = 0;
         bool waitConnectionSignal = false;
+        String direction = 'Direction.right';
         _connection = dart.Timer.periodic(const Duration(milliseconds: 1), (timer) async {
           //Signal to the server and update the game
           if ((!_stopConnection && engineLoaded) && !waitConnectionSignal) {
@@ -109,7 +110,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
               connectionDelay++;
             });
             //Direction Translate
-            late final String direction;
             if (engine.joystickPosition[0] < 0.0) {
               direction = 'Direction.left';
             }
@@ -119,7 +119,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             if (engine.joystickPosition[0] == 0.0) {
               direction = 'Direction.idle';
             }
-            // print(_playerPosition);
             //Server Signal
             final websocketMessage = await websocket.websocketSendIngame({
               'message': 'playersPosition',
@@ -162,7 +161,6 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             //Result
             final players = jsonDecode(websocketMessage);
             final enemy = jsonDecode(websocketMessage)['enemy'];
-
             //Update Users
             if (players != {}) {
               players.remove("enemy");
