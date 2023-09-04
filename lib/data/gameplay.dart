@@ -158,27 +158,31 @@ class Gameplay with ChangeNotifier {
 
   //Users In World Handle
   void usersHandle(handle, [data]) {
-    if (handle == 'add') {
-      _usersInWorld[data['id']] = data;
-    } else if (handle == 'replace') {
-      _usersInWorld = data;
-    } else if (handle == 'remove') {
-    } else if (handle == 'move') {
-    } else if (handle == 'clean') {
-      _usersInWorld = {};
+    switch (handle) {
+      case 'add':
+        _usersInWorld[data['id']] = data;
+        break;
+      case 'replace':
+        _usersInWorld = data;
+        break;
+      case 'clean':
+        _usersInWorld = {};
+        break;
     }
   }
 
   //Enemy In World Handle
   void enemyHandle(handle, [data]) {
-    if (handle == 'add') {
-      _enemiesInWorld[data['id']] = data;
-    } else if (handle == 'replace') {
-      _enemiesInWorld = data;
-    } else if (handle == 'remove') {
-    } else if (handle == 'move') {
-    } else if (handle == 'clean') {
-      _enemiesInWorld = {};
+    switch (handle) {
+      case 'add':
+        _enemiesInWorld[data['id']] = data;
+        break;
+      case 'replace':
+        _enemiesInWorld = data;
+        break;
+      case 'clean':
+        _enemiesInWorld = {};
+        break;
     }
   }
 

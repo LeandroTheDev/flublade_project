@@ -112,11 +112,9 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
             //Direction Translate
             if (engine.joystickPosition[0] < 0.0) {
               direction = 'Direction.left';
-            }
-            if (engine.joystickPosition[0] > 0.0) {
+            } else if (engine.joystickPosition[0] > 0.0) {
               direction = 'Direction.right';
-            }
-            if (engine.joystickPosition[0] == 0.0) {
+            } else {
               direction = 'Direction.idle';
             }
             //Server Signal
