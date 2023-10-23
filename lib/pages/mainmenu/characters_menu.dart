@@ -1,6 +1,7 @@
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 
@@ -82,14 +83,10 @@ class _CharactersMenuState extends State<CharactersMenu> {
                       ElevatedButton(
                         onPressed: () async {
                           if (input.text != 'DELETE') {
-                            GlobalFunctions.errorDialog(
-                              errorMsgTitle: 'response_incorrect',
-                              errorMsgContext: 'Incorrect',
-                              context: context,
-                            );
+                            Dialogs.alertDialog(context: context, message: 'response_incorrect');
                           } else {
                             GlobalFunctions.loadingWidget(context: context, language: options.language);
-                            await MySQL.removeCharacters(
+                            await Server.removeCharacters(
                               index: index,
                               context: context,
                             );

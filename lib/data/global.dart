@@ -3,13 +3,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flublade_project/components/character_creation.dart';
-import 'package:flublade_project/components/gameplay/game_engine.dart';
-import 'package:flublade_project/components/loot_widget.dart';
-import 'package:flublade_project/components/magic_widget.dart';
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/pages/mainmenu/character_creation.dart';
+import 'package:flublade_project/components/widget/magic_widget.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
@@ -87,418 +84,15 @@ class GlobalFunctions {
     '/magics': (context) => const Magics(),
   };
 
-  //Disconnect Dialog
-  static void disconnectDialog({
-    required String errorMsgTitle,
-    required String errorMsgContext,
-    required BuildContext context,
-  }) {
-    final options = Provider.of<Options>(context, listen: false);
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: Text(
-              Language.Translate(errorMsgTitle, options.language) ?? 'Are you sure?',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
-            content: Text(
-              Language.Translate(errorMsgContext, options.language) ?? 'MsgContext',
-              style: TextStyle(color: Theme.of(context).primaryColor),
-            ),
-            actions: [
-              //Yes
-              ElevatedButton(
-                onPressed: () {
-                  options.changeUsername('');
-                  options.changeToken('');
-                  options.changeRemember(value: false);
-                  options.changeId(0);
-                  SaveDatas.setRemember(false);
-                  Provider.of<Gameplay>(context, listen: false).changeCharacters({});
-                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const AuthenticationPage()), (route) => false);
-                },
-                child: Text(
-                  Language.Translate('response_yes', options.language) ?? 'Yes',
-                ),
-              ),
-              //No
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  Language.Translate('response_no', options.language) ?? 'No',
-                ),
-              ),
-            ],
-          );
-        });
-  }
-
-  //Loot Dialog
-  static void lootDialog({required BuildContext context, required List loots, required xp, required levelUpDialog}) {
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final settings = Provider.of<Settings>(context, listen: false);
-    gameplay.resetPlayerInventorySelected();
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return FittedBox(
-            child: WillPopScope(
-              onWillPop: () async => false,
-              child: AlertDialog(
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                title: Text(
-                  Language.Translate('battle_loot', options.language) ?? 'Language Error',
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ),
-                //Loot Items
-                content: SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                            ),
-                            shrinkWrap: true,
-                            itemCount: loots.length,
-                            itemBuilder: (context, index) {
-                              return LootWidget(
-                                loots: loots,
-                                index: index,
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15.0),
-                          child: Text(
-                            '${Language.Translate('battle_loot_experience', options.language) ?? 'Language Error'} $xp',
-                            style: TextStyle(color: Theme.of(context).primaryColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                actions: [
-                  //Take All
-                  ElevatedButton(
-                    onPressed: () async {
-                      GlobalFunctions.loadingWidget(context: context, language: options.language);
-                      //Add items
-                      gameplay.addInventoryItem(loots);
-                      //Update All Stats
-                      await MySQL.updateCharacters(context: context, characters: jsonEncode(gameplay.characters));
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      //Level up dialog
-                      if (levelUpDialog == false) {
-                      } else {
-                        //Level up Dialog
-                        showDialog(
-                            barrierColor: const Color.fromARGB(167, 0, 0, 0),
-                            context: context,
-                            builder: (context) {
-                              return WillPopScope(
-                                onWillPop: () async => false,
-                                child: FittedBox(
-                                  child: AlertDialog(
-                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                    backgroundColor: Colors.transparent,
-                                    content: Stack(
-                                      children: [
-                                        //Conffeti Level Up
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
-                                          width: 280,
-                                          height: 220,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(30),
-                                            child: Image.asset(
-                                              'assets/images/interface/levelUp.gif',
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        //Level Up Interface
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            //Level Up Text
-                                            Padding(
-                                              padding: const EdgeInsets.all(20.0),
-                                              child: Text(
-                                                Language.Translate('response_levelup', options.language) ?? 'Level UP',
-                                                style: TextStyle(fontFamily: 'PressStart', fontSize: 15, color: Theme.of(context).primaryColor),
-                                              ),
-                                            ),
-                                            //Level Number
-                                            Padding(
-                                              padding: const EdgeInsets.all(30.0),
-                                              child: Center(
-                                                child: Text(
-                                                  gameplay.playerLevel.toString(),
-                                                  style: TextStyle(fontSize: 40, fontFamily: 'PressStart', color: Theme.of(context).primaryColor),
-                                                ),
-                                              ),
-                                            ),
-                                            //Ok button
-                                            Padding(
-                                              padding: const EdgeInsets.all(20.0),
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Center(
-                                                  child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            });
-                      }
-                    },
-                    //Text
-                    child: Text(
-                      Language.Translate('battle_loot_all', options.language) ?? 'Take All',
-                    ),
-                  ),
-                  //Exit
-                  ElevatedButton(
-                    onPressed: () async {
-                      bool levelUpDialog = false;
-                      //Add items
-                      if (gameplay.playerInventorySelected.isNotEmpty) {
-                        //Loading
-                        GlobalFunctions.loadingWidget(context: context, language: options.language);
-                        //Add Items
-                        gameplay.addInventoryItem(gameplay.playerInventorySelected);
-                        //Update All Stats
-                        await MySQL.updateCharacters(context: context, characters: jsonEncode(gameplay.characters));
-                        Navigator.pop(context);
-                      }
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      //Level up dialog
-                      if (levelUpDialog == false) {
-                      } else {
-                        final characters = Provider.of<Gameplay>(context, listen: false).characters;
-                        final characterClass = characters['character${gameplay.selectedCharacter}']['class'];
-                        //Level up Dialog
-                        showDialog(
-                            barrierColor: const Color.fromARGB(167, 0, 0, 0),
-                            context: context,
-                            builder: (context) {
-                              return WillPopScope(
-                                onWillPop: () async => false,
-                                child: FittedBox(
-                                  child: AlertDialog(
-                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                      title: Text(
-                                        Language.Translate('response_levelup', options.language) ?? 'Level UP',
-                                        style: TextStyle(color: Theme.of(context).primaryColor),
-                                      ),
-                                      content: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          //Armor Text
-                                          Text(
-                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${settings.baseAtributes[characterClass]!['armorLevel']}',
-                                            style: TextStyle(color: Theme.of(context).primaryColor),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          //Strength Text
-                                          Text(
-                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${settings.baseAtributes[characterClass]!['strengthLevel']}',
-                                            style: TextStyle(color: Theme.of(context).primaryColor),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          //Agility Text
-                                          Text(
-                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${settings.baseAtributes[characterClass]!['agilityLevel']}',
-                                            style: TextStyle(color: Theme.of(context).primaryColor),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          //Intelligence Text
-                                          Text(
-                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${settings.baseAtributes[characterClass]!['intelligenceLevel']}',
-                                            style: TextStyle(color: Theme.of(context).primaryColor),
-                                          ),
-                                          //Skillpoints Text
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
-                                            style: TextStyle(color: Theme.of(context).primaryColor),
-                                          ),
-                                          const SizedBox(height: 20),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Center(
-                                              child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
-                                            ),
-                                          ),
-                                        ],
-                                      )),
-                                ),
-                              );
-                            });
-                      }
-                    },
-                    //Text
-                    child: Text(
-                      Language.Translate('battle_loot_exit', options.language) ?? 'Take All',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
-  //Error Dialog
-  static errorDialog({
-    required String errorMsgTitle,
-    required String errorMsgContext,
-    required BuildContext context,
-    String? popUntil,
-  }) {
-    final options = Provider.of<Options>(context, listen: false);
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: AlertDialog(
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Sad face
-              title: Text(
-                ':(',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              //Error information
-              content: Text(
-                Language.Translate(errorMsgTitle, options.language) ?? errorMsgContext,
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              //Ok Button
-              actions: [
-                Center(
-                    child: ElevatedButton(
-                  onPressed: () {
-                    if (popUntil != null) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(popUntil, (Route<dynamic> route) => false);
-                    } else {
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text('Ok'),
-                ))
-              ],
-            ),
-          );
-        });
-  }
-
-  //Pause Dialog
-  static pauseDialog({
-    required BuildContext context,
-  }) {
-    final websocket = Provider.of<Websocket>(context, listen: false);
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final engine = Provider.of<GameEngine>(context, listen: false);
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return FittedBox(
-            child: AlertDialog(
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                //Language Text
-                title: Text(
-                  Language.Translate('pausemenu_pause', options.language) ?? 'Pause',
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ),
-                content: Column(
-                  children: [
-                    //Continue
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(Language.Translate('pausemenu_continue', options.language) ?? 'Continue'),
-                      ),
-                    ),
-                    //Options
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/optionsmenu');
-                        },
-                        child: Text(Language.Translate('pausemenu_options', options.language) ?? 'Options'),
-                      ),
-                    ),
-                    //Disconnect
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          websocket.websocketDisconnectIngame(context);
-                          gameplay.changeIsTalkable(false);
-                          gameplay.cleanEnemiesChasing();
-                          engine.changeStopIngameConnection(true);
-                          Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (Route route) => false);
-                        },
-                        child: Text(Language.Translate('pausemenu_disconnectIngame', options.language) ?? 'Disconnect'),
-                      ),
-                    ),
-                  ],
-                )),
-          );
-        });
-  }
-
   //Show Player Stats Dialogs
   static playerStats(context) async {
     final settings = Provider.of<Settings>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     dynamic result = await http.post(
-      Uri.http(mysql.serverAddress, '/playerStats'),
-      headers: MySQL.headers,
+      Uri.http(server.serverAddress, '/playerStats'),
+      headers: Server.headers,
       body: jsonEncode({"id": options.id, "token": options.token, "selectedCharacter": gameplay.selectedCharacter}),
     );
     result = jsonDecode(result.body);
@@ -628,13 +222,10 @@ class GlobalFunctions {
                                                               context: context,
                                                               builder: (context) => FittedBox(
                                                                     child: AlertDialog(
-                                                                      shape: const RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
                                                                       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                                                                       title: Text(
-                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}',
-                                                                                options.language) ??
-                                                                            'Language Error',
+                                                                        Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}', options.language) ?? 'Language Error',
                                                                         style: TextStyle(color: Theme.of(context).primaryColor),
                                                                       ),
                                                                       content: SizedBox(
@@ -649,12 +240,8 @@ class GlobalFunctions {
                                                                                 child: Column(
                                                                                   children: [
                                                                                     Text(
-                                                                                      Language.Translate(
-                                                                                              'magics_${gameplay.playerDebuffs[index]['name']}_desc',
-                                                                                              options.language) ??
-                                                                                          'Language Error',
-                                                                                      style: TextStyle(
-                                                                                          color: Theme.of(context).primaryColor, fontSize: 20),
+                                                                                      Language.Translate('magics_${gameplay.playerDebuffs[index]['name']}_desc', options.language) ?? 'Language Error',
+                                                                                      style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 20),
                                                                                     ),
                                                                                   ],
                                                                                 ),

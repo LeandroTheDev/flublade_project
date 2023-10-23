@@ -1,7 +1,9 @@
 import 'package:flame/game.dart';
+import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
 
 import 'package:flutter/material.dart';
@@ -22,6 +24,68 @@ class _IngameInterfaceState extends State<IngameInterface> {
     final settings = Provider.of<Settings>(context, listen: false);
     final engine = Provider.of<GameEngine>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
+
+    pauseDialog({
+      required BuildContext context,
+    }) {
+      final websocket = Provider.of<Websocket>(context, listen: false);
+      final options = Provider.of<Options>(context, listen: false);
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      final engine = Provider.of<GameEngine>(context, listen: false);
+      showDialog(
+          barrierColor: const Color.fromARGB(167, 0, 0, 0),
+          context: context,
+          builder: (context) {
+            return FittedBox(
+              child: AlertDialog(
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  //Language Text
+                  title: Text(
+                    Language.Translate('pausemenu_pause', options.language) ?? 'Pause',
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                  content: Column(
+                    children: [
+                      //Continue
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(Language.Translate('pausemenu_continue', options.language) ?? 'Continue'),
+                        ),
+                      ),
+                      //Options
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/optionsmenu');
+                          },
+                          child: Text(Language.Translate('pausemenu_options', options.language) ?? 'Options'),
+                        ),
+                      ),
+                      //Disconnect
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            websocket.websocketDisconnectIngame(context);
+                            gameplay.changeIsTalkable(false);
+                            gameplay.cleanEnemiesChasing();
+                            engine.changeStopIngameConnection(true);
+                            Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (route) => false);
+                          },
+                          child: Text(Language.Translate('pausemenu_disconnectIngame', options.language) ?? 'Disconnect'),
+                        ),
+                      ),
+                    ],
+                  )),
+            );
+          });
+    }
 
     return FittedBox(
       child: SizedBox(
@@ -89,7 +153,7 @@ class _IngameInterfaceState extends State<IngameInterface> {
                     // Pause Button
                     TextButton(
                       onPressed: () {
-                        GlobalFunctions.pauseDialog(context: context);
+                        pauseDialog(context: context);
                       },
                       child: Container(
                         width: screenSize.width * 0.2,

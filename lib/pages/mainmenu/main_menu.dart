@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 
@@ -88,7 +88,7 @@ class _MainMenuState extends State<MainMenu> {
                                   });
                                   await Future.delayed(const Duration(milliseconds: 50));
                                   //Refresh
-                                  await MySQL.pushCharacters(context: context);
+                                  await Server.pushCharacters(context: context);
                                   Navigator.pushNamed(context, '/characterselection');
                                   Future.delayed(const Duration(milliseconds: 200)).then((value) => setState(() {
                                         isLoading = false;
@@ -110,7 +110,7 @@ class _MainMenuState extends State<MainMenu> {
                                     isLoading = true;
                                   });
                                   //Refresh
-                                  await MySQL.pushCharacters(context: context);
+                                  await Server.pushCharacters(context: context);
                                   Navigator.pushNamed(context, '/charactersmenu');
                                   Future.delayed(const Duration(milliseconds: 200)).then((value) => setState(() {
                                         isLoading = false;
@@ -140,11 +140,7 @@ class _MainMenuState extends State<MainMenu> {
                               //Logout
                               TextButton(
                                 onPressed: () {
-                                  GlobalFunctions.disconnectDialog(
-                                    errorMsgTitle: 'response_confirmation',
-                                    errorMsgContext: 'mainmenu_confirmation',
-                                    context: context,
-                                  );
+                                  Dialogs.disconnectDialog(context: context);
                                 },
                                 child: FittedBox(
                                   child: Text(

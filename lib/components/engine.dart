@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flame/cache.dart';
 import 'package:flame/game.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -66,12 +67,7 @@ class Websocket with ChangeNotifier {
     //Listen from the server
     _broadcastIngame = _websocketIngame.stream.asBroadcastStream().listen(
           (data) {},
-          onError: (error) => GlobalFunctions.errorDialog(
-            errorMsgTitle: ':(',
-            errorMsgContext: 'authentication_invalidlogin',
-            context: context,
-            popUntil: "/authenticationpage",
-          ),
+          onError: (error) => Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context),
         );
   }
 
@@ -135,9 +131,10 @@ class Websocket with ChangeNotifier {
     );
 
     //Listen from the server
-    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen((data) {},
-        onError: (error) => GlobalFunctions.errorDialog(
-            errorMsgTitle: ':(', errorMsgContext: 'authentication_invalidlogin', context: context, popUntil: "/authenticationpage"));
+    _broadcastBattle = _websocketBattle.stream.asBroadcastStream().listen(
+          (data) {},
+          onError: (error) => Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context),
+        );
   }
 
   //Websocket Battle Send Mensage

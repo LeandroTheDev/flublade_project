@@ -2,9 +2,10 @@
 
 import 'dart:convert';
 
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
@@ -35,10 +36,14 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
 
     //Register Modal
     registerModal() {
+      if (server.serverName == "") {
+        Dialogs.alertDialog(context: context, message: 'authentication_no_connection');
+        return;
+      }
       //Modal Bottom
       showModalBottomSheet<void>(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -162,11 +167,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             late final http.Response result;
                                             try {
                                               //Backend Work
-                                              result = await http.post(Uri.http(mysql.serverAddress, '/createAcc'), headers: MySQL.headers, body: jsonEncode({"username": registerUsername.text, "password": registerPassword.text, "language": options.language}));
+                                              result = await http.post(Uri.http(server.serverAddress, '/createAcc'), headers: Server.headers, body: jsonEncode({"username": registerUsername.text, "password": registerPassword.text, "language": options.language}));
                                               //No connection
                                             } catch (error) {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                              Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
                                               return;
                                             }
                                             //Account Rules Check
@@ -174,41 +179,25 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               //Too small username or password
                                               if (jsonDecode(result.body)["message"] == 'Too small or too big username') {
                                                 Navigator.pop(context);
-                                                GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_username',
-                                                  errorMsgContext: 'Username needs to have 3 or more Caracters',
-                                                  context: context,
-                                                );
+                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_username');
                                                 return;
                                               }
                                               //Too small or too big password
                                               if (jsonDecode(result.body)["message"] == 'Too small password or too big password') {
                                                 Navigator.pop(context);
-                                                GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_password',
-                                                  errorMsgContext: 'Password needs to have 3 or more Caracters',
-                                                  context: context,
-                                                );
+                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_password');
                                                 return;
                                               }
                                               //Username already exists
                                               if (jsonDecode(result.body)["message"] == 'Username already exists') {
                                                 Navigator.pop(context);
-                                                GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_existusername',
-                                                  errorMsgContext: 'Username already exist',
-                                                  context: context,
-                                                );
+                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_existusername');
                                                 return;
                                               }
                                               //Connection Error
                                               if (jsonDecode(result.body)["message"] == 'Unkown error') {
                                                 Navigator.pop(context);
-                                                GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_connection',
-                                                  errorMsgContext: 'Failed to connect to the Servers',
-                                                  context: context,
-                                                );
+                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
                                                 return;
                                               }
                                               //Success
@@ -358,23 +347,23 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         child: ElevatedButton(
                                           onPressed: () async {
                                             dynamic result;
-                                            mysql.changeServerAddress(serverAddress.text);
+                                            server.changeServerAddress(serverAddress.text);
                                             GlobalFunctions.loadingWidget(context: context, language: options.language);
                                             //Try connection
                                             try {
-                                              result = await http.post(Uri.http(mysql.serverAddress, '/gameplayStats'),
-                                                  headers: MySQL.headers,
+                                              result = await http.post(Uri.http(server.serverAddress, '/gameplayStats'),
+                                                  headers: Server.headers,
                                                   body: jsonEncode({
                                                     "testConnection": true,
                                                   }));
                                             } catch (error) {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                              Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
                                               return;
                                             }
                                             if (jsonDecode(result.body)['message'] == 'Success') {
                                               setState(() {
-                                                mysql.changeServerName(jsonDecode(result.body)['serverName']);
+                                                server.changeServerName(jsonDecode(result.body)['serverName']);
                                                 SaveDatas.setServerAddress(serverAddress.text);
                                                 SaveDatas.setServerName(jsonDecode(result.body)['serverName']);
                                                 Navigator.pop(context);
@@ -382,7 +371,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               });
                                             } else {
                                               Navigator.pop(context);
-                                              GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection_tryAddress', errorMsgContext: 'Failed to connect to the Servers', context: context);
+                                              Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
                                               return;
                                             }
                                           },
@@ -457,7 +446,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         height: 20,
                                         child: FittedBox(
                                           child: Text(
-                                            mysql.serverName,
+                                            server.serverName == "" ? "FLUBLADE" : server.serverName,
                                             style: const TextStyle(letterSpacing: 4, fontWeight: FontWeight.w900),
                                           ),
                                         ),
@@ -547,7 +536,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                       children: [
                                         //Check Box
                                         Checkbox(
-                                          fillColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.primary),
                                           value: options.remember,
                                           onChanged: (checked) => options.changeRemember(),
                                         ),
@@ -560,7 +548,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         //Language Button
                                         ElevatedButton(
                                             onPressed: () {
-                                              MySQL.changeLanguage(context, super.widget, false);
+                                              Dialogs.changeLanguage(context, super.widget);
                                             },
                                             child: Text(Language.Translate('authentication_language', options.language) ?? 'Language'))
                                       ],
@@ -597,15 +585,11 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               dynamic result;
                                               try {
                                                 //Credentials Check
-                                                result = await http.post(Uri.http(mysql.serverAddress, '/login'), headers: MySQL.headers, body: jsonEncode({"username": username.text, "password": password.text}));
+                                                result = await http.post(Uri.http(server.serverAddress, '/login'), headers: Server.headers, body: jsonEncode({"username": username.text, "password": password.text}));
                                               } catch (error) {
                                                 //Connection error
                                                 settings.changeIsLoading(value: false);
-                                                GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_register_problem_connection',
-                                                  errorMsgContext: 'Failed to connect to the Servers',
-                                                  context: context,
-                                                );
+                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
                                                 return;
                                               }
                                               //Json Decoding
@@ -613,11 +597,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                               //Wrong Credentials
                                               if (result['message'] == 'Wrong Credentials') {
                                                 settings.changeIsLoading(value: false);
-                                                GlobalFunctions.errorDialog(
-                                                  errorMsgTitle: 'authentication_login_notfound',
-                                                  errorMsgContext: 'Username or password is Invalid',
-                                                  context: context,
-                                                );
+                                                Dialogs.alertDialog(context: context, message: 'authentication_login_notfound');
                                               }
                                               //Proceed to connection
                                               if (result['message'] == 'Success') {
@@ -633,7 +613,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   SaveDatas.setRemember(options.remember);
                                                   SaveDatas.setId(options.id);
                                                   //Push Characters
-                                                  String characters = await MySQL.pushCharacters(context: context);
+                                                  String characters = await Server.pushCharacters(context: context);
                                                   gameplay.changeCharacters(jsonDecode(characters));
                                                   SaveDatas.setCharacters(characters);
                                                 } else {
@@ -643,7 +623,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   options.changeLanguage(result['language']);
                                                   options.changeToken(result['token']);
                                                   //Push Characters
-                                                  String characters = await MySQL.pushCharacters(context: context);
+                                                  String characters = await Server.pushCharacters(context: context);
                                                   Provider.of<Gameplay>(context, listen: false).changeCharacters(jsonDecode(characters));
                                                 }
                                                 settings.changeIsLoading(value: false);

@@ -1,8 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 
@@ -146,19 +147,15 @@ class CharacterSelection extends StatelessWidget {
                                   child: ElevatedButton(
                                       onPressed: () async {
                                         GlobalFunctions.loadingWidget(context: context, language: options.language);
-                                        final result = await MySQL.pushCharacters(context: context);
+                                        final result = await Server.pushCharacters(context: context);
                                         //Check if connection success
                                         if (result != false) {
                                           Provider.of<Gameplay>(context, listen: false).changeSelectedCharacter(index);
-                                          await MySQL.returnPlayerStats(context);
-                                          await MySQLGameplay.returnGameplayStats(context);
+                                          await Server.returnPlayerStats(context);
+                                          await ServerGameplay.returnGameplayStats(context);
                                           Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
                                         } else {
-                                          GlobalFunctions.errorDialog(
-                                            errorMsgTitle: 'authentication_register_problem_connection',
-                                            errorMsgContext: 'Failed to connect to the Servers',
-                                            context: context,
-                                          );
+                                          Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
                                         }
                                       },
                                       style: ButtonStyle(

@@ -3,8 +3,9 @@ import 'dart:convert';
 
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
@@ -13,17 +14,6 @@ import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-
-///
-/// PLAY WITHOUT SERVER
-///
-/// main.dart -- home: FlubladeProject() to Ingame()
-/// player.dart -- change imageLocation to a const player image
-/// player.dart -- comment player update -> connection
-/// interface.dart -- comment xp bar
-/// game_engine.dart -- comment world generation and create a fake world
-/// ingame.dart -- comment websocketInitIngame
-/// DEPRECATED
 
 void main() async {
   //SaveDatas Loading
@@ -44,7 +34,7 @@ void main() async {
           create: (_) => Gameplay(),
         ),
         ChangeNotifierProvider(
-          create: (_) => MySQL(),
+          create: (_) => Server(),
         ),
         ChangeNotifierProvider(
           create: (_) => Engine(),
@@ -97,39 +87,34 @@ class _FlubladeProjectState extends State<FlubladeProject> {
   void initState() {
     super.initState();
     final options = Provider.of<Options>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Load Datas
-    mysql.changeServerAddress(SaveDatas.getServerAddress() ?? '0.0.0.0:8080');
-    mysql.changeServerName(SaveDatas.getServerName() ?? 'FLUBLADE');
+    server.changeServerAddress(SaveDatas.getServerAddress() ?? '0.0.0.0:8080');
+    server.changeServerName("");
     options.changeUsername(SaveDatas.getUsername() ?? '');
     options.changeToken(SaveDatas.getToken() ?? '');
     options.changeId(SaveDatas.getId() ?? 0);
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
     options.changeTextSpeed(SaveDatas.getTextSpeed() ?? 700);
+    options.changeRemember(value: SaveDatas.getRemember() ?? false, notify: false);
     gameplay.changeCharacters(jsonDecode(SaveDatas.getCharacters() ?? '{}'));
-    Future.delayed(const Duration(seconds: 1), () async {
-      options.changeRemember(value: SaveDatas.getRemember() ?? false);
-      await Future.delayed(const Duration(milliseconds: 1));
+    //Auto Login Function
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       //Check Remember Box
       if (options.remember) {
         //Login
         dynamic result;
         try {
           //Credentials Check
-          result = await http.post(Uri.http(mysql.serverAddress, '/loginRemember'),
-              headers: MySQL.headers,
+          result = await http.post(Uri.http(server.serverAddress, '/loginRemember'),
+              headers: Server.headers,
               body: jsonEncode({
                 'id': options.id,
                 'token': options.token,
               }));
         } catch (error) {
-          Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(
-            errorMsgTitle: 'authentication_register_problem_connection',
-            errorMsgContext: 'Failed to connect to the Servers',
-            context: context,
-          );
+          Dialogs.errorDialog(errorMsg: 'authentication_register_problem_connection', context: context);
           return;
         }
         result = jsonDecode(result.body);
@@ -148,12 +133,9 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           SaveDatas.setCharacters(jsonEncode(gameplay.characters));
           Navigator.pushReplacementNamed(context, '/mainmenu');
         } else if (result['message'] == 'Invalid Login') {
-          Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context);
+          Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context);
         } else {
-          Navigator.of(context).pushReplacementNamed('/authenticationpage');
-          GlobalFunctions.errorDialog(
-              errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+          Dialogs.errorDialog(errorMsg: 'authentication_register_problem_connection', context: context);
         }
       } else {
         Navigator.of(context).pushReplacementNamed('/authenticationpage');

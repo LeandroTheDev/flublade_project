@@ -4,15 +4,18 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
+import 'package:flublade_project/components/widget/loot_widget.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/data/settings.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/mysql.dart';
+import '../../data/server.dart';
 
 class BattleScene extends StatefulWidget {
   final int enemyID;
@@ -38,6 +41,247 @@ class _BattleSceneState extends State<BattleScene> {
   late final Timer timer;
   late final Future future;
   final ScrollController _scrollController = ScrollController();
+
+  //Loot Dialog
+  void lootDialog({required BuildContext context, required List loots, required xp, required levelUpDialog}) {
+    final options = Provider.of<Options>(context, listen: false);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final settings = Provider.of<Settings>(context, listen: false);
+    gameplay.resetPlayerInventorySelected();
+    showDialog(
+        barrierColor: const Color.fromARGB(167, 0, 0, 0),
+        context: context,
+        builder: (context) {
+          return FittedBox(
+            child: WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                title: Text(
+                  Language.Translate('battle_loot', options.language) ?? 'Language Error',
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
+                //Loot Items
+                content: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                            ),
+                            shrinkWrap: true,
+                            itemCount: loots.length,
+                            itemBuilder: (context, index) {
+                              return LootWidget(
+                                loots: loots,
+                                index: index,
+                              );
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Text(
+                            '${Language.Translate('battle_loot_experience', options.language) ?? 'Language Error'} $xp',
+                            style: TextStyle(color: Theme.of(context).primaryColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  //Take All
+                  ElevatedButton(
+                    onPressed: () async {
+                      GlobalFunctions.loadingWidget(context: context, language: options.language);
+                      //Add items
+                      gameplay.addInventoryItem(loots);
+                      //Update All Stats
+                      await Server.updateCharacters(context: context, characters: jsonEncode(gameplay.characters));
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      //Level up dialog
+                      if (levelUpDialog == false) {
+                      } else {
+                        //Level up Dialog
+                        showDialog(
+                            barrierColor: const Color.fromARGB(167, 0, 0, 0),
+                            context: context,
+                            builder: (context) {
+                              return WillPopScope(
+                                onWillPop: () async => false,
+                                child: FittedBox(
+                                  child: AlertDialog(
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                    backgroundColor: Colors.transparent,
+                                    content: Stack(
+                                      children: [
+                                        //Conffeti Level Up
+                                        Container(
+                                          decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(30)),
+                                          width: 280,
+                                          height: 220,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(30),
+                                            child: Image.asset(
+                                              'assets/images/interface/levelUp.gif',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        //Level Up Interface
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            //Level Up Text
+                                            Padding(
+                                              padding: const EdgeInsets.all(20.0),
+                                              child: Text(
+                                                Language.Translate('response_levelup', options.language) ?? 'Level UP',
+                                                style: TextStyle(fontFamily: 'PressStart', fontSize: 15, color: Theme.of(context).primaryColor),
+                                              ),
+                                            ),
+                                            //Level Number
+                                            Padding(
+                                              padding: const EdgeInsets.all(30.0),
+                                              child: Center(
+                                                child: Text(
+                                                  gameplay.playerLevel.toString(),
+                                                  style: TextStyle(fontSize: 40, fontFamily: 'PressStart', color: Theme.of(context).primaryColor),
+                                                ),
+                                              ),
+                                            ),
+                                            //Ok button
+                                            Padding(
+                                              padding: const EdgeInsets.all(20.0),
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Center(
+                                                  child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            });
+                      }
+                    },
+                    //Text
+                    child: Text(
+                      Language.Translate('battle_loot_all', options.language) ?? 'Take All',
+                    ),
+                  ),
+                  //Exit
+                  ElevatedButton(
+                    onPressed: () async {
+                      bool levelUpDialog = false;
+                      //Add items
+                      if (gameplay.playerInventorySelected.isNotEmpty) {
+                        //Loading
+                        GlobalFunctions.loadingWidget(context: context, language: options.language);
+                        //Add Items
+                        gameplay.addInventoryItem(gameplay.playerInventorySelected);
+                        //Update All Stats
+                        await Server.updateCharacters(context: context, characters: jsonEncode(gameplay.characters));
+                        Navigator.pop(context);
+                      }
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      //Level up dialog
+                      if (levelUpDialog == false) {
+                      } else {
+                        final characters = Provider.of<Gameplay>(context, listen: false).characters;
+                        final characterClass = characters['character${gameplay.selectedCharacter}']['class'];
+                        //Level up Dialog
+                        showDialog(
+                            barrierColor: const Color.fromARGB(167, 0, 0, 0),
+                            context: context,
+                            builder: (context) {
+                              return WillPopScope(
+                                onWillPop: () async => false,
+                                child: FittedBox(
+                                  child: AlertDialog(
+                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                      title: Text(
+                                        Language.Translate('response_levelup', options.language) ?? 'Level UP',
+                                        style: TextStyle(color: Theme.of(context).primaryColor),
+                                      ),
+                                      content: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          //Armor Text
+                                          Text(
+                                            '${Language.Translate('levelup_armor', options.language) ?? 'Armor earned:'} ${settings.baseAtributes[characterClass]!['armorLevel']}',
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Strength Text
+                                          Text(
+                                            '${Language.Translate('levelup_strength', options.language) ?? 'Strength earned:'} ${settings.baseAtributes[characterClass]!['strengthLevel']}',
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Agility Text
+                                          Text(
+                                            '${Language.Translate('levelup_agility', options.language) ?? 'Agility earned:'} ${settings.baseAtributes[characterClass]!['agilityLevel']}',
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          //Intelligence Text
+                                          Text(
+                                            '${Language.Translate('levelup_intelligence', options.language) ?? 'Intelligence earned:'} ${settings.baseAtributes[characterClass]!['intelligenceLevel']}',
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
+                                          ),
+                                          //Skillpoints Text
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${Language.Translate('levelup_skillpoints', options.language) ?? 'Skill Points earned:'} 5',
+                                            style: TextStyle(color: Theme.of(context).primaryColor),
+                                          ),
+                                          const SizedBox(height: 20),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Center(
+                                              child: Text(Language.Translate('response_ok', options.language) ?? 'Ok'),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              );
+                            });
+                      }
+                    },
+                    //Text
+                    child: Text(
+                      Language.Translate('battle_loot_exit', options.language) ?? 'Take All',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
 
   @override
   void initState() {
@@ -110,14 +354,18 @@ class _BattleSceneState extends State<BattleScene> {
       if (timeoutHandle >= 50 && timeoutHandle < 100) {
         timer.cancel();
         timeoutHandle = 200;
-        gameplay.changeAlreadyInBattle(false);
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
-        websocket.disconnectWebsockets(context);
-        GlobalFunctions.errorDialog(
-          errorMsgTitle: 'authentication_lost_connection',
-          errorMsgContext: 'You have lost connection to the servers.',
-          context: context,
-        );
+        Dialogs.alertDialog(
+            context: context,
+            message: 'authentication_lost_connection',
+            cancel: false,
+            returnFunction: (BuildContext context) {
+              //Close Dialog
+              Navigator.pop(context);
+
+              gameplay.changeAlreadyInBattle(false);
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
+              websocket.disconnectWebsockets(context);
+            });
         gameplay.resetBattleLog();
       }
       return;
@@ -158,14 +406,13 @@ class _BattleSceneState extends State<BattleScene> {
 
     //Update Player
     if (stats['updatePlayer'] == true) {
-      await MySQL.returnPlayerStats(context);
+      await Server.returnPlayerStats(context);
       //Battle Log
       if (true) {
         for (int i = 0; i < stats['battleLog'].length; i++) {
           gameplay.addBattleLog(stats['battleLog'][i], context);
           //Animation
-          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
+          Future.delayed(const Duration(milliseconds: 100)).then((value) => _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut));
           await Future.delayed(Duration(milliseconds: options.textSpeed));
         }
       }
@@ -184,7 +431,7 @@ class _BattleSceneState extends State<BattleScene> {
       if (stats['win'] == true) {
         timer.cancel();
         websocket.websocketDisconnectBattle(context);
-        GlobalFunctions.lootDialog(context: context, loots: stats['loots'], xp: stats['earnedXP'], levelUpDialog: stats['levelUpDialog']);
+        lootDialog(context: context, loots: stats['loots'], xp: stats['earnedXP'], levelUpDialog: stats['levelUpDialog']);
         gameplay.changeAlreadyInBattle(false);
         gameplay.resetBattleLog();
       }
@@ -249,11 +496,7 @@ class _BattleSceneState extends State<BattleScene> {
                                       border: selectedEnemy == index ? Border.all(color: Theme.of(context).primaryColor) : Border.all(),
                                       borderRadius: BorderRadius.circular(20),
                                       color: Theme.of(context).colorScheme.primary,
-                                      image: DecorationImage(
-                                          image: actualEnemies[index]['life'] == "dead"
-                                              ? const ExactAssetImage("assets/images/enemys/gravestone.png")
-                                              : ExactAssetImage("assets/images/enemys/infight/${actualEnemies[index]['name']}.png"),
-                                          fit: actualEnemies[index]['life'] == "dead" ? BoxFit.fitHeight : BoxFit.cover),
+                                      image: DecorationImage(image: actualEnemies[index]['life'] == "dead" ? const ExactAssetImage("assets/images/enemys/gravestone.png") : ExactAssetImage("assets/images/enemys/infight/${actualEnemies[index]['name']}.png"), fit: actualEnemies[index]['life'] == "dead" ? BoxFit.fitHeight : BoxFit.cover),
                                     ),
                                   ),
                                 ),
@@ -719,8 +962,7 @@ class _BattleSceneState extends State<BattleScene> {
                                       //Battle Log
                                       Container(
                                         padding: const EdgeInsets.all(5),
-                                        decoration:
-                                            BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Theme.of(context).colorScheme.secondary),
                                         width: screenSize.width * 0.6,
                                         height: screenSize.height * 0.1,
                                         child: FittedBox(

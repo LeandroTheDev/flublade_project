@@ -9,9 +9,9 @@ import 'dart:convert';
 import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/gameplay.dart';
-import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/pages/mainmenu/main_menu.dart';
 import 'package:flutter/material.dart';
@@ -134,14 +134,18 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
               if (timeoutHandle > 500) {
                 if (_connection.isActive) {
                   try {
-                    closeConnection();
-                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
-                    websocket.disconnectWebsockets(context);
-                    GlobalFunctions.errorDialog(
-                      errorMsgTitle: 'authentication_lost_connection',
-                      errorMsgContext: 'You have lost connection to the servers.',
-                      context: context,
-                    );
+                    Dialogs.alertDialog(
+                        context: context,
+                        message: 'authentication_lost_connection',
+                        cancel: false,
+                        returnFunction: (BuildContext context) {
+                          //Close Dialog
+                          Navigator.pop(context);
+
+                          closeConnection();
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MainMenu()), (route) => false);
+                          websocket.disconnectWebsockets(context);
+                        });
                     return;
                   } catch (_) {}
                 }
@@ -291,10 +295,9 @@ class GameEngine extends FlameGame with HasCollisionDetection, ChangeNotifier, H
     //Add Components
     add(player);
     //Camera
-    // ignore: deprecated_member_use
-    camera.followVector2(player.cameraPosition);
+    camera.follow(player);
     //World Loading
-    MySQLGameplay.returnLevel(context: context, level: MySQL.returnInfo(context, returned: 'location')).then((value) {
+    ServerGameplay.returnLevel(context: context, level: Server.returnInfo(context, returned: 'location')).then((value) {
       final worldGeneration = WorldGeneration();
       worldGeneration.generateWorld(value, baseEngine.gameController);
     });

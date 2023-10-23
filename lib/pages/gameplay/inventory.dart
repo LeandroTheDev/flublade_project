@@ -2,9 +2,9 @@
 
 import 'dart:convert';
 
-import 'package:flublade_project/components/item_widget.dart';
+import 'package:flublade_project/components/widget/item_widget.dart';
 import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
@@ -29,7 +29,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
     final options = Provider.of<Options>(context);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
     final settings = Provider.of<Settings>(context, listen: false);
 
@@ -87,8 +87,8 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                             child: ElevatedButton(
                               onPressed: () async {
                                 GlobalFunctions.loadingWidget(context: context, language: Provider.of<Options>(context, listen: false).language);
-                                await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
-                                    headers: MySQL.headers,
+                                await http.post(Uri.http(server.serverAddress, '/changeEquip'),
+                                    headers: Server.headers,
                                     body: jsonEncode({
                                       'id': options.id,
                                       'token': options.token,
@@ -98,7 +98,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                       'selectedCharacter': gameplay.selectedCharacter,
                                       'index': equipIndex,
                                     }));
-                                await MySQL.returnPlayerStats(context);
+                                await Server.returnPlayerStats(context);
                                 setState(() {
                                   Navigator.pop(context);
                                   Navigator.pop(context);
@@ -338,15 +338,14 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                               padding: const EdgeInsets.all(8.0),
                                                               child: ElevatedButton(
                                                                 onPressed: () async {
-                                                                  final selectedIndex =
-                                                                      settings.itemsId[Settings.tierCheck(itemName)]['equip'][index];
+                                                                  final selectedIndex = settings.itemsId[Settings.tierCheck(itemName)]['equip'][index];
                                                                   //Loading Widget
                                                                   GlobalFunctions.loadingWidget(context: context, language: options.language);
                                                                   //Equipped item variable
                                                                   final equipped = gameplay.playerInventory[itemName];
                                                                   //Add Equip Stats
-                                                                  await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
-                                                                      headers: MySQL.headers,
+                                                                  await http.post(Uri.http(server.serverAddress, '/changeEquip'),
+                                                                      headers: Server.headers,
                                                                       body: jsonEncode({
                                                                         'id': options.id,
                                                                         'token': options.token,
@@ -356,7 +355,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                         'selectedCharacter': gameplay.selectedCharacter,
                                                                         'index': selectedIndex,
                                                                       }));
-                                                                  await MySQL.returnPlayerStats(context);
+                                                                  await Server.returnPlayerStats(context);
                                                                   setState(() {
                                                                     Navigator.pop(context);
                                                                     Navigator.pop(context);
@@ -365,10 +364,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                 },
                                                                 child: FittedBox(
                                                                   child: Text(
-                                                                    Language.Translate(
-                                                                            'response_equipmentIndex_${settings.itemsId[Settings.tierCheck(itemName)]['equip'][index]}',
-                                                                            options.language) ??
-                                                                        'Language Error',
+                                                                    Language.Translate('response_equipmentIndex_${settings.itemsId[Settings.tierCheck(itemName)]['equip'][index]}', options.language) ?? 'Language Error',
                                                                     style: const TextStyle(fontSize: 99),
                                                                   ),
                                                                 ),
@@ -388,8 +384,8 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                           //Equipped item variable
                                           final equipped = gameplay.playerInventory[itemName];
                                           //Add Equip Stats
-                                          await http.post(Uri.http(mysql.serverAddress, '/changeEquip'),
-                                              headers: MySQL.headers,
+                                          await http.post(Uri.http(server.serverAddress, '/changeEquip'),
+                                              headers: Server.headers,
                                               body: jsonEncode({
                                                 'id': options.id,
                                                 'token': options.token,
@@ -399,7 +395,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                 'selectedCharacter': gameplay.selectedCharacter,
                                                 'index': selectedIndex,
                                               }));
-                                          await MySQL.returnPlayerStats(context);
+                                          await Server.returnPlayerStats(context);
                                           setState(() {
                                             Navigator.pop(context);
                                             Navigator.pop(context);
@@ -879,7 +875,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
               //Items
               Center(
                 child: FutureBuilder(
-                  future: MySQL.returnPlayerInventory(context),
+                  future: Server.returnPlayerInventory(context),
                   builder: (context, future) {
                     if (future.data == 'Success') {
                       List inventory = [];

@@ -6,7 +6,7 @@ import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/gameplay.dart';
-import 'package:flublade_project/data/mysql.dart';
+import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
@@ -183,7 +183,7 @@ class PlayerSprite extends SpriteAnimationComponent with HasGameRef {
 
   @override
   Future<void> onLoad() async {
-    final imageLocation = 'players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}';
+    final imageLocation = 'players/${Server.returnInfo(context, returned: 'class')}/${Server.returnInfo(context, returned: 'class')}';
     //Idle Sprite
     gameRef.images.load('${imageLocation}_ingame_idleright.png').then((loadedSprite) {
       spriteIdle = SpriteAnimation.fromFrameData(
@@ -260,7 +260,7 @@ class PlayerClientSprite extends SpriteAnimationComponent with HasGameRef {
 
   @override
   Future<void> onLoad() async {
-    final imageLocation = 'players/${MySQL.returnInfo(context, returned: 'class')}/${MySQL.returnInfo(context, returned: 'class')}';
+    final imageLocation = 'players/${Server.returnInfo(context, returned: 'class')}/${Server.returnInfo(context, returned: 'class')}';
     //Idle Sprite
     gameRef.images.load('${imageLocation}_ingame_idleright.png').then((loadedSprite) {
       spriteIdle = SpriteAnimation.fromFrameData(

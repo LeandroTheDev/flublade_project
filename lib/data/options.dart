@@ -7,6 +7,7 @@ class Options with ChangeNotifier {
   String _token = '';
   bool _remember = false;
   int _id = 0;
+  bool _debug = false;
 
   String get language => _language;
   int get textSpeed => _textSpeed;
@@ -14,6 +15,7 @@ class Options with ChangeNotifier {
   String get token => _token;
   bool get remember => _remember;
   int get id => _id;
+  bool get debug => _debug;
 
   void changeLanguage(value) {
     _language = value;
@@ -31,22 +33,26 @@ class Options with ChangeNotifier {
     _token = value;
   }
 
-  void changeRemember({value}) {
+  void changeRemember({value, notify = true}) {
     if (value == null) {
       _remember = !_remember;
-      notifyListeners();
+      notify ? notifyListeners() : () => {};
       return;
     }
     if (value) {
       _remember = value;
-      notifyListeners();
+      notify ? notifyListeners() : () => {};
     } else if (!value) {
       _remember = value;
-      notifyListeners();
+      notify ? notifyListeners() : () => {};
     }
   }
 
   void changeId(value) {
     _id = value;
+  }
+
+  void changeDebug(value) {
+    _debug = value;
   }
 }

@@ -3,8 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flublade_project/data/global.dart';
-import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
@@ -13,9 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
-class MySQL with ChangeNotifier {
+class Server with ChangeNotifier {
   String _serverAddress = '0.0.0.0:8080';
-  String _serverName = 'FLUBLADE';
+  String _serverName = '';
   String get serverAddress => _serverAddress;
   String get serverName => _serverName;
 
@@ -24,7 +23,7 @@ class MySQL with ChangeNotifier {
   //-----
   //Change server IP
   void changeServerAddress(value) {
-    _serverAddress = '$value:8080';
+    _serverAddress = '$value:$ports';
   }
 
   //Change server Name
@@ -34,116 +33,20 @@ class MySQL with ChangeNotifier {
 
   //Backend Connection
   static const ports = 8080;
-
-  // static const url = '$ip:$ports';
   static const headers = {
     HttpHeaders.contentTypeHeader: 'application/json',
   };
-
-  //-----
-  //Requisitions
-  //-----
-  //Change Language
-  static Future<void> changeLanguage(context, widget, [needConnection = true]) async {
-    final screenSize = MediaQuery.of(context).size;
-    final options = Provider.of<Options>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
-    //Upload to MySQL
-    uploadData(String language) async {
-      GlobalFunctions.loadingWidget(context: context, language: language);
-      //Update Datas
-      options.changeLanguage(language);
-      SaveDatas.setLanguage(language);
-      if (needConnection) {
-        late final http.Response result;
-        try {
-          //Credentials Check
-          result = await http.post(
-            Uri.http(mysql._serverAddress, '/updateLanguage'),
-            headers: headers,
-            body: jsonEncode({"id": options.id, "language": language, "token": options.token}),
-          );
-        } catch (error) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
-          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
-          return;
-        }
-        if (jsonDecode(result.body)['message'] == 'Invalid Login') {
-          GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
-          Navigator.pushReplacementNamed(context, '/authenticationpage');
-          return;
-        }
-      }
-      //Pop the Dialog
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => widget));
-    }
-
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return FittedBox(
-            child: AlertDialog(
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Language Text
-              title: Text(
-                Language.Translate('authentication_language', options.language) ?? 'Language',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              content: SizedBox(
-                width: screenSize.width * 0.5,
-                height: screenSize.height * 0.3,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      //en_US
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            uploadData('en_US');
-                          },
-                          child: const Text(
-                            'English',
-                          ),
-                        ),
-                      ),
-                      //pt_BR
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            uploadData('pt_BR');
-                          },
-                          child: const Text(
-                            'Português',
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
-  }
 
   //Return Character Inventory
   static Future<String> returnPlayerInventory(BuildContext context) async {
     final options = Provider.of<Options>(context);
     final gameplay = Provider.of<Gameplay>(context);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     //Pickup from database
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
+      charactersdb = await http.post(Uri.http(server.serverAddress, '/getCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'selectedCharacter': gameplay.selectedCharacter, 'onlyInventory': true}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -163,12 +66,12 @@ class MySQL with ChangeNotifier {
   static Future<String> pushUploadCharacters({required BuildContext context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     dynamic charactersdb;
 
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(server.serverAddress, '/getCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -218,21 +121,21 @@ class MySQL with ChangeNotifier {
   static Future<dynamic> pushCharacters({required context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(server.serverAddress, '/getCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
     } catch (error) {
       //Connection Error
-      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context);
+      Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
       return 'Connection Error';
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
     if (charactersdb['message'] == 'Invalid Login') {
       Navigator.pushNamed(context, '/authenticationpage');
-      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+      Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context);
       return 'Invalid Login';
     }
     gameplay.changeCharacters(jsonDecode(charactersdb['characters']));
@@ -243,14 +146,14 @@ class MySQL with ChangeNotifier {
   static Future<String> updateCharacters({String characters = '', context, bool isLevelUp = false}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     dynamic charactersdb = jsonDecode(characters);
     dynamic result;
     try {
       if (isLevelUp) {
         //Connection
-        result = await http.post(Uri.http(mysql.serverAddress, '/updateCharacters'),
-            headers: MySQL.headers,
+        result = await http.post(Uri.http(server.serverAddress, '/updateCharacters'),
+            headers: Server.headers,
             body: jsonEncode({
               'id': options.id,
               'token': options.token,
@@ -265,8 +168,8 @@ class MySQL with ChangeNotifier {
         gameplay.changeStats(value: jsonDecode(jsonDecode(result.body)['characters'])['character${gameplay.selectedCharacter}']['skillpoint'], stats: 'skillpoint');
       } else {
         //Connection
-        result = await http.post(Uri.http(mysql.serverAddress, '/updateCharacters'),
-            headers: MySQL.headers,
+        result = await http.post(Uri.http(server.serverAddress, '/updateCharacters'),
+            headers: Server.headers,
             body: jsonEncode({
               'id': options.id,
               'token': options.token,
@@ -303,21 +206,20 @@ class MySQL with ChangeNotifier {
   static Future removeCharacters({required index, required context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/removeCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
+      charactersdb = await http.post(Uri.http(server.serverAddress, '/removeCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
     } catch (error) {
       //Connection Error
-      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_register_problem_connection', errorMsgContext: 'Failed to connect to the Servers', context: context, popUntil: '/charactercreation');
+      Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
       return;
     }
     charactersdb = jsonDecode(charactersdb.body);
     //Token Check
     if (charactersdb['message'] == 'Invalid Login') {
-      Navigator.pushNamed(context, '/authenticationpage');
-      GlobalFunctions.errorDialog(errorMsgTitle: 'authentication_invalidlogin', errorMsgContext: 'Invalid Session', context: context, popUntil: '/authenticationpage');
+      Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context);
       return;
     }
     //Success
@@ -355,12 +257,12 @@ class MySQL with ChangeNotifier {
   static Future returnPlayerStats(context) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     //Receive from database
     dynamic charactersdb;
     try {
       //Connection
-      charactersdb = await http.post(Uri.http(mysql.serverAddress, '/getCharacters'), headers: MySQL.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
+      charactersdb = await http.post(Uri.http(server.serverAddress, '/getCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token}));
       //Token check
       if (jsonDecode(charactersdb.body)['message'] == 'Invalid Login') {
         return 'Invalid Login';
@@ -393,16 +295,16 @@ class MySQL with ChangeNotifier {
   }
 }
 
-class MySQLGameplay {
+class ServerGameplay {
   //Return Server Stats
   static Future returnGameplayStats(context) async {
     final settings = Provider.of<Settings>(context, listen: false);
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     dynamic result;
     //Receive All Stats
     result = await http.post(
-      Uri.http(mysql.serverAddress, '/gameplayStats'),
-      headers: MySQL.headers,
+      Uri.http(server.serverAddress, '/gameplayStats'),
+      headers: Server.headers,
       body: jsonEncode({
         'all': true,
       }),
@@ -415,14 +317,14 @@ class MySQLGameplay {
 
   //Return Level
   static Future<List<dynamic>> returnLevel({required BuildContext context, required String level}) async {
-    final mysql = Provider.of<MySQL>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     List results = [];
 
     //Returning the Tiles
-    dynamic result = await http.post(Uri.http(mysql.serverAddress, '/pushLevel'),
-        headers: MySQL.headers,
+    dynamic result = await http.post(Uri.http(server.serverAddress, '/pushLevel'),
+        headers: Server.headers,
         body: jsonEncode({
           'id': options.id,
           'token': options.token,

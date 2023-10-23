@@ -1,6 +1,6 @@
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/mysql.dart';
 import 'package:flublade_project/data/options.dart';
 
 import 'package:flutter/material.dart';
@@ -135,7 +135,7 @@ class _OptionsMenuState extends State<OptionsMenu> {
                     child: TextButton(
                       onPressed: () {
                         setState(() {
-                          MySQL.changeLanguage(context, super.widget);
+                          Dialogs.changeLanguage(context, super.widget);
                         });
                       },
                       child: Container(
