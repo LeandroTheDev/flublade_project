@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flublade_project/components/system/dialogs.dart';
+import 'package:flublade_project/components/widget/color_widget.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
@@ -21,15 +22,11 @@ class CharacterCreation extends StatefulWidget {
 
 class _CharacterCreationState extends State<CharacterCreation> {
   int selectedClass = 0;
-  List<int> playableClasses = [4];
-  TextEditingController createName = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final server = Provider.of<Server>(context, listen: false);
 
     //Change Class Button
     void changeClass(bool value) {
@@ -54,138 +51,6 @@ class _CharacterCreationState extends State<CharacterCreation> {
           });
         }
       }
-    }
-
-    //Select Username Dialog
-    void usernameSelect() {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return FittedBox(
-            child: AlertDialog(
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Title
-              title: Text(
-                Language.Translate('characters_create_name', options.language) ?? 'Character Name',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              //Text and Input
-              content: Stack(
-                children: [
-                  //Background Box Color and Decoration
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 209, 209, 209),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      width: 250,
-                      height: 40,
-                    ),
-                  ),
-                  //Input
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    alignment: Alignment.topLeft,
-                    width: 250,
-                    height: 47,
-                    child: TextFormField(controller: createName),
-                  ),
-                ],
-              ),
-              //Butons
-              actions: [
-                Row(
-                  children: [
-                    const Spacer(),
-                    //Create Button
-                    ElevatedButton(
-                      onPressed: () async {
-                        //Class declaration
-                        String characterClass = Gameplay.classes[selectedClass].substring(18);
-                        characterClass = characterClass.substring(0, characterClass.length - 4);
-                        //Loading Widget
-                        GlobalFunctions.loadingWidget(context: context, language: options.language);
-                        dynamic result;
-                        try {
-                          //Load Stats
-                          await ServerGameplay.returnGameplayStats(context);
-                          //Server Creation
-                          result = await http.post(Uri.http(server.serverAddress, '/createCharacters'),
-                              headers: Server.headers,
-                              body: jsonEncode({
-                                'id': options.id,
-                                'token': options.token,
-                                'name': createName.text,
-                                'class': characterClass,
-                              }));
-                        } catch (error) {
-                          Navigator.pop(context);
-                          //Connection Error
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error');
-                          return;
-                        }
-                        result = jsonDecode(result.body);
-                        //Empty Text
-                        if (result['message'] == 'Empty') {
-                          Navigator.pop(context);
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
-                          return;
-                        }
-                        //Too big Text
-                        if (result['message'] == 'Too big') {
-                          Navigator.pop(context);
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
-                          return;
-                        }
-                        //Success
-                        if (result['message'] == 'Success') {
-                          gameplay.changeCharacters(result['characters']);
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        } else {
-                          Navigator.pop(context);
-                          //Connection Error
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error');
-                          return;
-                        }
-                      },
-                      child: Text(
-                        Language.Translate('response_create', options.language) ?? 'Language',
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                    ),
-
-                    const Spacer(),
-                    //Back Button
-                    ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        Language.Translate('response_back', options.language) ?? 'Language',
-                        style: TextStyle(color: Theme.of(context).primaryColor),
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    }
-
-    //Verifiy if class is playable
-    bool verifyPlayableClass() {
-      for (int i = 0; i <= playableClasses.length - 1; i++) {
-        if (selectedClass == playableClasses[i]) {
-          return true;
-        }
-      }
-      return false;
     }
 
     //Return Class Info By Index
@@ -338,47 +203,512 @@ class _CharacterCreationState extends State<CharacterCreation> {
                   ),
                 ),
                 //Select Button
-                verifyPlayableClass()
-                    ? FittedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: SizedBox(
-                              height: screenSize.height * 0.15,
-                              width: screenSize.width,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    usernameSelect();
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: FittedBox(
-                                      child: Text(
-                                        Language.Translate('response_select', options.language) ?? 'Select',
-                                        style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
-                                      ),
-                                    ),
-                                  ))),
-                        ),
-                      )
-                    : FittedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: SizedBox(
-                              height: screenSize.height * 0.15,
-                              width: screenSize.width,
-                              child: ElevatedButton(
-                                  onPressed: null,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: FittedBox(
-                                      child: Text(
-                                        Language.Translate('response_select', options.language) ?? 'Select',
-                                        style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
-                                      ),
-                                    ),
-                                  ))),
+                FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SizedBox(
+                        height: screenSize.height * 0.15,
+                        width: screenSize.width,
+                        child: ElevatedButton(
+                            onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CharacterBody(selectedClass: selectedClass),
+                                  ),
+                                ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FittedBox(
+                                child: Text(
+                                  Language.Translate('response_select', options.language) ?? 'Select',
+                                  style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
+                                ),
+                              ),
+                            ))),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CharacterBody extends StatefulWidget {
+  final int selectedClass;
+  const CharacterBody({super.key, required this.selectedClass});
+
+  @override
+  State<CharacterBody> createState() => _CharacterBodyState();
+}
+
+class _CharacterBodyState extends State<CharacterBody> {
+  TextEditingController createName = TextEditingController();
+  //Page Declarations
+  Map<String, Color> bodyColors = {
+    "hairColor": const Color.fromARGB(255, 0, 0, 0),
+    "eyesColor": const Color.fromARGB(255, 0, 0, 0),
+    "mouthColor": const Color.fromARGB(255, 0, 0, 0),
+    "skinColor": const Color.fromARGB(255, 0, 0, 0),
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    //System Declarations
+    final screenSize = MediaQuery.of(context).size;
+    final options = Provider.of<Options>(context);
+    final gameplay = Provider.of<Gameplay>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
+
+    //Select Color Dialog for compatible items
+    void selectColor(String body) {
+      showDialog(
+        context: context,
+        builder: (context) => FittedBox(
+          child: AlertDialog(
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            //Title
+            title: Text(
+              Language.Translate("characters_create_${body}_color", options.language) ?? "Language Error",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            //Color Select
+            content: ColorSelect(
+              onColorSelected: (Color color, BuildContext context) {
+                setState(() {
+                  bodyColors["${body}Color"] = color;
+                });
+                Navigator.pop(context);
+              },
+              previousColor: bodyColors["${body}Color"]!,
+            ),
+          ),
+        ),
+      );
+    }
+
+    //Select Username Dialog
+    void usernameSelect() {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return FittedBox(
+            child: AlertDialog(
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              //Title
+              title: Text(
+                Language.Translate('characters_create_name', options.language) ?? 'Character Name',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              //Text and Input
+              content: Stack(
+                children: [
+                  //Background Box Color and Decoration
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 209, 209, 209),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      width: 250,
+                      height: 40,
+                    ),
+                  ),
+                  //Input
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    alignment: Alignment.topLeft,
+                    width: 250,
+                    height: 47,
+                    child: TextFormField(controller: createName),
+                  ),
+                ],
+              ),
+              //Butons
+              actions: [
+                Row(
+                  children: [
+                    const Spacer(),
+                    //Create Button
+                    ElevatedButton(
+                      onPressed: () async {
+                        //Class declaration
+                        String characterClass = Gameplay.classes[widget.selectedClass].substring(18);
+                        characterClass = characterClass.substring(0, characterClass.length - 4);
+                        //Loading Widget
+                        GlobalFunctions.loadingWidget(context: context, language: options.language);
+                        dynamic result;
+                        try {
+                          //Load Stats
+                          await ServerGameplay.returnGameplayStats(context);
+                          //Server Creation
+                          result = await http.post(Uri.http(server.serverAddress, '/createCharacters'),
+                              headers: Server.headers,
+                              body: jsonEncode({
+                                'id': options.id,
+                                'token': options.token,
+                                'name': createName.text,
+                                'class': characterClass,
+                              }));
+                        } catch (error) {
+                          Navigator.pop(context);
+                          //Connection Error
+                          Dialogs.alertDialog(context: context, message: 'characters_create_error');
+                          return;
+                        }
+                        result = jsonDecode(result.body);
+                        //Empty Text
+                        if (result['message'] == 'Empty') {
+                          Navigator.pop(context);
+                          Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
+                          return;
+                        }
+                        //Too big Text
+                        if (result['message'] == 'Too big') {
+                          Navigator.pop(context);
+                          Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
+                          return;
+                        }
+                        //Success
+                        if (result['message'] == 'Success') {
+                          gameplay.changeCharacters(result['characters']);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.pop(context);
+                          //Connection Error
+                          Dialogs.alertDialog(context: context, message: 'characters_create_error');
+                          return;
+                        }
+                      },
+                      child: Text(
+                        Language.Translate('response_create', options.language) ?? 'Language',
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+
+                    const Spacer(),
+                    //Back Button
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        Language.Translate('response_back', options.language) ?? 'Language',
+                        style: TextStyle(color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Stack(
+        children: [
+          //Background Image
+          SizedBox(
+            width: screenSize.width,
+            height: screenSize.height,
+            child: Image.asset(
+              'assets/tavern.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          //Creation
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: screenSize.height * 0.07),
+                //Book Selection
+                FittedBox(
+                  child: Stack(
+                    children: [
+                      //Book Image
+                      SizedBox(
+                        width: 2800,
+                        height: 2800,
+                        child: Image.asset(
+                          'assets/open_book.png',
+                          fit: BoxFit.fill,
                         ),
                       ),
+                      //Class Text
+                      SizedBox(
+                        width: 950,
+                        height: 580,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 510.0, top: 500),
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('characters_create_you', options.language) ?? 'You',
+                              maxLines: 1,
+                              style: const TextStyle(fontFamily: 'PressStart'),
+                            ),
+                          ),
+                        ),
+                      ),
+                      //Info Text
+                      SizedBox(
+                        width: 2180,
+                        height: 580,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 1810.0, top: 500),
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('characters_create_type', options.language) ?? 'Type',
+                              maxLines: 1,
+                              style: const TextStyle(fontFamily: 'PressStart'),
+                            ),
+                          ),
+                        ),
+                      ),
+                      //Player Body
+                      SizedBox(
+                        width: 1140,
+                        height: 2110,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 350.0, top: 770),
+                          child: Image.asset(
+                            Gameplay.classes[widget.selectedClass],
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                      //Class Info
+                      Padding(
+                        padding: const EdgeInsets.only(left: 1700.0, top: 750),
+                        child: SizedBox(
+                          width: 650,
+                          height: 1350,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                //Hair
+                                Column(
+                                  children: [
+                                    Text(
+                                      Language.Translate('characters_create_hair', options.language) ?? 'Hair',
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_back, size: 175),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_forward, size: 175),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Hair Color
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //Change Color Button
+                                    TextButton(
+                                      onPressed: () => selectColor("hair"),
+                                      child: Text(
+                                        Language.Translate('characters_create_hair_color', options.language) ?? 'Hair Color',
+                                        style: const TextStyle(fontFamily: 'Explora', fontSize: 130, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                      ),
+                                    ),
+                                    //Color Preview
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: bodyColors["hairColor"],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                //Spacer
+                                const SizedBox(height: 100),
+                                //Eyes
+                                Column(
+                                  children: [
+                                    Text(
+                                      Language.Translate('chatacters_create_eyes', options.language) ?? 'Eyes',
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_back, size: 175),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_forward, size: 175),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Eyes Color
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //Change Color Button
+                                    TextButton(
+                                      onPressed: () => selectColor("eyes"),
+                                      child: Text(
+                                        Language.Translate('characters_create_eyes_color', options.language) ?? 'Eyes Color',
+                                        style: const TextStyle(fontFamily: 'Explora', fontSize: 130, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                      ),
+                                    ),
+                                    //Color Preview
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: bodyColors["eyesColor"],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                //Mouth
+                                Column(
+                                  children: [
+                                    Text(
+                                      Language.Translate('chatacters_create_mouth', options.language) ?? 'Mouth',
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_back, size: 175),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_forward, size: 175),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Mouth Color
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //Change Color Button
+                                    TextButton(
+                                      onPressed: () => selectColor("mouth"),
+                                      child: Text(
+                                        Language.Translate('characters_create_mouth_color', options.language) ?? 'Mouth Color',
+                                        style: const TextStyle(fontFamily: 'Explora', fontSize: 130, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                      ),
+                                    ),
+                                    //Color Preview
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: bodyColors["mouthColor"],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                //Skin
+                                Column(
+                                  children: [
+                                    Text(
+                                      Language.Translate('chatacters_create_skin', options.language) ?? 'Skin',
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_back, size: 175),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {},
+                                          child: const Icon(Icons.arrow_forward, size: 175),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Skin Color
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //Change Color Button
+                                    TextButton(
+                                      onPressed: () => selectColor("skin"),
+                                      child: Text(
+                                        Language.Translate('characters_create_mouth_skin', options.language) ?? 'Skin Color',
+                                        style: const TextStyle(fontFamily: 'Explora', fontSize: 130, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                      ),
+                                    ),
+                                    //Color Preview
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: bodyColors["skinColor"],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                //Confirm
+                FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SizedBox(
+                        height: screenSize.height * 0.15,
+                        width: screenSize.width,
+                        child: ElevatedButton(
+                            onPressed: () => usernameSelect(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FittedBox(
+                                child: Text(
+                                  Language.Translate('response_confirm', options.language) ?? 'Confirm',
+                                  style: const TextStyle(fontSize: 500, fontFamily: 'PressStart'),
+                                ),
+                              ),
+                            ))),
+                  ),
+                ),
               ],
             ),
           ),

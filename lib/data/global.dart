@@ -36,7 +36,6 @@ class SaveDatas {
   static const _keyServer = '0.0.0.0';
   static const _keyServerName = 'FLUBLADE';
   //Storage Options
-  static const _keyCharacters = '{}';
   static const _keyLanguage = 'en_US';
   static const _keyTextSpeed = 700;
 
@@ -53,7 +52,6 @@ class SaveDatas {
 
   //Set Datas Options
   static Future setLanguage(String language) async => await _preferences.setString(_keyLanguage, language);
-  static Future setCharacters(String characters) async => await _preferences.setString(_keyCharacters, characters);
   static Future setTextSpeed(int textSpeed) async => await _preferences.setInt(_keyTextSpeed.toString(), textSpeed);
 
   //Get Datas Login
@@ -66,7 +64,6 @@ class SaveDatas {
 
   //Get Datas Options
   static String? getLanguage() => _preferences.getString(_keyLanguage);
-  static String? getCharacters() => _preferences.getString(_keyCharacters);
   static int? getTextSpeed() => _preferences.getInt(_keyTextSpeed.toString());
 }
 

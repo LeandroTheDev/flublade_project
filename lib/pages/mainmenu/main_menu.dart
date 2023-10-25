@@ -2,7 +2,6 @@
 
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/language.dart';
-import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 
@@ -17,12 +16,11 @@ class MainMenu extends StatefulWidget {
 }
 
 class _MainMenuState extends State<MainMenu> {
-  bool isLoading = false;
-
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1)).then((value) {
+    //Reset Ingame Variables
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final gameplay = Provider.of<Gameplay>(context, listen: false);
       gameplay.changeAlreadyInBattle(false);
       gameplay.resetBattleLog();
@@ -67,92 +65,67 @@ class _MainMenuState extends State<MainMenu> {
                   ),
                 ),
                 //Menu Buttons
-                isLoading
-                    ? Column(
-                        children: [
-                          SizedBox(height: screenSize.height * 0.2),
-                          const CircularProgressIndicator(),
-                        ],
-                      )
-                    : FittedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.all(400.0),
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 100),
-                              //Play Button
-                              TextButton(
-                                onPressed: () async {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  await Future.delayed(const Duration(milliseconds: 50));
-                                  //Refresh
-                                  await Server.pushCharacters(context: context);
-                                  Navigator.pushNamed(context, '/characterselection');
-                                  Future.delayed(const Duration(milliseconds: 200)).then((value) => setState(() {
-                                        isLoading = false;
-                                      }));
-                                },
-                                child: FittedBox(
-                                  child: Text(
-                                    Language.Translate('mainmenu_play', options.language) ?? 'Play',
-                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 400),
-                              //Characters Button
-                              TextButton(
-                                onPressed: () async {
-                                  //Loading
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  //Refresh
-                                  await Server.pushCharacters(context: context);
-                                  Navigator.pushNamed(context, '/charactersmenu');
-                                  Future.delayed(const Duration(milliseconds: 200)).then((value) => setState(() {
-                                        isLoading = false;
-                                      }));
-                                },
-                                child: FittedBox(
-                                  child: Text(
-                                    Language.Translate('mainmenu_characters', options.language) ?? 'Characters',
-                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 400),
-                              //Options
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushNamed("/optionsmenu").then((value) => setState(() {}));
-                                },
-                                child: FittedBox(
-                                  child: Text(
-                                    Language.Translate('mainmenu_options', options.language) ?? 'Options',
-                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 400),
-                              //Logout
-                              TextButton(
-                                onPressed: () {
-                                  Dialogs.disconnectDialog(context: context);
-                                },
-                                child: FittedBox(
-                                  child: Text(
-                                    Language.Translate('mainmenu_logout', options.language) ?? 'Logout',
-                                    style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
-                                  ),
-                                ),
-                              ),
-                            ],
+                FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(400.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 100),
+                        //Play Button
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pushNamed(context, '/characterselection');
+                          },
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('mainmenu_play', options.language) ?? 'Play',
+                              style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 400),
+                        //Characters Button
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.pushNamed(context, '/charactersmenu');
+                          },
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('mainmenu_characters', options.language) ?? 'Characters',
+                              style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 400),
+                        //Options
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed("/optionsmenu").then((value) => setState(() {}));
+                          },
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('mainmenu_options', options.language) ?? 'Options',
+                              style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 400),
+                        //Logout
+                        TextButton(
+                          onPressed: () {
+                            Dialogs.disconnectDialog(context: context);
+                          },
+                          child: FittedBox(
+                            child: Text(
+                              Language.Translate('mainmenu_logout', options.language) ?? 'Logout',
+                              style: TextStyle(fontFamily: 'PressStart', fontSize: 500, color: Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

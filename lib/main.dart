@@ -88,7 +88,6 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     super.initState();
     final options = Provider.of<Options>(context, listen: false);
     final server = Provider.of<Server>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
     //Load Datas
     server.changeServerAddress(SaveDatas.getServerAddress() ?? '0.0.0.0:8080');
     server.changeServerName("");
@@ -98,7 +97,6 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
     options.changeTextSpeed(SaveDatas.getTextSpeed() ?? 700);
     options.changeRemember(value: SaveDatas.getRemember() ?? false, notify: false);
-    gameplay.changeCharacters(jsonDecode(SaveDatas.getCharacters() ?? '{}'));
     //Auto Login Function
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       //Check Remember Box
@@ -124,13 +122,11 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           options.changeUsername(result['username']);
           options.changeLanguage(result['language']);
           options.changeToken(result['token']);
-          gameplay.changeCharacters(jsonDecode(result['characters']));
           //Save reload
           SaveDatas.setId(options.id);
           SaveDatas.setUsername(options.username);
           SaveDatas.setLanguage(options.language);
           SaveDatas.setToken(options.token);
-          SaveDatas.setCharacters(jsonEncode(gameplay.characters));
           Navigator.pushReplacementNamed(context, '/mainmenu');
         } else if (result['message'] == 'Invalid Login') {
           Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context);

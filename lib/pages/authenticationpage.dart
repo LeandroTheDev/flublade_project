@@ -33,7 +33,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   Widget build(BuildContext context) {
     final options = Provider.of<Options>(context);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
     final settings = Provider.of<Settings>(context);
     final screenSize = MediaQuery.of(context).size;
     final server = Provider.of<Server>(context, listen: false);
@@ -346,6 +345,18 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         width: 150,
                                         child: ElevatedButton(
                                           onPressed: () async {
+                                            //Debug Activation
+                                            if (serverAddress.text == "debug") {
+                                              options.changeDebug(true);
+                                              options.changeId(0);
+                                              options.changeUsername('debugger');
+                                              options.changeLanguage('en_US');
+                                              options.changeToken('0000');
+                                              Navigator.pushReplacementNamed(context, '/mainmenu');
+                                              return;
+                                            } else {
+                                              options.changeDebug(false);
+                                            }
                                             dynamic result;
                                             server.changeServerAddress(serverAddress.text);
                                             GlobalFunctions.loadingWidget(context: context, language: options.language);
@@ -612,10 +623,6 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                   SaveDatas.setToken(result['token']);
                                                   SaveDatas.setRemember(options.remember);
                                                   SaveDatas.setId(options.id);
-                                                  //Push Characters
-                                                  String characters = await Server.pushCharacters(context: context);
-                                                  gameplay.changeCharacters(jsonDecode(characters));
-                                                  SaveDatas.setCharacters(characters);
                                                 } else {
                                                   //Update Providers
                                                   options.changeId(result['id']);

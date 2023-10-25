@@ -17,19 +17,19 @@ class Options with ChangeNotifier {
   int get id => _id;
   bool get debug => _debug;
 
-  void changeLanguage(value) {
+  void changeLanguage(String value) {
     _language = value;
   }
 
-  void changeTextSpeed(value) {
+  void changeTextSpeed(int value) {
     _textSpeed = value;
   }
 
-  void changeUsername(value) {
+  void changeUsername(String value) {
     _username = value;
   }
 
-  void changeToken(value) {
+  void changeToken(String value) {
     _token = value;
   }
 
@@ -48,11 +48,11 @@ class Options with ChangeNotifier {
     }
   }
 
-  void changeId(value) {
+  void changeId(int value) {
     _id = value;
   }
 
-  void changeDebug(value) {
+  void changeDebug(bool value) {
     _debug = value;
   }
 }
