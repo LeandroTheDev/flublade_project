@@ -76,11 +76,42 @@ flutter:
     - assets/images/interface/
     # Classes & Characters
     - assets/characters/
+    # Human
     - assets/images/players/human/
+    - assets/images/players/human/eyes/
+    - assets/images/players/human/hair/
+    - assets/images/players/human/mouth/
+    - assets/images/players/human/skin/
+    # Aghars
     - assets/images/players/aghars/
+    - assets/images/players/aghars/eyes/
+    - assets/images/players/aghars/hair/
+    - assets/images/players/aghars/mouth/
+    - assets/images/players/aghars/skin/
+    # Nature
     - assets/images/players/nature/
+    - assets/images/players/nature/eyes/
+    - assets/images/players/nature/hair/
+    - assets/images/players/nature/mouth/
+    - assets/images/players/nature/skin/
+    # Dytol
     - assets/images/players/dytol/
+    - assets/images/players/dytol/eyes/
+    - assets/images/players/dytol/hair/
+    - assets/images/players/dytol/mouth/
+    - assets/images/players/dytol/skin/
+    # Undead
+    - assets/images/players/dark/
+    - assets/images/players/dark/eyes/
+    - assets/images/players/dark/hair/
+    - assets/images/players/dark/mouth/
+    - assets/images/players/dark/skin/
+    # Undead
     - assets/images/players/undead/
+    - assets/images/players/undead/eyes/
+    - assets/images/players/undead/hair/
+    - assets/images/players/undead/mouth/
+    - assets/images/players/undead/skin/
     # Monster
       #drauy_monsters
     - assets/images/enemys/

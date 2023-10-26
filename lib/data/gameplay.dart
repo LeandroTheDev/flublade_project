@@ -36,94 +36,158 @@ class Gameplay with ChangeNotifier {
   static Map bodyOptions = {
     'human': {
       'male': {
-        'idle': 'assets/images/players/human/male_idle.png',
-        'running0': 'assets/images/players/human/male_running0.png',
-        'running1': 'assets/images/players/human/male_running1.png',
-        'running2': 'assets/images/players/human/male_running2.png',
-        'running3': 'assets/images/players/human/male_running3.png',
+        'idle': 'assets/images/players/human/male_body_idle.png',
+        'running0': 'assets/images/players/human/male_body_running0.png',
+        'running1': 'assets/images/players/human/male_body_running1.png',
+        'running2': 'assets/images/players/human/male_body_running2.png',
+        'running3': 'assets/images/players/human/male_body_running3.png',
       },
       'female': {},
       'hair': {
-        0: 'assets/images/players/human/hair0.png',
+        0: 'assets/images/players/human/hair/hair0.png',
+        1: 'assets/images/players/human/hair/hair1.png',
       },
       'eyes': {
-        0: 'assets/images/players/human/eyes0.png',
+        0: 'assets/images/players/human/eyes/eyes0.png',
+        1: 'assets/images/players/human/eyes/eyes1.png',
       },
       'mouth': {
-        0: 'assets/images/players/human/mouth0.png',
+        0: 'assets/images/players/human/mouth/mouth0.png',
+        1: 'assets/images/players/human/mouth/mouth1.png',
       },
       'skin': {
-        0: 'assets/images/players/human/skin0.png',
+        0: 'assets/images/players/human/skin/male_skin_idle0.png',
+        1: 'assets/images/players/human/skin/male_skin_idle1.png',
       },
     },
     'nature': {
+      'male': {
+        'idle': 'assets/images/players/nature/male_body_idle.png',
+        'running0': 'assets/images/players/nature/male_body_running0.png',
+        'running1': 'assets/images/players/nature/male_body_running1.png',
+        'running2': 'assets/images/players/nature/male_body_running2.png',
+        'running3': 'assets/images/players/nature/male_body_running3.png',
+      },
+      'female': {},
       'hair': {
-        0: 'assets/images/players/nature/hair0.png',
+        0: 'assets/images/players/nature/hair/hair0.png',
+        1: 'assets/images/players/nature/hair/hair1.png',
       },
       'eyes': {
-        0: 'assets/images/players/nature/eyes0.png',
+        0: 'assets/images/players/nature/eyes/eyes0.png',
+        1: 'assets/images/players/nature/eyes/eyes1.png',
       },
       'mouth': {
-        0: 'assets/images/players/nature/mouth0.png',
+        0: 'assets/images/players/nature/mouth/mouth0.png',
+        1: 'assets/images/players/nature/mouth/mouth1.png',
       },
       'skin': {
-        0: 'assets/images/players/nature/skin0.png',
+        0: 'assets/images/players/nature/skin/male_skin_idle0.png',
+        1: 'assets/images/players/nature/skin/male_skin_idle1.png',
       },
     },
     'dytol': {
+      'male': {
+        'idle': 'assets/images/players/dytol/male_body_idle.png',
+        'running0': 'assets/images/players/dytol/male_body_running0.png',
+        'running1': 'assets/images/players/dytol/male_body_running1.png',
+        'running2': 'assets/images/players/dytol/male_body_running2.png',
+        'running3': 'assets/images/players/dytol/male_body_running3.png',
+      },
+      'female': {},
       'hair': {
-        0: 'assets/images/players/dytol/hair0.png',
+        0: 'assets/images/players/dytol/hair/hair0.png',
+        1: 'assets/images/players/dytol/hair/hair1.png',
       },
       'eyes': {
-        0: 'assets/images/players/dytol/eyes0.png',
+        0: 'assets/images/players/dytol/eyes/eyes0.png',
+        1: 'assets/images/players/dytol/eyes/eyes1.png',
       },
       'mouth': {
-        0: 'assets/images/players/dytol/mouth0.png',
+        0: 'assets/images/players/dytol/mouth/mouth0.png',
+        1: 'assets/images/players/dytol/mouth/mouth1.png',
       },
       'skin': {
-        0: 'assets/images/players/dytol/skin0.png',
+        0: 'assets/images/players/dytol/skin/male_skin_idle0.png',
+        1: 'assets/images/players/dytol/skin/male_skin_idle1.png',
       },
     },
     'aghars': {
+      'male': {
+        'idle': 'assets/images/players/aghars/male_body_idle.png',
+        'running0': 'assets/images/players/aghars/male_body_running0.png',
+        'running1': 'assets/images/players/aghars/male_body_running1.png',
+        'running2': 'assets/images/players/aghars/male_body_running2.png',
+        'running3': 'assets/images/players/aghars/male_body_running3.png',
+      },
+      'female': {},
       'hair': {
-        0: 'assets/images/players/aghars/hair0.png',
+        0: 'assets/images/players/aghars/hair/hair0.png',
+        1: 'assets/images/players/aghars/hair/hair1.png',
       },
       'eyes': {
-        0: 'assets/images/players/aghars/eyes0.png',
+        0: 'assets/images/players/aghars/eyes/eyes0.png',
+        1: 'assets/images/players/aghars/eyes/eyes1.png',
       },
       'mouth': {
-        0: 'assets/images/players/aghars/mouth0.png',
+        0: 'assets/images/players/aghars/mouth/mouth0.png',
+        1: 'assets/images/players/aghars/mouth/mouth1.png',
       },
       'skin': {
-        0: 'assets/images/players/aghars/skin0.png',
+        0: 'assets/images/players/aghars/skin/male_skin_idle0.png',
+        1: 'assets/images/players/aghars/skin/male_skin_idle1.png',
       },
     },
     'dark': {
+      'male': {
+        'idle': 'assets/images/players/dark/male_body_idle.png',
+        'running0': 'assets/images/players/dark/male_body_running0.png',
+        'running1': 'assets/images/players/dark/male_body_running1.png',
+        'running2': 'assets/images/players/dark/male_body_running2.png',
+        'running3': 'assets/images/players/dark/male_body_running3.png',
+      },
+      'female': {},
       'hair': {
-        0: 'assets/images/players/dark/hair0.png',
+        0: 'assets/images/players/dark/hair/hair0.png',
+        1: 'assets/images/players/dark/hair/hair1.png',
       },
       'eyes': {
-        0: 'assets/images/players/dark/eyes0.png',
+        0: 'assets/images/players/dark/eyes/eyes0.png',
+        1: 'assets/images/players/dark/eyes/eyes1.png',
       },
       'mouth': {
-        0: 'assets/images/players/dark/mouth0.png',
+        0: 'assets/images/players/dark/mouth/mouth0.png',
+        1: 'assets/images/players/dark/mouth/mouth1.png',
       },
       'skin': {
-        0: 'assets/images/players/dark/skin0.png',
+        0: 'assets/images/players/dark/skin/male_skin_idle0.png',
+        1: 'assets/images/players/dark/skin/male_skin_idle1.png',
       },
     },
     'undead': {
+      'male': {
+        'idle': 'assets/images/players/undead/male_body_idle.png',
+        'running0': 'assets/images/players/undead/male_body_running0.png',
+        'running1': 'assets/images/players/undead/male_body_running1.png',
+        'running2': 'assets/images/players/undead/male_body_running2.png',
+        'running3': 'assets/images/players/undead/male_body_running3.png',
+      },
+      'female': {},
       'hair': {
-        0: 'assets/images/players/undead/hair0.png',
+        0: 'assets/images/players/undead/hair/hair0.png',
+        1: 'assets/images/players/undead/hair/hair1.png',
       },
       'eyes': {
-        0: 'assets/images/players/undead/eyes0.png',
+        0: 'assets/images/players/undead/eyes/eyes0.png',
+        1: 'assets/images/players/undead/eyes/eyes1.png',
       },
       'mouth': {
-        0: 'assets/images/players/undead/mouth0.png',
+        0: 'assets/images/players/undead/mouth/mouth0.png',
+        1: 'assets/images/players/undead/mouth/mouth1.png',
       },
       'skin': {
-        0: 'assets/images/players/undead/skin0.png',
+        0: 'assets/images/players/undead/skin/male_skin_idle0.png',
+        1: 'assets/images/players/undead/skin/male_skin_idle1.png',
       },
     },
   };

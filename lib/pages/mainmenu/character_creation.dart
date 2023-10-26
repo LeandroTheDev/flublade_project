@@ -273,6 +273,7 @@ class _CharacterBodyState extends State<CharacterBody> {
 
     //Change Body Options Button
     void changeBodyOptions(bool value, String selectedOption) {
+      print(bodyOptions);
       //Changing that is not a part of body
       //Race Changing
       raceChange() {
@@ -323,7 +324,7 @@ class _CharacterBodyState extends State<CharacterBody> {
           return;
         }
         //Body Changing
-        if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length) {
+        if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length - 1) {
           setState(() {
             bodyOptions[selectedOption] = 0;
           });
@@ -541,7 +542,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                           fit: BoxFit.fill,
                         ),
                       ),
-                      //Class Text
+                      //You Text
                       SizedBox(
                         width: 950,
                         height: 580,
@@ -556,7 +557,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                           ),
                         ),
                       ),
-                      //Info Text
+                      //Type Text
                       SizedBox(
                         width: 2180,
                         height: 580,
@@ -571,7 +572,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                           ),
                         ),
                       ),
-                      //Player Body
+                      //Body View
                       Padding(
                         padding: const EdgeInsets.only(left: 350.0, top: 770),
                         child: CharacterWidget(
@@ -588,7 +589,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                           mouthColor: bodyColors['mouthColor']!,
                         ),
                       ),
-                      //Class Info
+                      //Body Customization
                       Padding(
                         padding: const EdgeInsets.only(left: 1700.0, top: 750),
                         child: SizedBox(
