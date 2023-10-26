@@ -76,7 +76,11 @@ flutter:
     - assets/images/interface/
     # Classes & Characters
     - assets/characters/
-    - assets/images/players/berserk/
+    - assets/images/players/human/
+    - assets/images/players/aghars/
+    - assets/images/players/nature/
+    - assets/images/players/dytol/
+    - assets/images/players/undead/
     # Monster
       #drauy_monsters
     - assets/images/enemys/

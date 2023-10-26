@@ -22,6 +22,112 @@ class Gameplay with ChangeNotifier {
     11: 'assets/characters/witch.png',
   };
 
+  //All Races
+  static Map races = {
+    0: 'human',
+    1: 'nature',
+    2: 'dytol',
+    3: 'aghars',
+    4: 'dark',
+    5: 'undead',
+  };
+
+  //All Body Options
+  static Map bodyOptions = {
+    'human': {
+      'male': {
+        'idle': 'assets/images/players/human/male_idle.png',
+        'running0': 'assets/images/players/human/male_running0.png',
+        'running1': 'assets/images/players/human/male_running1.png',
+        'running2': 'assets/images/players/human/male_running2.png',
+        'running3': 'assets/images/players/human/male_running3.png',
+      },
+      'female': {},
+      'hair': {
+        0: 'assets/images/players/human/hair0.png',
+      },
+      'eyes': {
+        0: 'assets/images/players/human/eyes0.png',
+      },
+      'mouth': {
+        0: 'assets/images/players/human/mouth0.png',
+      },
+      'skin': {
+        0: 'assets/images/players/human/skin0.png',
+      },
+    },
+    'nature': {
+      'hair': {
+        0: 'assets/images/players/nature/hair0.png',
+      },
+      'eyes': {
+        0: 'assets/images/players/nature/eyes0.png',
+      },
+      'mouth': {
+        0: 'assets/images/players/nature/mouth0.png',
+      },
+      'skin': {
+        0: 'assets/images/players/nature/skin0.png',
+      },
+    },
+    'dytol': {
+      'hair': {
+        0: 'assets/images/players/dytol/hair0.png',
+      },
+      'eyes': {
+        0: 'assets/images/players/dytol/eyes0.png',
+      },
+      'mouth': {
+        0: 'assets/images/players/dytol/mouth0.png',
+      },
+      'skin': {
+        0: 'assets/images/players/dytol/skin0.png',
+      },
+    },
+    'aghars': {
+      'hair': {
+        0: 'assets/images/players/aghars/hair0.png',
+      },
+      'eyes': {
+        0: 'assets/images/players/aghars/eyes0.png',
+      },
+      'mouth': {
+        0: 'assets/images/players/aghars/mouth0.png',
+      },
+      'skin': {
+        0: 'assets/images/players/aghars/skin0.png',
+      },
+    },
+    'dark': {
+      'hair': {
+        0: 'assets/images/players/dark/hair0.png',
+      },
+      'eyes': {
+        0: 'assets/images/players/dark/eyes0.png',
+      },
+      'mouth': {
+        0: 'assets/images/players/dark/mouth0.png',
+      },
+      'skin': {
+        0: 'assets/images/players/dark/skin0.png',
+      },
+    },
+    'undead': {
+      'hair': {
+        0: 'assets/images/players/undead/hair0.png',
+      },
+      'eyes': {
+        0: 'assets/images/players/undead/eyes0.png',
+      },
+      'mouth': {
+        0: 'assets/images/players/undead/mouth0.png',
+      },
+      'skin': {
+        0: 'assets/images/players/undead/skin0.png',
+      },
+    },
+  };
+
   //System Provider
   Map _characters = {};
   int _selectedCharacter = 0;

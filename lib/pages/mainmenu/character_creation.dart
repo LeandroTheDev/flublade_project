@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flublade_project/components/system/dialogs.dart';
+import 'package:flublade_project/components/widget/character_widget.dart';
 import 'package:flublade_project/components/widget/color_widget.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
@@ -253,6 +254,14 @@ class _CharacterBodyState extends State<CharacterBody> {
     "mouthColor": const Color.fromARGB(255, 0, 0, 0),
     "skinColor": const Color.fromARGB(255, 0, 0, 0),
   };
+  Map<String, int> bodyOptions = {
+    'gender': 0,
+    'race': 0,
+    'hair': 0,
+    'eyes': 0,
+    'mouth': 0,
+    'skin': 0,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -261,6 +270,91 @@ class _CharacterBodyState extends State<CharacterBody> {
     final options = Provider.of<Options>(context);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final server = Provider.of<Server>(context, listen: false);
+
+    //Change Body Options Button
+    void changeBodyOptions(bool value, String selectedOption) {
+      //Changing that is not a part of body
+      //Race Changing
+      raceChange() {
+        if (value) {
+          if (bodyOptions[selectedOption] == Gameplay.races.length - 1) {
+            setState(() {
+              bodyOptions[selectedOption] = 0;
+            });
+          } else {
+            setState(() {
+              bodyOptions[selectedOption] = bodyOptions[selectedOption]! + 1;
+            });
+          }
+        } else {
+          if (bodyOptions[selectedOption]! < 1) {
+            setState(() {
+              bodyOptions[selectedOption] = Gameplay.races.length - 1;
+            });
+          } else {
+            setState(() {
+              bodyOptions[selectedOption] = bodyOptions[selectedOption]! - 1;
+            });
+          }
+        }
+      }
+
+      //Gender Changing
+      genderChange() {
+        switch (value) {
+          case false:
+            bodyOptions['gender'] = 0;
+            return;
+          case true:
+            bodyOptions['gender'] = 1;
+            return;
+        }
+      }
+
+      if (value) {
+        //Check if options is Race
+        if (selectedOption == 'race') {
+          raceChange();
+          return;
+        }
+        //Check if options is Gender
+        if (selectedOption == 'gender') {
+          genderChange();
+          return;
+        }
+        //Body Changing
+        if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length) {
+          setState(() {
+            bodyOptions[selectedOption] = 0;
+          });
+        } else {
+          setState(() {
+            bodyOptions[selectedOption] = bodyOptions[selectedOption]! + 1;
+          });
+        }
+      } else {
+        //Check if options is Race
+        if (selectedOption == 'race') {
+          raceChange();
+          return;
+        }
+        //Check if options is Gender
+        if (selectedOption == 'gender') {
+          genderChange();
+          return;
+        }
+        //Body Changing
+        if (bodyOptions[selectedOption]! < 1) {
+          setState(() {
+            bodyOptions[selectedOption] = Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length - 1;
+          });
+        } else {
+          setState(() {
+            bodyOptions[selectedOption] = bodyOptions[selectedOption]! - 1;
+          });
+        }
+      }
+    }
 
     //Select Color Dialog for compatible items
     void selectColor(String body) {
@@ -478,15 +572,20 @@ class _CharacterBodyState extends State<CharacterBody> {
                         ),
                       ),
                       //Player Body
-                      SizedBox(
-                        width: 1140,
-                        height: 2110,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 350.0, top: 770),
-                          child: Image.asset(
-                            Gameplay.classes[widget.selectedClass],
-                            fit: BoxFit.fill,
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 350.0, top: 770),
+                        child: CharacterWidget(
+                          scale: 10.5,
+                          //      All Body Types        Discover race name by id                     Pickup Gender from id              Idle Image
+                          body: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][bodyOptions['gender'] == 0 ? 'male' : 'female']['idle'],
+                          skin: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['skin'][bodyOptions['skin']],
+                          skinColor: bodyColors['skinColor']!,
+                          hair: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['hair'][bodyOptions['hair']],
+                          hairColor: bodyColors['hairColor']!,
+                          eyes: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['eyes'][bodyOptions['eyes']],
+                          eyesColor: bodyColors['eyesColor']!,
+                          mouth: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['mouth'][bodyOptions['mouth']],
+                          mouthColor: bodyColors['mouthColor']!,
                         ),
                       ),
                       //Class Info
@@ -499,6 +598,54 @@ class _CharacterBodyState extends State<CharacterBody> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                //Gender
+                                Column(
+                                  children: [
+                                    Text(
+                                      Language.Translate('characters_create_gender', options.language) ?? 'Gender',
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () => changeBodyOptions(false, 'gender'),
+                                          child: const Icon(Icons.male, size: 175),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => changeBodyOptions(false, 'gender'),
+                                          child: const Icon(Icons.female, size: 175),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Spacer
+                                const SizedBox(height: 100),
+                                //Race
+                                Column(
+                                  children: [
+                                    Text(
+                                      Language.Translate('characters_race_${Gameplay.races[bodyOptions['race']]}', options.language) ?? 'Race',
+                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () => changeBodyOptions(false, 'race'),
+                                          child: const Icon(Icons.arrow_back, size: 175),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => changeBodyOptions(true, 'race'),
+                                          child: const Icon(Icons.arrow_forward, size: 175),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                //Spacer
+                                const SizedBox(height: 100),
                                 //Hair
                                 Column(
                                   children: [
@@ -510,11 +657,11 @@ class _CharacterBodyState extends State<CharacterBody> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(false, 'hair'),
                                           child: const Icon(Icons.arrow_back, size: 175),
                                         ),
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(true, 'hair'),
                                           child: const Icon(Icons.arrow_forward, size: 175),
                                         ),
                                       ],
@@ -557,11 +704,11 @@ class _CharacterBodyState extends State<CharacterBody> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(false, 'eyes'),
                                           child: const Icon(Icons.arrow_back, size: 175),
                                         ),
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(true, 'eyes'),
                                           child: const Icon(Icons.arrow_forward, size: 175),
                                         ),
                                       ],
@@ -591,6 +738,8 @@ class _CharacterBodyState extends State<CharacterBody> {
                                     )
                                   ],
                                 ),
+                                //Spacer
+                                const SizedBox(height: 100),
                                 //Mouth
                                 Column(
                                   children: [
@@ -602,11 +751,11 @@ class _CharacterBodyState extends State<CharacterBody> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(false, 'mouth'),
                                           child: const Icon(Icons.arrow_back, size: 175),
                                         ),
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(true, 'mouth'),
                                           child: const Icon(Icons.arrow_forward, size: 175),
                                         ),
                                       ],
@@ -636,6 +785,8 @@ class _CharacterBodyState extends State<CharacterBody> {
                                     )
                                   ],
                                 ),
+                                //Spacer
+                                const SizedBox(height: 100),
                                 //Skin
                                 Column(
                                   children: [
@@ -647,11 +798,11 @@ class _CharacterBodyState extends State<CharacterBody> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(false, 'skin'),
                                           child: const Icon(Icons.arrow_back, size: 175),
                                         ),
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () => changeBodyOptions(true, 'skin'),
                                           child: const Icon(Icons.arrow_forward, size: 175),
                                         ),
                                       ],
