@@ -273,7 +273,6 @@ class _CharacterBodyState extends State<CharacterBody> {
 
     //Change Body Options Button
     void changeBodyOptions(bool value, String selectedOption) {
-      print(bodyOptions);
       //Changing that is not a part of body
       //Race Changing
       raceChange() {

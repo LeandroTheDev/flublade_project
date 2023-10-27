@@ -1,11 +1,19 @@
 # Flublade Project
 
-This is a MMORPG turn based game, it uses the backend server and database to work, the idea is to make any game that can be changed and configured in the backend servers, the applications will work together with the server and cannot work without it (better for anti cheat), like the triple A MMO games.
+Flublade is a MMORPG Sandbox turn based game, you can fight enemies, create friends (real life or not), level up your character, raid dungeons, make insane builds, be the stronger player alive, pvp other players, you can choose a race for your character, change you hair, color, skin type.
 
 Features:
-- > //To do
+- > Fully customizable character
+- > Multiplayer
+- > Enemy Battles
+- > Inventory
+- > Equipments
 
-
+Future Features:
+- > Procedural Dungeons
+- > Quests
+- > PVP Battles
+- > Co-op Battles
 
 # Packages using in this project
 
@@ -28,7 +36,7 @@ How to create a server?
 > See the [flublade backend](https://github.com/LeandroTheDev/flublade_backend) for more informations
 
 What i need to compile?
-> Do you need the [flutter](https://docs.flutter.dev/get-started/install) in your machine, after then you use "flutter create flublade_project", then you need to extract the flublade files to the flublade_project folder, then you start [compiling](https://docs.flutter.dev/deployment/android).
+> Do you need the [flutter](https://docs.flutter.dev/get-started/install) in your machine, in your folder open the terminal and type "flutter create flublade_project", after that extract the flublade files to the flublade_project folder, then you start [compiling](https://docs.flutter.dev/deployment/android).
 
 I need to change something in the code for host my own server?
 > No, the client just needs to change the ip address in authetication page.

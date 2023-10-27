@@ -12,6 +12,7 @@ import 'package:flublade_project/data/settings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -357,23 +358,29 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             } else {
                                               options.changeDebug(false);
                                             }
-                                            dynamic result;
-                                            server.changeServerAddress(serverAddress.text);
+                                            final http.Response result;
                                             GlobalFunctions.loadingWidget(context: context, language: options.language);
                                             //Try connection
                                             try {
-                                              result = await http.post(Uri.http(server.serverAddress, '/gameplayStats'),
-                                                  headers: Server.headers,
-                                                  body: jsonEncode({
-                                                    "testConnection": true,
-                                                  }));
+                                              result = await http.get(Uri.http(server.serverAddress, '/getServerData'), headers: Server.headers);
                                             } catch (error) {
                                               Navigator.pop(context);
                                               Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
                                               return;
                                             }
-                                            if (jsonDecode(result.body)['message'] == 'Success') {
+
+                                            final Map response = jsonDecode(result.body);
+                                            if (response['message'] == 'success') {
+                                              //Verify Game Version
+                                              final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+                                              if (response['gameVersion'] != packageInfo.version) {
+                                                Navigator.pop(context);
+                                                Dialogs.alertDialog(context: context, message: 'response_version_mismatch');
+                                                return;
+                                              }
+                                              //Update Server
                                               setState(() {
+                                                server.changeServerAddress(serverAddress.text);
                                                 server.changeServerName(jsonDecode(result.body)['serverName']);
                                                 SaveDatas.setServerAddress(serverAddress.text);
                                                 SaveDatas.setServerName(jsonDecode(result.body)['serverName']);
@@ -381,6 +388,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                                 Navigator.pop(context);
                                               });
                                             } else {
+                                              //Server Error
                                               Navigator.pop(context);
                                               Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
                                               return;
