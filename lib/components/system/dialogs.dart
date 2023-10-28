@@ -71,6 +71,7 @@ class Dialogs {
     required String errorMsg,
     required BuildContext context,
   }) {
+    final options = Provider.of<Options>(context, listen: false);
     showDialog(
         barrierColor: const Color.fromARGB(167, 0, 0, 0),
         context: context,
@@ -87,7 +88,7 @@ class Dialogs {
               ),
               //Error information
               content: Text(
-                errorMsg,
+                Language.Translate(errorMsg, options.language) ?? "Invalid Session",
                 style: TextStyle(color: Theme.of(context).primaryColor),
               ),
               //Ok Button

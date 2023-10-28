@@ -6,7 +6,6 @@ import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
-import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
 
@@ -362,7 +361,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             GlobalFunctions.loadingWidget(context: context, language: options.language);
                                             //Try connection
                                             try {
-                                              result = await http.get(Uri.http(server.serverAddress, '/getServerData'), headers: Server.headers);
+                                              result = await http.get(Uri.http("${serverAddress.text}:${Server.ports}", '/getServerData'), headers: Server.headers);
                                             } catch (error) {
                                               Navigator.pop(context);
                                               Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
@@ -417,6 +416,60 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
               ),
             );
           }).then((value) => Future.delayed(const Duration(milliseconds: 100)).then((value) => FocusManager.instance.primaryFocus?.unfocus()));
+    }
+
+    //Login
+    login() async {
+      //Verify if user is connected to a server
+      if (server.serverName == "") {
+        Dialogs.alertDialog(context: context, message: 'authentication_no_connection');
+        return;
+      }
+      settings.changeIsLoading(value: true);
+      http.Response response;
+      try {
+        //Credentials Check
+        response = await http.post(Uri.http(server.serverAddress, '/login'), headers: Server.headers, body: jsonEncode({"username": username.text, "password": password.text}));
+      } catch (error) {
+        //Connection error
+        settings.changeIsLoading(value: false);
+        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
+        return;
+      }
+      //Json Decoding
+      final result = jsonDecode(response.body);
+      //Wrong Credentials
+      if (result['message'] == 'Wrong Credentials') {
+        settings.changeIsLoading(value: false);
+        Dialogs.alertDialog(context: context, message: 'authentication_login_notfound');
+      }
+      //Too many attempts
+      if (result['message'] == 'Too many attempts') {
+        settings.changeIsLoading(value: false);
+        Dialogs.alertDialog(context: context, message: 'authentication_temporary_blocked');
+      }
+      //Proceed to connection
+      if (result['message'] == 'Success') {
+        if (options.remember) {
+          //Update Providers
+          options.changeId(result['id']);
+          options.changeUsername(result['username']);
+          options.changeToken(result['token']);
+          //Update Save
+          SaveDatas.setUsername(options.username);
+          SaveDatas.setToken(result['token']);
+          SaveDatas.setRemember(options.remember);
+          SaveDatas.setId(options.id);
+        } else {
+          //Update Providers
+          options.changeId(result['id']);
+          options.changeUsername(result['username']);
+          options.changeToken(result['token']);
+        }
+        settings.changeIsLoading(value: false);
+        Navigator.pushReplacementNamed(context, '/mainmenu');
+      }
+      settings.changeIsLoading(value: false);
     }
 
     return Scaffold(
@@ -599,53 +652,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                           width: 310,
                                           height: 30,
                                           child: ElevatedButton(
-                                            onPressed: () async {
-                                              settings.changeIsLoading(value: true);
-                                              dynamic result;
-                                              try {
-                                                //Credentials Check
-                                                result = await http.post(Uri.http(server.serverAddress, '/login'), headers: Server.headers, body: jsonEncode({"username": username.text, "password": password.text}));
-                                              } catch (error) {
-                                                //Connection error
-                                                settings.changeIsLoading(value: false);
-                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-                                                return;
-                                              }
-                                              //Json Decoding
-                                              result = (jsonDecode(result.body));
-                                              //Wrong Credentials
-                                              if (result['message'] == 'Wrong Credentials') {
-                                                settings.changeIsLoading(value: false);
-                                                Dialogs.alertDialog(context: context, message: 'authentication_login_notfound');
-                                              }
-                                              //Proceed to connection
-                                              if (result['message'] == 'Success') {
-                                                if (options.remember) {
-                                                  //Update Providers
-                                                  options.changeId(result['id']);
-                                                  options.changeUsername(result['username']);
-                                                  options.changeLanguage(result['language']);
-                                                  options.changeToken(result['token']);
-                                                  //Update Save
-                                                  SaveDatas.setUsername(options.username);
-                                                  SaveDatas.setToken(result['token']);
-                                                  SaveDatas.setRemember(options.remember);
-                                                  SaveDatas.setId(options.id);
-                                                } else {
-                                                  //Update Providers
-                                                  options.changeId(result['id']);
-                                                  options.changeUsername(result['username']);
-                                                  options.changeLanguage(result['language']);
-                                                  options.changeToken(result['token']);
-                                                  //Push Characters
-                                                  String characters = await Server.pushCharacters(context: context);
-                                                  Provider.of<Gameplay>(context, listen: false).changeCharacters(jsonDecode(characters));
-                                                }
-                                                settings.changeIsLoading(value: false);
-                                                Navigator.pushReplacementNamed(context, '/mainmenu');
-                                              }
-                                              settings.changeIsLoading(value: false);
-                                            },
+                                            onPressed: () => login(),
                                             child: Text(Language.Translate('authentication_login', options.language) ?? 'Login'),
                                           ),
                                         ),
@@ -653,9 +660,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
                                     child: TextButton(
-                                      onPressed: () {
-                                        registerModal();
-                                      },
+                                      onPressed: () => registerModal(),
                                       child: Text(Language.Translate('authentication_register', options.language) ?? 'Don\'t have an account?'),
                                     ),
                                   ),

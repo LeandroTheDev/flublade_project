@@ -9,16 +9,18 @@
 .history
 .svn/
 migrate_working_dir/
-/ios
-/android
-/linux
-/macos
-/web
-/windows
-/.metadata
-/analysis_options.yaml
+
+#Misc
+linux
+macos
+web
+ios
+android
+windows
+.metadata
+analysis_options.yaml
 pubspec.lock
-.keystore
+
 
 # IntelliJ related
 *.iml

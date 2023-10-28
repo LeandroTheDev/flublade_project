@@ -90,11 +90,10 @@ class _FlubladeProjectState extends State<FlubladeProject> {
     final server = Provider.of<Server>(context, listen: false);
     //Load Datas
     server.changeServerAddress(SaveDatas.getServerAddress() ?? '0.0.0.0:8080');
-    server.changeServerName("");
+    server.changeServerName(SaveDatas.getServerName() ?? '');
     options.changeUsername(SaveDatas.getUsername() ?? '');
     options.changeToken(SaveDatas.getToken() ?? '');
     options.changeId(SaveDatas.getId() ?? 0);
-    options.changeLanguage(SaveDatas.getLanguage() ?? 'en_US');
     options.changeTextSpeed(SaveDatas.getTextSpeed() ?? 700);
     options.changeRemember(value: SaveDatas.getRemember() ?? false, notify: false);
     //Auto Login Function
@@ -120,16 +119,14 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           //Reload infos
           options.changeId(result['id']);
           options.changeUsername(result['username']);
-          options.changeLanguage(result['language']);
           options.changeToken(result['token']);
           //Save reload
           SaveDatas.setId(options.id);
           SaveDatas.setUsername(options.username);
-          SaveDatas.setLanguage(options.language);
           SaveDatas.setToken(options.token);
           Navigator.pushReplacementNamed(context, '/mainmenu');
         } else if (result['message'] == 'Invalid Login') {
-          Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context);
+          Dialogs.errorDialog(errorMsg: 'authentication_invalid_login', context: context);
         } else {
           Dialogs.errorDialog(errorMsg: 'authentication_register_problem_connection', context: context);
         }
