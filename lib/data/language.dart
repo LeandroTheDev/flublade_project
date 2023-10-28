@@ -357,7 +357,7 @@ class Language {
     'characters_class_assassin_info': 'Assassino\nSilencioso, quase não da pra ouvir, frágil, facilidade alta em roubos, chances altas de esquiva, danos altos se pego desprevinido.',
     'characters_class_bard_info': 'Bardo\nNão sabe ser silencioso, péssimo em roubos, robusto, bom para alegrar, curandeiro, consegue domesticar com facilidade, aumenta o astral do grupo e de si mesmo, consegue se virar.',
     'characters_class_beastmaster_info': 'Domador de Fera\nAmigo da Natureza, animais não o atacam, consegue domesticar com muita facilidade, muito frágil, animais domesticados tem 10% de status adicionais.',
-    'characters_class_berserk_info': 'Berserk\nInimigo de todos, não consegue ser silencioso, não consegue usar magias elementais, quanto menos vida mais dano e regeneração, não pode domesticar, dificuldade em criar amizades, extremamente robusto.',
+    'characters_class_berserk_info': 'Berserk\nInimigo de todos, não consegue ser silencioso, não consegue usar magias elementais, quanto menos vida mais dano e regeneração, não pode domesticar, dificuldade em criar amizades, níveis de resistência medianos, alto nível de vida e regeneração, níveis de mana extremamente baixo, alto indíce de força, alto indíce de dano fisíco, danos a longa distancia e mágico extremamente baixo e com escala baixa.',
     'characters_class_druid_info': 'Druida\nAmigo da Natureza, pode se transformar em um animal de cada bioma, ótimo curandeiro, frágil se não transformado, não consegue esquivar na forma humana nem usar magias de cura, pode domesticar com facilidade, regeneração alta de vida.',
     'characters_class_mage_info': 'Mago\nMana e regeneração altas, magias elementais dão 10% mais de dano, dificuldade em criar amizades, extremamente frágil.',
     'characters_class_paladin_info': 'Paladino\nExtremamente robusto, magias de escudo são 10% mais eficazes, curas recebidas são 10% mais fortes, ótimo curandeiro, excelente em fazer amizades, facilidade em domesticar.',
@@ -377,6 +377,7 @@ class Language {
     'characters_class_trickmagician': 'Mágico',
     'characters_class_weaponsmith': 'Armeiro',
     'characters_class_witch': 'Bruxa',
+    'characters_race_human': 'Humanos\nSão extremamente inteligentes e tem um ganho maior de inteligência e mana, humanos também são ótimos canalizadores de mágia da luz',
     'characters_remove': 'Digite "DELETE" para remover o personagem',
     //Locations
     'locations_prologue': 'Prólogo',

@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+import 'dart:convert';
+
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
@@ -8,6 +11,8 @@ import 'package:flublade_project/data/options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:http/http.dart' as http;
+
 class CharactersMenu extends StatefulWidget {
   const CharactersMenu({super.key});
 
@@ -16,11 +21,42 @@ class CharactersMenu extends StatefulWidget {
 }
 
 class _CharactersMenuState extends State<CharactersMenu> {
+  bool isLoading = true;
+  late final Map characters;
+
+  getCharacters() async {
+    final options = Provider.of<Options>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
+    late final http.Response response;
+    try {
+      response = await http.get(Uri.http(server.serverAddress, '/getCharacters', {'id': options.id.toString(), 'token': options.token}));
+    } catch (error) {
+      Dialogs.alertDialog(
+          context: context,
+          cancel: false,
+          message: 'authentication_lost_connection',
+          returnFunction: (BuildContext context) {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          });
+      return;
+    }
+    setState(() {
+      characters = jsonDecode(jsonDecode(response.body)["characters"]);
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => getCharacters());
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
-    final characters = Provider.of<Gameplay>(context).characters;
 
     //Remove Character
     removeCharacterDialog(int index) {
@@ -174,128 +210,132 @@ class _CharactersMenuState extends State<CharactersMenu> {
                   ),
                 ),
                 //Character List
-                ListView.builder(
-                    //Disable Scroll List View
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: characters.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return FittedBox(
-                        child: Stack(
-                          children: [
-                            //Board Image
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 85.0),
-                              child: SizedBox(
-                                width: 2800,
-                                height: 1800,
-                                child: Image.asset(
-                                  'assets/character.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            //Name
-                            Padding(
-                              padding: const EdgeInsets.only(left: 900),
-                              child: SizedBox(
-                                height: 450,
-                                width: 970,
-                                child: Center(
-                                  child: FittedBox(
-                                    child: Text(
-                                      characters['character$index']['name'],
-                                      style: const TextStyle(fontFamily: 'Explora', fontSize: 400, fontWeight: FontWeight.bold),
+                isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : ListView.builder(
+                        //Disable Scroll List View
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: characters.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return FittedBox(
+                            child: Stack(
+                              children: [
+                                //Board Image
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 85.0),
+                                  child: SizedBox(
+                                    width: 2800,
+                                    height: 1800,
+                                    child: Image.asset(
+                                      'assets/character.png',
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            //Character Infos
-                            Padding(
-                              padding: const EdgeInsets.only(top: 380, left: 230),
-                              child: SizedBox(
-                                height: 1600,
-                                width: 1450,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    //Class
-                                    FittedBox(
-                                      child: Text(
-                                        '${Language.Translate('characters_create_class', options.language) ?? 'Class'}:  ${Language.Translate('characters_class_${characters['character$index']['class']}', options.language) ?? 'Language Error'}',
-                                        maxLines: 1,
-                                        style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ),
-                                    //Level
-                                    Text(
-                                      '${Language.Translate('characters_create_level', options.language) ?? 'Level'}:  ${characters['character$index']['level']}',
-                                      maxLines: 1,
-                                      style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
-                                    ),
-                                    //Gold
-                                    Text(
-                                      '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${returnGold(index)}',
-                                      maxLines: 1,
-                                      style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
-                                    ),
-                                    //Location
-                                    Text(
-                                      '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location'].substring(0, characters['character$index']['location'].length - 3)}', options.language) ?? 'Language Error'}',
-                                      maxLines: 1,
-                                      style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            //Class Image
-                            Padding(
-                              padding: const EdgeInsets.only(top: 400.0, left: 1440),
-                              child: SizedBox(
-                                width: 1150,
-                                height: 1300,
-                                child: Image.asset(
-                                  'assets/characters/${characters['character$index']['class']}.png',
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            ),
-                            //Remove Button
-                            Padding(
-                              padding: const EdgeInsets.only(left: 1100.0, top: 1673),
-                              child: SizedBox(
-                                width: 600,
-                                height: 170,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    removeCharacterDialog(index);
-                                  },
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(40.0),
-                                        side: const BorderSide(color: Colors.black),
-                                      ),
-                                    ),
-                                  ),
-                                  child: FittedBox(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(200.0),
-                                      child: Text(
-                                        Language.Translate('response_remove', options.language) ?? 'remove',
-                                        style: const TextStyle(fontFamily: 'PressStart', fontSize: 500),
+                                //Name
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 900),
+                                  child: SizedBox(
+                                    height: 450,
+                                    width: 970,
+                                    child: Center(
+                                      child: FittedBox(
+                                        child: Text(
+                                          characters['character$index']['name'],
+                                          style: const TextStyle(fontFamily: 'Explora', fontSize: 400, fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    })
+                                //Character Infos
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 380, left: 230),
+                                  child: SizedBox(
+                                    height: 1600,
+                                    width: 1450,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        //Class
+                                        FittedBox(
+                                          child: Text(
+                                            '${Language.Translate('characters_create_class', options.language) ?? 'Class'}:  ${Language.Translate('characters_class_${characters['character$index']['class']}', options.language) ?? 'Language Error'}',
+                                            maxLines: 1,
+                                            style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
+                                          ),
+                                        ),
+                                        //Level
+                                        Text(
+                                          '${Language.Translate('characters_create_level', options.language) ?? 'Level'}:  ${characters['character$index']['level']}',
+                                          maxLines: 1,
+                                          style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
+                                        ),
+                                        //Gold
+                                        Text(
+                                          '${Language.Translate('characters_create_gold', options.language) ?? 'Ouro'}:  ${returnGold(index)}',
+                                          maxLines: 1,
+                                          style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
+                                        ),
+                                        //Location
+                                        Text(
+                                          '${Language.Translate('characters_create_location', options.language) ?? 'Location'}:  ${Language.Translate('locations_${characters['character$index']['location'].substring(0, characters['character$index']['location'].length - 3)}', options.language) ?? 'Language Error'}',
+                                          maxLines: 1,
+                                          style: TextStyle(fontFamily: 'Explora', fontSize: 250, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor, overflow: TextOverflow.ellipsis),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                //Class Image
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 400.0, left: 1440),
+                                  child: SizedBox(
+                                    width: 1150,
+                                    height: 1300,
+                                    child: Image.asset(
+                                      'assets/characters/${characters['character$index']['class']}.png',
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
+                                ),
+                                //Remove Button
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 1100.0, top: 1673),
+                                  child: SizedBox(
+                                    width: 600,
+                                    height: 170,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        removeCharacterDialog(index);
+                                      },
+                                      style: ButtonStyle(
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(40.0),
+                                            side: const BorderSide(color: Colors.black),
+                                          ),
+                                        ),
+                                      ),
+                                      child: FittedBox(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(200.0),
+                                          child: Text(
+                                            Language.Translate('response_remove', options.language) ?? 'remove',
+                                            style: const TextStyle(fontFamily: 'PressStart', fontSize: 500),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        })
               ],
             ),
           ),

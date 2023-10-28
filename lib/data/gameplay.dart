@@ -42,7 +42,13 @@ class Gameplay with ChangeNotifier {
         'running2': 'assets/images/players/human/male_body_running2.png',
         'running3': 'assets/images/players/human/male_body_running3.png',
       },
-      'female': {},
+      'female': {
+        'idle': 'assets/images/players/human/female_body_idle.png',
+        'running0': 'assets/images/players/human/female_body_running0.png',
+        'running1': 'assets/images/players/human/female_body_running1.png',
+        'running2': 'assets/images/players/human/female_body_running2.png',
+        'running3': 'assets/images/players/human/female_body_running3.png',
+      },
       'hair': {
         0: 'assets/images/players/human/hair/hair0.png',
         1: 'assets/images/players/human/hair/hair1.png',

@@ -254,7 +254,7 @@ class _CharacterBodyState extends State<CharacterBody> {
     "mouthColor": const Color.fromARGB(255, 0, 0, 0),
     "skinColor": const Color.fromARGB(255, 0, 0, 0),
   };
-  Map<String, int> bodyOptions = {
+  Map<String, dynamic> bodyOptions = {
     'gender': 0,
     'race': 0,
     'hair': 0,
@@ -268,7 +268,6 @@ class _CharacterBodyState extends State<CharacterBody> {
     //System Declarations
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
     final server = Provider.of<Server>(context, listen: false);
 
     //Change Body Options Button
@@ -386,6 +385,86 @@ class _CharacterBodyState extends State<CharacterBody> {
 
     //Select Username Dialog
     void usernameSelect() {
+      createCharacter() async {
+        //Class declaration
+        String characterClass = Gameplay.classes[widget.selectedClass].substring(18); //THIS NEED TO BE CHANGED AFTER GAMEPLAY.CLASSES CHANGE
+        characterClass = characterClass.substring(0, characterClass.length - 4); // THIS TOO
+        //Loading Widget
+        GlobalFunctions.loadingWidget(context: context, language: options.language);
+        late final http.Response response;
+        try {
+          //Creating body response
+          Map bodyResponse = bodyOptions;
+          bodyResponse['gender'] = bodyOptions['gender'] == 0 ? 'male' : 'female';
+          bodyResponse['race'] = Gameplay.races[bodyOptions['race']];
+          //Colors
+          bodyResponse['hairColor'] = {
+            'red': bodyColors['hairColor']!.red,
+            'green': bodyColors['hairColor']!.green,
+            'blue': bodyColors['hairColor']!.blue,
+          };
+          bodyResponse['eyesColor'] = {
+            'red': bodyColors['eyesColor']!.red,
+            'green': bodyColors['eyesColor']!.green,
+            'blue': bodyColors['eyesColor']!.blue,
+          };
+          bodyResponse['mouthColor'] = {
+            'red': bodyColors['mouthColor']!.red,
+            'green': bodyColors['mouthColor']!.green,
+            'blue': bodyColors['mouthColor']!.blue,
+          };
+          bodyResponse['skinColor'] = {
+            'red': bodyColors['skinColor']!.red,
+            'green': bodyColors['skinColor']!.green,
+            'blue': bodyColors['skinColor']!.blue,
+          };
+          //Server Communication
+          response = await http.post(
+            Uri.http(server.serverAddress, '/createCharacters'),
+            headers: Server.headers,
+            body: jsonEncode(
+              {
+                'id': options.id,
+                'token': options.token,
+                'name': createName.text,
+                'class': characterClass,
+                'body': bodyResponse,
+              },
+            ),
+          );
+        } catch (error) {
+          Navigator.pop(context);
+          //Connection Error
+          Dialogs.alertDialog(context: context, message: 'characters_create_error');
+          return;
+        }
+        final result = jsonDecode(response.body);
+        //Empty Text
+        if (result['message'] == 'Empty') {
+          Navigator.pop(context);
+          Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
+          return;
+        }
+        //Too big Text
+        if (result['message'] == 'Too big') {
+          Navigator.pop(context);
+          Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
+          return;
+        }
+        //Success
+        if (result['message'] == 'success') {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        } else {
+          print(result);
+          Navigator.pop(context);
+          //Connection Error
+          Dialogs.alertDialog(context: context, message: 'characters_create_error');
+          return;
+        }
+      }
+
       showDialog(
         context: context,
         builder: (context) {
@@ -430,57 +509,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                     const Spacer(),
                     //Create Button
                     ElevatedButton(
-                      onPressed: () async {
-                        //Class declaration
-                        String characterClass = Gameplay.classes[widget.selectedClass].substring(18);
-                        characterClass = characterClass.substring(0, characterClass.length - 4);
-                        //Loading Widget
-                        GlobalFunctions.loadingWidget(context: context, language: options.language);
-                        dynamic result;
-                        try {
-                          //Load Stats
-                          await ServerGameplay.returnGameplayStats(context);
-                          //Server Creation
-                          result = await http.post(Uri.http(server.serverAddress, '/createCharacters'),
-                              headers: Server.headers,
-                              body: jsonEncode({
-                                'id': options.id,
-                                'token': options.token,
-                                'name': createName.text,
-                                'class': characterClass,
-                              }));
-                        } catch (error) {
-                          Navigator.pop(context);
-                          //Connection Error
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error');
-                          return;
-                        }
-                        result = jsonDecode(result.body);
-                        //Empty Text
-                        if (result['message'] == 'Empty') {
-                          Navigator.pop(context);
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
-                          return;
-                        }
-                        //Too big Text
-                        if (result['message'] == 'Too big') {
-                          Navigator.pop(context);
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
-                          return;
-                        }
-                        //Success
-                        if (result['message'] == 'Success') {
-                          gameplay.changeCharacters(result['characters']);
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                        } else {
-                          Navigator.pop(context);
-                          //Connection Error
-                          Dialogs.alertDialog(context: context, message: 'characters_create_error');
-                          return;
-                        }
-                      },
+                      onPressed: () => createCharacter(),
                       child: Text(
                         Language.Translate('response_create', options.language) ?? 'Language',
                         style: TextStyle(color: Theme.of(context).primaryColor),
