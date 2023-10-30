@@ -1,7 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'dart:convert';
-
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
@@ -12,8 +9,6 @@ import 'package:flublade_project/data/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import 'package:http/http.dart' as http;
 
 class AuthenticationPage extends StatefulWidget {
   const AuthenticationPage({super.key});
@@ -162,81 +157,57 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                         child: ElevatedButton(
                                           onPressed: () async {
                                             //Loading Widget
-                                            GlobalFunctions.loadingWidget(context: context, language: options.language);
-                                            late final http.Response result;
-                                            try {
-                                              //Backend Work
-                                              result = await http.post(Uri.http(server.serverAddress, '/createAcc'), headers: Server.headers, body: jsonEncode({"username": registerUsername.text, "password": registerPassword.text, "language": options.language}));
-                                              //No connection
-                                            } catch (error) {
-                                              Navigator.pop(context);
-                                              Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-                                              return;
-                                            }
+                                            Dialogs.loadingDialog(context: context);
+                                            final Map result = await Server.sendMessage(
+                                              context,
+                                              address: '/createAcc',
+                                              body: {
+                                                "username": registerUsername.text,
+                                                "password": registerPassword.text,
+                                                "language": options.language,
+                                              },
+                                            );
                                             //Account Rules Check
-                                            if (true) {
-                                              //Too small username or password
-                                              if (jsonDecode(result.body)["message"] == 'Too small or too big username') {
+                                            if (result["message"] == 'Success') {
+                                              Navigator.pop(context);
+                                              //Show Result Dialog
+                                              showDialog(
+                                                  barrierColor: const Color.fromARGB(167, 0, 0, 0),
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+                                                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                                                      //Sucess Text
+                                                      title: Text(
+                                                        Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
+                                                        style: TextStyle(color: Theme.of(context).primaryColor),
+                                                      ),
+                                                      content: Text(
+                                                        Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
+                                                        style: TextStyle(color: Theme.of(context).primaryColor),
+                                                      ),
+                                                      actions: [
+                                                        Center(
+                                                            child: ElevatedButton(
+                                                          onPressed: () {
+                                                            registerUsername = TextEditingController();
+                                                            registerPassword = TextEditingController();
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: const Text('Ok'),
+                                                        ))
+                                                      ],
+                                                    );
+                                                  }).then((result) {
+                                                registerUsername = TextEditingController();
+                                                registerPassword = TextEditingController();
                                                 Navigator.pop(context);
-                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_username');
-                                                return;
-                                              }
-                                              //Too small or too big password
-                                              if (jsonDecode(result.body)["message"] == 'Too small password or too big password') {
-                                                Navigator.pop(context);
-                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_password');
-                                                return;
-                                              }
-                                              //Username already exists
-                                              if (jsonDecode(result.body)["message"] == 'Username already exists') {
-                                                Navigator.pop(context);
-                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_existusername');
-                                                return;
-                                              }
-                                              //Connection Error
-                                              if (jsonDecode(result.body)["message"] == 'Unkown error') {
-                                                Navigator.pop(context);
-                                                Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-                                                return;
-                                              }
-                                              //Success
-                                              if (jsonDecode(result.body)["message"] == 'Success') {
-                                                Navigator.pop(context);
-                                                //Show Result Dialog
-                                                showDialog(
-                                                    barrierColor: const Color.fromARGB(167, 0, 0, 0),
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return AlertDialog(
-                                                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-                                                        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                                                        //Sucess Text
-                                                        title: Text(
-                                                          Language.Translate('authentication_register_sucess', options.language) ?? 'Failed to connect to the Servers',
-                                                          style: TextStyle(color: Theme.of(context).primaryColor),
-                                                        ),
-                                                        content: Text(
-                                                          Language.Translate('authentication_register_sucess_account', options.language) ?? 'Failed to connect to the Servers',
-                                                          style: TextStyle(color: Theme.of(context).primaryColor),
-                                                        ),
-                                                        actions: [
-                                                          Center(
-                                                              child: ElevatedButton(
-                                                            onPressed: () {
-                                                              registerUsername = TextEditingController();
-                                                              registerPassword = TextEditingController();
-                                                              Navigator.pop(context);
-                                                            },
-                                                            child: const Text('Ok'),
-                                                          ))
-                                                        ],
-                                                      );
-                                                    }).then((result) {
-                                                  registerUsername = TextEditingController();
-                                                  registerPassword = TextEditingController();
-                                                  Navigator.pop(context);
-                                                });
-                                              }
+                                              });
+                                            } else {
+                                              Navigator.pop(context);
+                                              Server.errorTreatment(result["message"], context);
+                                              return;
                                             }
                                           },
                                           child: Text(
@@ -357,39 +328,28 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                                             } else {
                                               options.changeDebug(false);
                                             }
-                                            final http.Response result;
-                                            GlobalFunctions.loadingWidget(context: context, language: options.language);
+                                            Dialogs.loadingDialog(context: context);
                                             //Try connection
-                                            try {
-                                              result = await http.get(Uri.http("${serverAddress.text}:${Server.ports}", '/getServerData'), headers: Server.headers);
-                                            } catch (error) {
-                                              Navigator.pop(context);
-                                              Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
-                                              return;
-                                            }
-
-                                            final Map response = jsonDecode(result.body);
-                                            if (response['message'] == 'success') {
+                                            server.changeServerAddress(serverAddress.text);
+                                            final Map result = await Server.sendMessage(context, address: '/getServerData', body: {}, get: true);
+                                            if (result['message'] == 'Success') {
                                               //Verify Game Version
                                               final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-                                              if (response['gameVersion'] != packageInfo.version) {
+                                              if (result['gameVersion'] != packageInfo.version) {
                                                 Navigator.pop(context);
                                                 Dialogs.alertDialog(context: context, message: 'response_version_mismatch');
                                                 return;
                                               }
                                               //Update Server
                                               setState(() {
-                                                server.changeServerAddress(serverAddress.text);
-                                                server.changeServerName(jsonDecode(result.body)['serverName']);
+                                                server.changeServerName(result['serverName']);
                                                 SaveDatas.setServerAddress(serverAddress.text);
-                                                SaveDatas.setServerName(jsonDecode(result.body)['serverName']);
+                                                SaveDatas.setServerName(result['serverName']);
                                                 Navigator.pop(context);
                                                 Navigator.pop(context);
                                               });
                                             } else {
-                                              //Server Error
-                                              Navigator.pop(context);
-                                              Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection_tryAddress');
+                                              Server.errorTreatment(result['message'], context);
                                               return;
                                             }
                                           },
@@ -426,28 +386,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         return;
       }
       settings.changeIsLoading(value: true);
-      http.Response response;
-      try {
-        //Credentials Check
-        response = await http.post(Uri.http(server.serverAddress, '/login'), headers: Server.headers, body: jsonEncode({"username": username.text, "password": password.text}));
-      } catch (error) {
-        //Connection error
-        settings.changeIsLoading(value: false);
-        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-        return;
-      }
-      //Json Decoding
-      final result = jsonDecode(response.body);
-      //Wrong Credentials
-      if (result['message'] == 'Wrong Credentials') {
-        settings.changeIsLoading(value: false);
-        Dialogs.alertDialog(context: context, message: 'authentication_login_notfound');
-      }
-      //Too many attempts
-      if (result['message'] == 'Too many attempts') {
-        settings.changeIsLoading(value: false);
-        Dialogs.alertDialog(context: context, message: 'authentication_temporary_blocked');
-      }
+      final Map result = await Server.sendMessage(context, address: '/login', body: {"username": username.text, "password": password.text});
       //Proceed to connection
       if (result['message'] == 'Success') {
         if (options.remember) {
@@ -468,6 +407,8 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
         }
         settings.changeIsLoading(value: false);
         Navigator.pushReplacementNamed(context, '/mainmenu');
+      } else {
+        Server.errorTreatment(result['message'], context);
       }
       settings.changeIsLoading(value: false);
     }

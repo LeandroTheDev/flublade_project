@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/components/widget/item_widget.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/server.dart';
@@ -86,7 +87,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                             height: 50,
                             child: ElevatedButton(
                               onPressed: () async {
-                                GlobalFunctions.loadingWidget(context: context, language: Provider.of<Options>(context, listen: false).language);
+                                Dialogs.loadingDialog(context: context);
                                 await http.post(Uri.http(server.serverAddress, '/changeEquip'),
                                     headers: Server.headers,
                                     body: jsonEncode({
@@ -340,7 +341,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                                                 onPressed: () async {
                                                                   final selectedIndex = settings.itemsId[Settings.tierCheck(itemName)]['equip'][index];
                                                                   //Loading Widget
-                                                                  GlobalFunctions.loadingWidget(context: context, language: options.language);
+                                                                  Dialogs.loadingDialog(context: context);
                                                                   //Equipped item variable
                                                                   final equipped = gameplay.playerInventory[itemName];
                                                                   //Add Equip Stats
@@ -380,7 +381,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                                         } else {
                                           final selectedIndex = settings.itemsId[Settings.tierCheck(itemName)]['equip'][0];
                                           //Loading Widget
-                                          GlobalFunctions.loadingWidget(context: context, language: options.language);
+                                          Dialogs.loadingDialog(context: context);
                                           //Equipped item variable
                                           final equipped = gameplay.playerInventory[itemName];
                                           //Add Equip Stats

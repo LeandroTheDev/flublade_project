@@ -1,18 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:convert';
-
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/components/widget/character_widget.dart';
 import 'package:flublade_project/components/widget/color_widget.dart';
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
+import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 class CharacterCreation extends StatefulWidget {
   const CharacterCreation({super.key});
@@ -268,7 +265,6 @@ class _CharacterBodyState extends State<CharacterBody> {
     //System Declarations
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
-    final server = Provider.of<Server>(context, listen: false);
 
     //Change Body Options Button
     void changeBodyOptions(bool value, String selectedOption) {
@@ -390,77 +386,54 @@ class _CharacterBodyState extends State<CharacterBody> {
         String characterClass = Gameplay.classes[widget.selectedClass].substring(18); //THIS NEED TO BE CHANGED AFTER GAMEPLAY.CLASSES CHANGE
         characterClass = characterClass.substring(0, characterClass.length - 4); // THIS TOO
         //Loading Widget
-        GlobalFunctions.loadingWidget(context: context, language: options.language);
-        late final http.Response response;
-        try {
-          //Creating body response
-          Map bodyResponse = bodyOptions;
-          bodyResponse['gender'] = bodyOptions['gender'] == 0 ? 'male' : 'female';
-          bodyResponse['race'] = Gameplay.races[bodyOptions['race']];
-          //Colors
-          bodyResponse['hairColor'] = {
-            'red': bodyColors['hairColor']!.red,
-            'green': bodyColors['hairColor']!.green,
-            'blue': bodyColors['hairColor']!.blue,
-          };
-          bodyResponse['eyesColor'] = {
-            'red': bodyColors['eyesColor']!.red,
-            'green': bodyColors['eyesColor']!.green,
-            'blue': bodyColors['eyesColor']!.blue,
-          };
-          bodyResponse['mouthColor'] = {
-            'red': bodyColors['mouthColor']!.red,
-            'green': bodyColors['mouthColor']!.green,
-            'blue': bodyColors['mouthColor']!.blue,
-          };
-          bodyResponse['skinColor'] = {
-            'red': bodyColors['skinColor']!.red,
-            'green': bodyColors['skinColor']!.green,
-            'blue': bodyColors['skinColor']!.blue,
-          };
-          //Server Communication
-          response = await http.post(
-            Uri.http(server.serverAddress, '/createCharacters'),
-            headers: Server.headers,
-            body: jsonEncode(
-              {
-                'id': options.id,
-                'token': options.token,
-                'name': createName.text,
-                'class': characterClass,
-                'body': bodyResponse,
-              },
-            ),
-          );
-        } catch (error) {
-          Navigator.pop(context);
-          //Connection Error
-          Dialogs.alertDialog(context: context, message: 'characters_create_error');
-          return;
-        }
-        final result = jsonDecode(response.body);
-        //Empty Text
-        if (result['message'] == 'Empty') {
-          Navigator.pop(context);
-          Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
-          return;
-        }
-        //Too big Text
-        if (result['message'] == 'Too big') {
-          Navigator.pop(context);
-          Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
-          return;
-        }
+        Dialogs.loadingDialog(context: context);
+        //Creating body response
+        Map bodyResponse = bodyOptions;
+        bodyResponse['gender'] = bodyOptions['gender'] == 0 ? 'male' : 'female';
+        bodyResponse['race'] = Gameplay.races[bodyOptions['race']];
+        //Colors
+        bodyResponse['hairColor'] = {
+          'red': bodyColors['hairColor']!.red,
+          'green': bodyColors['hairColor']!.green,
+          'blue': bodyColors['hairColor']!.blue,
+        };
+        bodyResponse['eyesColor'] = {
+          'red': bodyColors['eyesColor']!.red,
+          'green': bodyColors['eyesColor']!.green,
+          'blue': bodyColors['eyesColor']!.blue,
+        };
+        bodyResponse['mouthColor'] = {
+          'red': bodyColors['mouthColor']!.red,
+          'green': bodyColors['mouthColor']!.green,
+          'blue': bodyColors['mouthColor']!.blue,
+        };
+        bodyResponse['skinColor'] = {
+          'red': bodyColors['skinColor']!.red,
+          'green': bodyColors['skinColor']!.green,
+          'blue': bodyColors['skinColor']!.blue,
+        };
+
+        final Map result = await Server.sendMessage(
+          context,
+          address: '/createCharacters',
+          body: {
+            'id': options.id,
+            'token': options.token,
+            'name': createName.text,
+            'class': characterClass,
+            'body': bodyResponse,
+          },
+        );
         //Success
-        if (result['message'] == 'success') {
+        if (result['message'] == 'Success') {
           Navigator.pop(context);
           Navigator.pop(context);
           Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const CharactersMenu()));
         } else {
-          print(result);
           Navigator.pop(context);
-          //Connection Error
-          Dialogs.alertDialog(context: context, message: 'characters_create_error');
+          Server.errorTreatment(result['message'], context);
           return;
         }
       }
@@ -605,15 +578,14 @@ class _CharacterBodyState extends State<CharacterBody> {
                         padding: const EdgeInsets.only(left: 350.0, top: 770),
                         child: CharacterWidget(
                           scale: 10.5,
-                          //      All Body Types        Discover race name by id                     Pickup Gender from id              Idle Image
-                          body: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][bodyOptions['gender'] == 0 ? 'male' : 'female']['idle'],
-                          skin: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['skin'][bodyOptions['skin']],
+                          body: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'body', gender: bodyOptions['gender'] == 1, selectedSprite: 'idle'),
+                          skin: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'skin', gender: bodyOptions['gender'] == 1, selectedSprite: 'idle'),
                           skinColor: bodyColors['skinColor']!,
-                          hair: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['hair'][bodyOptions['hair']],
+                          hair: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'hair', selectedOption: bodyOptions['hair']),
                           hairColor: bodyColors['hairColor']!,
-                          eyes: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['eyes'][bodyOptions['eyes']],
+                          eyes: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'eyes', selectedOption: bodyOptions['eyes']),
                           eyesColor: bodyColors['eyesColor']!,
-                          mouth: Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]]['mouth'][bodyOptions['mouth']],
+                          mouth: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'mouth', selectedOption: bodyOptions['mouth']),
                           mouthColor: bodyColors['mouthColor']!,
                         ),
                       ),

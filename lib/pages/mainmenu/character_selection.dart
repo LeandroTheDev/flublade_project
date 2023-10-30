@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flublade_project/components/system/dialogs.dart';
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
@@ -146,7 +145,7 @@ class CharacterSelection extends StatelessWidget {
                                   height: 170,
                                   child: ElevatedButton(
                                       onPressed: () async {
-                                        GlobalFunctions.loadingWidget(context: context, language: options.language);
+                                        Dialogs.loadingDialog(context: context);
                                         final result = await Server.pushCharacters(context: context);
                                         //Check if connection success
                                         if (result != false) {

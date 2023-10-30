@@ -38,6 +38,7 @@ class Server with ChangeNotifier {
   };
 
   //Return Character Inventory
+  ///DEPRECATED
   static Future<String> returnPlayerInventory(BuildContext context) async {
     final options = Provider.of<Options>(context);
     final gameplay = Provider.of<Gameplay>(context);
@@ -63,6 +64,7 @@ class Server with ChangeNotifier {
   }
 
   //Push and Upload Characters
+  ///DEPRECATED
   static Future<String> pushUploadCharacters({required BuildContext context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
@@ -118,6 +120,7 @@ class Server with ChangeNotifier {
   }
 
   //Push Characters
+  ///DEPRECATED
   static Future<dynamic> pushCharacters({required context}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
@@ -143,6 +146,7 @@ class Server with ChangeNotifier {
   }
 
   //Update Characters to the database
+  ///DEPRECATED
   static Future<String> updateCharacters({String characters = '', context, bool isLevelUp = false}) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
@@ -202,34 +206,8 @@ class Server with ChangeNotifier {
     return 'Success';
   }
 
-  //Remove Characters
-  static Future removeCharacters({required index, required context}) async {
-    final options = Provider.of<Options>(context, listen: false);
-    final gameplay = Provider.of<Gameplay>(context, listen: false);
-    final server = Provider.of<Server>(context, listen: false);
-    dynamic charactersdb;
-    try {
-      //Connection
-      charactersdb = await http.post(Uri.http(server.serverAddress, '/removeCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
-    } catch (error) {
-      //Connection Error
-      Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-      return;
-    }
-    charactersdb = jsonDecode(charactersdb.body);
-    //Token Check
-    if (charactersdb['message'] == 'Invalid Login') {
-      Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context);
-      return;
-    }
-    //Success
-    if (charactersdb['message'] == 'Success') {
-      gameplay.changeCharacters(charactersdb['characters']);
-    }
-    return;
-  }
-
   //Return Info
+  ///DEPRECATED
   static dynamic returnInfo(context, {required String returned}) {
     final gameplay = Provider.of<Gameplay>(context, listen: false);
     final Map characters = gameplay.characters;
@@ -254,6 +232,7 @@ class Server with ChangeNotifier {
   }
 
   //Return Player Stats // Update selected character to actual gameplay
+  ///DEPRECATED
   static Future returnPlayerStats(context) async {
     final options = Provider.of<Options>(context, listen: false);
     final gameplay = Provider.of<Gameplay>(context, listen: false);
@@ -293,10 +272,124 @@ class Server with ChangeNotifier {
     gameplay.changeStats(value: selectedCharacter['debuffs'], stats: 'debuffs');
     gameplay.changeLocation(selectedCharacter['location']);
   }
+
+  ///Comunicates the server via http request and return a Map with the server response
+  ///
+  ///Example Post:
+  ///```dart
+  ///sendServerMessage("/login", { username: "test", password: "123" })
+  ///```
+  ///
+  ///Also change the get paramater to true for "get" responses,
+  ///to send data via get with query parameters you can do the same with post body
+  ///
+  ///Example Get:
+  ///```dart
+  ///sendSeverMessage("/loginRemember", { username: "test", token: "123" }, true)
+  ///```
+  static Future<Map> sendMessage(context, {required String address, required Map<String, dynamic> body, bool get = false}) async {
+    final server = Provider.of<Server>(context, listen: false);
+    late final http.Response result;
+    //Get Response
+    if (get) {
+      try {
+        result = await http.get(Uri.http(server.serverAddress, address, body), headers: Server.headers);
+      } catch (error) {
+        return {
+          "error": true,
+          "message": "No Connection",
+        };
+      }
+      return jsonDecode(result.body);
+    }
+    //Post Response
+    else {
+      try {
+        result = await http.post(Uri.http(server.serverAddress, address), headers: Server.headers, body: jsonEncode(body));
+      } catch (error) {
+        return {
+          "error": true,
+          "message": "No Connection",
+        };
+      }
+      return jsonDecode(result.body);
+    }
+  }
+
+  ///Provides any dialog message for the respective error message,
+  ///if the error is not listed then no dialogs will appear
+  static errorTreatment(String message, BuildContext context) {
+    switch (message) {
+      case 'Invalid Login':
+        Dialogs.errorDialog(context: context, errorMsg: 'authentication_invalid_login');
+        return;
+      case 'Server Crashed':
+        Dialogs.alertDialog(context: context, message: 'authentication_lost_connection');
+        return;
+      case 'Too Many Attempts':
+        Dialogs.alertDialog(context: context, message: 'authentication_temporary_blocked');
+        return;
+      case 'Wrong Credentials':
+        Dialogs.alertDialog(context: context, message: 'authentication_login_notfound');
+        return;
+      case 'Empty':
+        Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
+        return;
+      case 'Too Big':
+        Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
+        return;
+      case 'Too Small or Too Big Username':
+        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_username');
+        return;
+      case 'Too Small Password or Too Big Password':
+        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_password');
+        return;
+      case 'Username Already Exists':
+        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_existusername');
+        return;
+      case 'No Connection':
+        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
+        return;
+    }
+  }
+
+  ///Remove the specific character by the index of characters account
+  static Future<void> removeCharacter({required index, required context}) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final server = Provider.of<Server>(context, listen: false);
+    http.Response response;
+    try {
+      //Connection
+      response = await http.post(Uri.http(server.serverAddress, '/removeCharacters'), headers: Server.headers, body: jsonEncode({'id': options.id, 'token': options.token, 'index': index}));
+    } catch (error) {
+      //Connection Error
+      Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
+      return;
+    }
+    Map result = jsonDecode(response.body);
+    //Error Treatment
+    Server.errorTreatment(result['message'], context);
+  }
+
+  ///Returns a Map of all characters from current account logged
+  ///
+  ///Returns any empty Map if any errors occurs,
+  ///also display any alert dialog in case of errors
+  static Future<Map> getCharacters({required BuildContext context}) async {
+    final options = Provider.of<Options>(context, listen: false);
+    final Map result = await Server.sendMessage(context, address: '/getCharacters', body: {'id': options.id.toString(), 'token': options.token}, get: true);
+    if (result['message'] == "Success") {
+      return jsonDecode(result["characters"]);
+    } else {
+      Server.errorTreatment(result['message'], context);
+      return {};
+    }
+  }
 }
 
 class ServerGameplay {
   //Return Server Stats
+  ///DEPRECATED
   static Future returnGameplayStats(context) async {
     final settings = Provider.of<Settings>(context, listen: false);
     final server = Provider.of<Server>(context, listen: false);
@@ -316,6 +409,7 @@ class ServerGameplay {
   }
 
   //Return Level
+  ///DEPRECATED
   static Future<List<dynamic>> returnLevel({required BuildContext context, required String level}) async {
     final server = Provider.of<Server>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);

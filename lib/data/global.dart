@@ -82,6 +82,7 @@ class GlobalFunctions {
   };
 
   //Show Player Stats Dialogs
+  ///DEPRECATED
   static playerStats(context) async {
     final settings = Provider.of<Settings>(context, listen: false);
     final options = Provider.of<Options>(context, listen: false);
@@ -273,31 +274,6 @@ class GlobalFunctions {
                           ),
                         ),
                 ],
-              ),
-            ),
-          );
-        });
-  }
-
-  //Loading
-  static void loadingWidget({required BuildContext context, required String language}) {
-    showDialog(
-        barrierColor: const Color.fromARGB(167, 0, 0, 0),
-        context: context,
-        builder: (context) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: AlertDialog(
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              //Language Text
-              title: Text(
-                Language.Translate('authentication_register_loading', language) ?? 'Loading',
-                style: TextStyle(color: Theme.of(context).primaryColor),
-              ),
-              content: const Padding(
-                padding: EdgeInsets.all(50.0),
-                child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()),
               ),
             ),
           );

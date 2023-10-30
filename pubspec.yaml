@@ -83,6 +83,8 @@ flutter:
     - assets/images/players/human/hair/
     - assets/images/players/human/mouth/
     - assets/images/players/human/skin/
+    - assets/images/players/human/skin/0/
+    - assets/images/players/human/skin/1/
     # Aghars
     - assets/images/players/aghars/
     - assets/images/players/aghars/eyes/

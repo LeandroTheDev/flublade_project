@@ -1,9 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:convert';
-
 import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
-import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/server.dart';
 
@@ -13,7 +10,6 @@ import 'package:flublade_project/data/settings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 void main() async {
   //SaveDatas Loading
@@ -101,20 +97,11 @@ class _FlubladeProjectState extends State<FlubladeProject> {
       //Check Remember Box
       if (options.remember) {
         //Login
-        dynamic result;
-        try {
-          //Credentials Check
-          result = await http.post(Uri.http(server.serverAddress, '/loginRemember'),
-              headers: Server.headers,
-              body: jsonEncode({
-                'id': options.id,
-                'token': options.token,
-              }));
-        } catch (error) {
-          Dialogs.errorDialog(errorMsg: 'authentication_register_problem_connection', context: context);
-          return;
-        }
-        result = jsonDecode(result.body);
+        final Map result = await Server.sendMessage(context, address: '/loginRemember', body: {
+          'id': options.id,
+          'token': options.token,
+        });
+
         if (result['message'] == 'Success') {
           //Reload infos
           options.changeId(result['id']);
@@ -125,10 +112,9 @@ class _FlubladeProjectState extends State<FlubladeProject> {
           SaveDatas.setUsername(options.username);
           SaveDatas.setToken(options.token);
           Navigator.pushReplacementNamed(context, '/mainmenu');
-        } else if (result['message'] == 'Invalid Login') {
-          Dialogs.errorDialog(errorMsg: 'authentication_invalid_login', context: context);
         } else {
-          Dialogs.errorDialog(errorMsg: 'authentication_register_problem_connection', context: context);
+          Server.errorTreatment(result['message'], context);
+          Navigator.of(context).pushReplacementNamed('/authenticationpage');
         }
       } else {
         Navigator.of(context).pushReplacementNamed('/authenticationpage');

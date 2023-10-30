@@ -101,7 +101,7 @@ class _BattleSceneState extends State<BattleScene> {
                   //Take All
                   ElevatedButton(
                     onPressed: () async {
-                      GlobalFunctions.loadingWidget(context: context, language: options.language);
+                      Dialogs.loadingDialog(context: context);
                       //Add items
                       gameplay.addInventoryItem(loots);
                       //Update All Stats
@@ -194,7 +194,7 @@ class _BattleSceneState extends State<BattleScene> {
                       //Add items
                       if (gameplay.playerInventorySelected.isNotEmpty) {
                         //Loading
-                        GlobalFunctions.loadingWidget(context: context, language: options.language);
+                        Dialogs.loadingDialog(context: context);
                         //Add Items
                         gameplay.addInventoryItem(gameplay.playerInventorySelected);
                         //Update All Stats

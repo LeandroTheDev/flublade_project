@@ -86,9 +86,7 @@ class _MainMenuState extends State<MainMenu> {
                         const SizedBox(height: 400),
                         //Characters Button
                         TextButton(
-                          onPressed: () async {
-                            Navigator.pushNamed(context, '/charactersmenu');
-                          },
+                          onPressed: () => Navigator.pushNamed(context, '/charactersmenu'),
                           child: FittedBox(
                             child: Text(
                               Language.Translate('mainmenu_characters', options.language) ?? 'Characters',

@@ -36,11 +36,19 @@ class Gameplay with ChangeNotifier {
   static Map bodyOptions = {
     'human': {
       'male': {
-        'idle': 'assets/images/players/human/male_body_idle.png',
-        'running0': 'assets/images/players/human/male_body_running0.png',
-        'running1': 'assets/images/players/human/male_body_running1.png',
-        'running2': 'assets/images/players/human/male_body_running2.png',
-        'running3': 'assets/images/players/human/male_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/human/skin/0/male_skin_idle.png',
+          },
+          1: {'assets/images/players/human/skin/1/male_skin_idle.png'},
+        },
+        'body': {
+          'idle': 'assets/images/players/human/male_body_idle.png',
+          'running0': 'assets/images/players/human/male_body_running0.png',
+          'running1': 'assets/images/players/human/male_body_running1.png',
+          'running2': 'assets/images/players/human/male_body_running2.png',
+          'running3': 'assets/images/players/human/male_body_running3.png',
+        }
       },
       'female': {
         'idle': 'assets/images/players/human/female_body_idle.png',
@@ -60,10 +68,6 @@ class Gameplay with ChangeNotifier {
       'mouth': {
         0: 'assets/images/players/human/mouth/mouth0.png',
         1: 'assets/images/players/human/mouth/mouth1.png',
-      },
-      'skin': {
-        0: 'assets/images/players/human/skin/male_skin_idle0.png',
-        1: 'assets/images/players/human/skin/male_skin_idle1.png',
       },
     },
     'nature': {
@@ -197,6 +201,43 @@ class Gameplay with ChangeNotifier {
       },
     },
   };
+
+  ///Return the asset location of the body option
+  ///
+  ///raceID = its the race id of the character, you can get by using Gameplay.races
+  ///
+  ///bodyOption = the specific option do you want for the body: (body, skin, hair, eyes...)
+  ///
+  ///gender = gender is only necessary for body and skin, false for male, true for female
+  ///
+  ///selectedOption = only necessary if you selecting a body option that uses int numbers like (hair, eyes, mouth, skin)
+  ///
+  ///selectedSprite = only for body option thats have multiples sprites (body, skin)
+  static returnBodyOptionAsset({required int raceID, String bodyOption = "body", bool gender = false, int selectedOption = 0, selectedSprite = 'idle'}) {
+    final characterGender = !gender ? 'male' : 'female';
+    switch (bodyOption) {
+      case 'body':
+        return Gameplay.bodyOptions[Gameplay.races[raceID]][characterGender][bodyOption][selectedSprite];
+      case 'skin':
+        return Gameplay.bodyOptions[Gameplay.races[raceID]][characterGender][bodyOption][selectedOption][selectedSprite];
+      case 'hair':
+        return Gameplay.bodyOptions[Gameplay.races[raceID]][bodyOption][selectedOption];
+      case 'eyes':
+        return Gameplay.bodyOptions[Gameplay.races[raceID]][bodyOption][selectedOption];
+      case 'mouth':
+        return Gameplay.bodyOptions[Gameplay.races[raceID]][bodyOption][selectedOption];
+    }
+  }
+
+  ///Return the race id by the name of the race, in case of errors return 0
+  static int returnRaceIDbyName(raceName) {
+    for (var entry in races.entries) {
+      if (entry.value == raceName) {
+        return entry.key;
+      }
+    }
+    return 0;
+  }
 
   //System Provider
   Map _characters = {};

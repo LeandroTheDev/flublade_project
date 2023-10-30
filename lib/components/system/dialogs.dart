@@ -176,10 +176,6 @@ class Dialogs {
   }
 
   ///Show a Language dialog to change the application language
-  //-----
-  //Requisitions
-  //-----
-  //Change Language
   static Future<void> changeLanguage(context, widget) async {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context, listen: false);
@@ -243,5 +239,33 @@ class Dialogs {
             ),
           );
         });
+  }
+
+  ///Loading dialog display a circular indicator
+  static void loadingDialog({required BuildContext context, bool cancel = false}) {
+    final options = Provider.of<Options>(context, listen: false);
+    showDialog(
+      barrierColor: const Color.fromARGB(167, 0, 0, 0),
+      context: context,
+      barrierDismissible: cancel,
+      builder: (context) {
+        return WillPopScope(
+          onWillPop: () async => cancel,
+          child: AlertDialog(
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32.0))),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            //Language Text
+            title: Text(
+              Language.Translate('authentication_register_loading', options.language) ?? 'Loading',
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ),
+            content: const Padding(
+              padding: EdgeInsets.all(50.0),
+              child: SizedBox(width: 100, height: 100, child: CircularProgressIndicator()),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

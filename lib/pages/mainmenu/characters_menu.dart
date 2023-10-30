@@ -1,17 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:convert';
 
 import 'package:flublade_project/components/system/dialogs.dart';
-import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/components/widget/character_widget.dart';
+import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
-import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:http/http.dart' as http;
 
 class CharactersMenu extends StatefulWidget {
   const CharactersMenu({super.key});
@@ -24,33 +21,21 @@ class _CharactersMenuState extends State<CharactersMenu> {
   bool isLoading = true;
   late final Map characters;
 
-  getCharacters() async {
-    final options = Provider.of<Options>(context, listen: false);
-    final server = Provider.of<Server>(context, listen: false);
-    late final http.Response response;
-    try {
-      response = await http.get(Uri.http(server.serverAddress, '/getCharacters', {'id': options.id.toString(), 'token': options.token}));
-    } catch (error) {
-      Dialogs.alertDialog(
-          context: context,
-          cancel: false,
-          message: 'authentication_lost_connection',
-          returnFunction: (BuildContext context) {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          });
-      return;
-    }
-    setState(() {
-      characters = jsonDecode(jsonDecode(response.body)["characters"]);
-      isLoading = false;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => getCharacters());
+    WidgetsBinding.instance.addPostFrameCallback(
+      //Get the Characters from Server
+      (_) => Server.getCharacters(context: context).then(
+        (value) => setState(
+          () {
+            //Update
+            characters = value;
+            isLoading = false;
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -117,21 +102,21 @@ class _CharactersMenuState extends State<CharactersMenu> {
                     children: [
                       const Spacer(),
                       ElevatedButton(
-                        onPressed: () async {
+                        onPressed: () {
                           if (input.text != 'DELETE') {
                             Dialogs.alertDialog(context: context, message: 'response_incorrect');
                           } else {
-                            GlobalFunctions.loadingWidget(context: context, language: options.language);
-                            await Server.removeCharacters(
+                            Dialogs.loadingDialog(context: context);
+                            Server.removeCharacter(
                               index: index,
                               context: context,
+                            ).then(
+                              (value) => {
+                                Navigator.pop(context),
+                                Navigator.pop(context),
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => super.widget)),
+                              },
                             );
-                            // ignore: use_build_context_synchronously
-                            Navigator.pop(context);
-                            // ignore: use_build_context_synchronously
-                            Navigator.pop(context);
-                            // ignore: use_build_context_synchronously
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => super.widget));
                           }
                         },
                         child: Text(Language.Translate('response_remove', options.language) ?? 'Remove'),
@@ -220,6 +205,8 @@ class _CharactersMenuState extends State<CharactersMenu> {
                         itemCount: characters.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
+                          final raceID = Gameplay.returnRaceIDbyName(characters['character$index']['race']);
+                          final gender = characters['character$index']['body']['gender'] == 'female';
                           return FittedBox(
                             child: Stack(
                               children: [
@@ -290,15 +277,43 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                     ),
                                   ),
                                 ),
-                                //Class Image
+                                //Character Preview
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 400.0, left: 1440),
+                                  padding: const EdgeInsets.only(top: 400.0, left: 1540),
                                   child: SizedBox(
                                     width: 1150,
                                     height: 1300,
-                                    child: Image.asset(
-                                      'assets/characters/${characters['character$index']['class']}.png',
-                                      fit: BoxFit.fill,
+                                    child: CharacterWidget(
+                                      scale: 20,
+                                      body: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'body', gender: gender, selectedSprite: 'idle'),
+                                      skin: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'skin', gender: gender, selectedSprite: 'idle'),
+                                      skinColor: Color.fromARGB(
+                                        255,
+                                        characters['character$index']['body']['skinColor']['red'],
+                                        characters['character$index']['body']['skinColor']['green'],
+                                        characters['character$index']['body']['skinColor']['blue'],
+                                      ),
+                                      hair: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'hair', selectedOption: characters['character$index']['body']['hair']),
+                                      hairColor: Color.fromARGB(
+                                        255,
+                                        characters['character$index']['body']['hairColor']['red'],
+                                        characters['character$index']['body']['hairColor']['green'],
+                                        characters['character$index']['body']['hairColor']['blue'],
+                                      ),
+                                      eyes: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'eyes', selectedOption: characters['character$index']['body']['eyes']),
+                                      eyesColor: Color.fromARGB(
+                                        255,
+                                        characters['character$index']['body']['eyesColor']['red'],
+                                        characters['character$index']['body']['eyesColor']['green'],
+                                        characters['character$index']['body']['eyesColor']['blue'],
+                                      ),
+                                      mouth: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'mouth', selectedOption: characters['character$index']['body']['mouth']),
+                                      mouthColor: Color.fromARGB(
+                                        255,
+                                        characters['character$index']['body']['mouthColor']['red'],
+                                        characters['character$index']['body']['mouthColor']['green'],
+                                        characters['character$index']['body']['mouthColor']['blue'],
+                                      ),
                                     ),
                                   ),
                                 ),
