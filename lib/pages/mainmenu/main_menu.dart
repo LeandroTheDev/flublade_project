@@ -40,7 +40,7 @@ class _MainMenuState extends State<MainMenu> {
             width: screenSize.width,
             height: screenSize.height,
             child: Image.asset(
-              'assets/main_menu_background.png',
+              'assets/images/menu/main_menu_background.png',
               fit: BoxFit.cover,
             ),
           ),

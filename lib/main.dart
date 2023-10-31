@@ -139,7 +139,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
                     width: screenSize.width,
                     height: screenSize.height,
                     child: Image.asset(
-                      'assets/loading_cover_background.png',
+                      'assets/images/menu/logo_background.png',
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -153,7 +153,7 @@ class _FlubladeProjectState extends State<FlubladeProject> {
                         width: 2300,
                         height: 3900,
                         child: Image.asset(
-                          'assets/logo.png',
+                          'assets/images/menu/logo.png',
                           fit: BoxFit.fill,
                         ),
                       ),

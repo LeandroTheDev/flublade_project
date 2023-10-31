@@ -159,7 +159,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
             width: screenSize.width,
             height: screenSize.height,
             child: Image.asset(
-              'assets/main_menu_background.png',
+              'assets/images/menu/main_menu_background.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -196,9 +196,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
                 ),
                 //Character List
                 isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
+                    ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
                         //Disable Scroll List View
                         physics: const NeverScrollableScrollPhysics(),
@@ -217,7 +215,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                     width: 2800,
                                     height: 1800,
                                     child: Image.asset(
-                                      'assets/character.png',
+                                      'assets/images/menu/board_view.png',
                                       fit: BoxFit.cover,
                                     ),
                                   ),

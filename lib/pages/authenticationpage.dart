@@ -436,7 +436,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(200),
                           ),
-                          child: Image.asset('assets/authentication_image.png', fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
+                          child: Image.asset('assets/images/menu/authentication_background.png', fit: BoxFit.fill, color: const Color.fromARGB(33, 255, 255, 255), colorBlendMode: BlendMode.modulate),
                         ),
                         //Auth
                         SizedBox(

@@ -83,7 +83,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
             width: screenSize.width,
             height: screenSize.height,
             child: Image.asset(
-              'assets/tavern.png',
+              'assets/images/menu/character_creation/tavern.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -101,7 +101,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         width: 2800,
                         height: 2800,
                         child: Image.asset(
-                          'assets/open_book.png',
+                          'assets/images/menu/character_creation/book_view.png',
                           fit: BoxFit.fill,
                         ),
                       ),
@@ -142,7 +142,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 350.0, top: 770),
                           child: Image.asset(
-                            Gameplay.classes[selectedClass],
+                            'assets/images/menu/classes/${Gameplay.classes[selectedClass]}.png',
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -383,8 +383,7 @@ class _CharacterBodyState extends State<CharacterBody> {
     void usernameSelect() {
       createCharacter() async {
         //Class declaration
-        String characterClass = Gameplay.classes[widget.selectedClass].substring(18); //THIS NEED TO BE CHANGED AFTER GAMEPLAY.CLASSES CHANGE
-        characterClass = characterClass.substring(0, characterClass.length - 4); // THIS TOO
+        String characterClass = Gameplay.classes[widget.selectedClass];
         //Loading Widget
         Dialogs.loadingDialog(context: context);
         //Creating body response
@@ -521,7 +520,7 @@ class _CharacterBodyState extends State<CharacterBody> {
             width: screenSize.width,
             height: screenSize.height,
             child: Image.asset(
-              'assets/tavern.png',
+              'assets/images/menu/character_creation/tavern.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -539,7 +538,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                         width: 2800,
                         height: 2800,
                         child: Image.asset(
-                          'assets/open_book.png',
+                          'assets/images/menu/character_creation/book_view.png',
                           fit: BoxFit.fill,
                         ),
                       ),

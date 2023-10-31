@@ -639,7 +639,7 @@ class _BattleSceneState extends State<BattleScene> {
                             SizedBox(
                               width: screenSize.width,
                               height: screenSize.height * 0.45,
-                              child: Image.asset('assets/locations/prologue/paradise.png', fit: BoxFit.cover),
+                              child: Image.asset('assets/images/locations/prologue/paradise.png', fit: BoxFit.cover),
                             ),
                             //Enemy image
                             SizedBox(

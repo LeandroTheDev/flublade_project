@@ -60,7 +60,7 @@ class MagicWidget extends StatelessWidget {
                               width: 30,
                               height: 30,
                               child: Image.asset(
-                                'assets/skills/${gameplay.playerSkills[name]['type']}Indicator.png',
+                                'assets/images/skills/${gameplay.playerSkills[name]['type']}Indicator.png',
                                 fit: BoxFit.contain,
                               )),
                     ),

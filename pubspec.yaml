@@ -63,20 +63,22 @@ dev_dependencies:
 flutter:
   assets:
     # Menu
-    - assets/
+    - assets/images/menu/
+    - assets/images/menu/character_creation/
+    - assets/images/menu/classes/
     # Skills
-    - assets/skills/
-    - assets/skills/passives/
+    - assets/images/skills/
+    - assets/images/skills/passives/
     # Items
-    - assets/items/
+    - assets/images/items/
     # NPC
     - assets/images/npc/
     # Tilesets
     - assets/images/tilesets/overworld/
     # Interface
     - assets/images/interface/
-    # Classes & Characters
-    - assets/characters/
+    # Classes
+    - assets/images/menu/classes/
     # Human
     - assets/images/players/human/
     - assets/images/players/human/eyes/
@@ -121,9 +123,9 @@ flutter:
     - assets/images/enemys/infight/
     # locations
       #drauy_location
-    - assets/locations/drauy_dungeon/
+    - assets/images/locations/drauy_dungeon/
       #prologue
-    - assets/locations/prologue/
+    - assets/images/locations/prologue/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

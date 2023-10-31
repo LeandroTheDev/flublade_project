@@ -8,18 +8,18 @@ import 'package:provider/provider.dart';
 class Gameplay with ChangeNotifier {
   //All Classes
   static Map classes = {
-    0: 'assets/characters/archer.png',
-    1: 'assets/characters/assassin.png',
-    2: 'assets/characters/bard.png',
-    3: 'assets/characters/beastmaster.png',
-    4: 'assets/characters/berserk.png',
-    5: 'assets/characters/druid.png',
-    6: 'assets/characters/mage.png',
-    7: 'assets/characters/paladin.png',
-    8: 'assets/characters/priest.png',
-    9: 'assets/characters/trickmagician.png',
-    10: 'assets/characters/weaponsmith.png',
-    11: 'assets/characters/witch.png',
+    0: 'archer',
+    1: 'assassin',
+    2: 'bard',
+    3: 'beastmaster',
+    4: 'berserk',
+    5: 'druid',
+    6: 'mage',
+    7: 'paladin',
+    8: 'priest',
+    9: 'trickmagician',
+    10: 'weaponsmith',
+    11: 'witch',
   };
 
   //All Races
