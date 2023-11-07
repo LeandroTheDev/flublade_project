@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/components/widget/item_widget.dart';
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
@@ -499,7 +498,7 @@ class _GameplayInventoryState extends State<GameplayInventory> with SingleTicker
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () => GlobalFunctions.playerStats(context),
+                        onPressed: () {}, //TO DO
                         child: SizedBox(
                           height: 40,
                           width: 40,

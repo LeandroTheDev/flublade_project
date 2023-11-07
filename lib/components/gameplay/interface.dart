@@ -1,5 +1,5 @@
 import 'package:flame/game.dart';
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/engine_deprecated.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/language.dart';

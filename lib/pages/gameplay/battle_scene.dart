@@ -3,10 +3,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/engine_deprecated.dart';
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/components/widget/loot_widget.dart';
-import 'package:flublade_project/data/global.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
@@ -614,7 +613,7 @@ class _BattleSceneState extends State<BattleScene> {
                                     child: FittedBox(
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          GlobalFunctions.playerStats(context);
+                                          //TO DO
                                         },
                                         child: Text(Language.Translate('response_status', options.language) ?? 'Stats'),
                                       ),
@@ -920,7 +919,7 @@ class _BattleSceneState extends State<BattleScene> {
                                       !isFighting
                                           ? ElevatedButton(
                                               onPressed: () {
-                                                GlobalFunctions.playerStats(context);
+                                                //TO DO
                                               },
                                               child: Text(Language.Translate('response_view', options.language) ?? 'View'),
                                             )

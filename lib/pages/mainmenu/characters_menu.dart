@@ -277,9 +277,9 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                 ),
                                 //Character Preview
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 400.0, left: 1540),
+                                  padding: const EdgeInsets.only(top: 400.0, left: 1840),
                                   child: SizedBox(
-                                    width: 1150,
+                                    width: 800,
                                     height: 1300,
                                     child: CharacterWidget(
                                       scale: 20,

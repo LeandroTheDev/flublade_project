@@ -93,30 +93,40 @@ flutter:
     - assets/images/players/aghars/hair/
     - assets/images/players/aghars/mouth/
     - assets/images/players/aghars/skin/
+    - assets/images/players/aghars/skin/0/
+    - assets/images/players/aghars/skin/1/
     # Nature
     - assets/images/players/nature/
     - assets/images/players/nature/eyes/
     - assets/images/players/nature/hair/
     - assets/images/players/nature/mouth/
     - assets/images/players/nature/skin/
+    - assets/images/players/nature/skin/0/
+    - assets/images/players/nature/skin/1/
     # Dytol
     - assets/images/players/dytol/
     - assets/images/players/dytol/eyes/
     - assets/images/players/dytol/hair/
     - assets/images/players/dytol/mouth/
     - assets/images/players/dytol/skin/
-    # Undead
+    - assets/images/players/dytol/skin/0/
+    - assets/images/players/dytol/skin/1/
+    # Dark
     - assets/images/players/dark/
     - assets/images/players/dark/eyes/
     - assets/images/players/dark/hair/
     - assets/images/players/dark/mouth/
     - assets/images/players/dark/skin/
+    - assets/images/players/dark/skin/0/
+    - assets/images/players/dark/skin/1/
     # Undead
     - assets/images/players/undead/
     - assets/images/players/undead/eyes/
     - assets/images/players/undead/hair/
     - assets/images/players/undead/mouth/
     - assets/images/players/undead/skin/
+    - assets/images/players/undead/skin/0/
+    - assets/images/players/undead/skin/1/
     # Monster
       #drauy_monsters
     - assets/images/enemys/

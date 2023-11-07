@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flublade_project/components/system/dialogs.dart';
+import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/widget/character_widget.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
@@ -31,7 +31,6 @@ class _CharacterSelectionState extends State<CharacterSelection> {
           () {
             //Update
             characters = value;
-            print(characters.length);
             isLoading = false;
           },
         ),
@@ -45,17 +44,16 @@ class _CharacterSelectionState extends State<CharacterSelection> {
     final options = Provider.of<Options>(context);
 
     selectCharacter(int index) async {
-      Dialogs.loadingDialog(context: context);
-      final result = await Server.pushCharacters(context: context);
+      final gameplay = Provider.of<Gameplay>(context, listen: false);
+      gameplay.start(context);
+      //Initializing the Navigator Socket
+
       //Check if connection success
-      if (result != false) {
-        Provider.of<Gameplay>(context, listen: false).changeSelectedCharacter(index);
-        await Server.returnPlayerStats(context);
-        await ServerGameplay.returnGameplayStats(context);
-        Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
-      } else {
-        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-      }
+      // if (result != false) {
+      //   Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
+      // } else {
+      //   Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
+      // }
     }
 
     returnGold(index) {
@@ -171,9 +169,9 @@ class _CharacterSelectionState extends State<CharacterSelection> {
                                 ),
                                 //Character Preview
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 400.0, left: 1540),
+                                  padding: const EdgeInsets.only(top: 400.0, left: 1840),
                                   child: SizedBox(
-                                    width: 1150,
+                                    width: 800,
                                     height: 1300,
                                     child: CharacterWidget(
                                       scale: 20,

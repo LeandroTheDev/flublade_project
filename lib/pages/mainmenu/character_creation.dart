@@ -306,6 +306,20 @@ class _CharacterBodyState extends State<CharacterBody> {
         }
       }
 
+      //Skin Changing
+      skinChange() {
+        //Skin Changing
+        if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][bodyOptions['gender'] == 0 ? 'male' : 'female'][selectedOption].length - 1) {
+          setState(() {
+            bodyOptions[selectedOption] = 0;
+          });
+        } else {
+          setState(() {
+            bodyOptions[selectedOption] = bodyOptions[selectedOption]! + 1;
+          });
+        }
+      }
+
       if (value) {
         //Check if options is Race
         if (selectedOption == 'race') {
@@ -317,7 +331,12 @@ class _CharacterBodyState extends State<CharacterBody> {
           genderChange();
           return;
         }
-        //Body Changing
+        //Check if options is Skin
+        if (selectedOption == 'skin') {
+          skinChange();
+          return;
+        }
+        //Skin Changing
         if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length - 1) {
           setState(() {
             bodyOptions[selectedOption] = 0;
@@ -336,6 +355,11 @@ class _CharacterBodyState extends State<CharacterBody> {
         //Check if options is Gender
         if (selectedOption == 'gender') {
           genderChange();
+          return;
+        }
+        //Check if options is Skin
+        if (selectedOption == 'skin') {
+          skinChange();
           return;
         }
         //Body Changing
@@ -578,7 +602,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                         child: CharacterWidget(
                           scale: 10.5,
                           body: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'body', gender: bodyOptions['gender'] == 1, selectedSprite: 'idle'),
-                          skin: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'skin', gender: bodyOptions['gender'] == 1, selectedSprite: 'idle'),
+                          skin: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'skin', gender: bodyOptions['gender'] == 1, selectedOption: bodyOptions['skin'], selectedSprite: 'idle'),
                           skinColor: bodyColors['skinColor']!,
                           hair: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'hair', selectedOption: bodyOptions['hair']),
                           hairColor: bodyColors['hairColor']!,

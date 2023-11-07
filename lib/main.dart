@@ -1,12 +1,20 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:flublade_project/components/engine.dart';
 import 'package:flublade_project/components/gameplay/game_engine.dart';
-import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/server.dart';
 
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
+import 'package:flublade_project/pages/authenticationpage.dart';
+import 'package:flublade_project/pages/gameplay/ingame.dart';
+import 'package:flublade_project/pages/gameplay/inventory.dart';
+import 'package:flublade_project/pages/gameplay/magics.dart';
+import 'package:flublade_project/pages/mainmenu/character_creation.dart';
+import 'package:flublade_project/pages/mainmenu/character_selection.dart';
+import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
+import 'package:flublade_project/pages/mainmenu/main_menu.dart';
+import 'package:flublade_project/pages/mainmenu/options_menu.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +39,6 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => Server(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => Engine(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => Websocket(),
         ),
         ChangeNotifierProvider(
           create: (_) => GameEngine(),
@@ -65,7 +67,17 @@ class FluBlade extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flublade Project',
       home: const FlubladeProject(),
-      routes: GlobalFunctions.routes,
+      routes: {
+        '/authenticationpage': (context) => const AuthenticationPage(),
+        '/mainmenu': (context) => const MainMenu(),
+        '/optionsmenu': (context) => const OptionsMenu(),
+        '/charactersmenu': (context) => const CharactersMenu(),
+        '/charactercreation': (context) => const CharacterCreation(),
+        '/characterselection': (context) => const CharacterSelection(),
+        '/ingame': (context) => const InGame(),
+        '/inventory': (context) => const GameplayInventory(),
+        '/magics': (context) => const Magics(),
+      },
     );
   }
 }

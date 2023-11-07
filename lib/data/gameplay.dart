@@ -1,12 +1,20 @@
 import 'dart:convert';
 
+import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Gameplay with ChangeNotifier {
-  //All Classes
+  //Engine
+  late Engine _engine;
+
+  ///This provides the main functions to control the game connection and functions
+  Engine get engine => _engine;
+
+  ///All Classes ordened by ID
   static Map classes = {
     0: 'archer',
     1: 'assassin',
@@ -22,7 +30,7 @@ class Gameplay with ChangeNotifier {
     11: 'witch',
   };
 
-  //All Races
+  //All Races ordened by ID
   static Map races = {
     0: 'human',
     1: 'nature',
@@ -32,7 +40,7 @@ class Gameplay with ChangeNotifier {
     5: 'undead',
   };
 
-  //All Body Options
+  //All Body Options ordened by Race
   static Map bodyOptions = {
     'human': {
       'male': {
@@ -40,7 +48,9 @@ class Gameplay with ChangeNotifier {
           0: {
             'idle': 'assets/images/players/human/skin/0/male_skin_idle.png',
           },
-          1: {'assets/images/players/human/skin/1/male_skin_idle.png'},
+          1: {
+            'idle': 'assets/images/players/human/skin/1/male_skin_idle.png',
+          },
         },
         'body': {
           'idle': 'assets/images/players/human/male_body_idle.png',
@@ -51,11 +61,21 @@ class Gameplay with ChangeNotifier {
         }
       },
       'female': {
-        'idle': 'assets/images/players/human/female_body_idle.png',
-        'running0': 'assets/images/players/human/female_body_running0.png',
-        'running1': 'assets/images/players/human/female_body_running1.png',
-        'running2': 'assets/images/players/human/female_body_running2.png',
-        'running3': 'assets/images/players/human/female_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/human/skin/0/female_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/human/skin/1/female_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/human/female_body_idle.png',
+          'running0': 'assets/images/players/human/female_body_running0.png',
+          'running1': 'assets/images/players/human/female_body_running1.png',
+          'running2': 'assets/images/players/human/female_body_running2.png',
+          'running3': 'assets/images/players/human/female_body_running3.png',
+        }
       },
       'hair': {
         0: 'assets/images/players/human/hair/hair0.png',
@@ -72,13 +92,39 @@ class Gameplay with ChangeNotifier {
     },
     'nature': {
       'male': {
-        'idle': 'assets/images/players/nature/male_body_idle.png',
-        'running0': 'assets/images/players/nature/male_body_running0.png',
-        'running1': 'assets/images/players/nature/male_body_running1.png',
-        'running2': 'assets/images/players/nature/male_body_running2.png',
-        'running3': 'assets/images/players/nature/male_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/nature/skin/0/male_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/nature/skin/1/male_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/nature/male_body_idle.png',
+          'running0': 'assets/images/players/nature/male_body_running0.png',
+          'running1': 'assets/images/players/nature/male_body_running1.png',
+          'running2': 'assets/images/players/nature/male_body_running2.png',
+          'running3': 'assets/images/players/nature/male_body_running3.png',
+        }
       },
-      'female': {},
+      'female': {
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/nature/skin/0/female_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/nature/skin/1/female_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/nature/female_body_idle.png',
+          'running0': 'assets/images/players/nature/female_body_running0.png',
+          'running1': 'assets/images/players/nature/female_body_running1.png',
+          'running2': 'assets/images/players/nature/female_body_running2.png',
+          'running3': 'assets/images/players/nature/female_body_running3.png',
+        }
+      },
       'hair': {
         0: 'assets/images/players/nature/hair/hair0.png',
         1: 'assets/images/players/nature/hair/hair1.png',
@@ -91,20 +137,42 @@ class Gameplay with ChangeNotifier {
         0: 'assets/images/players/nature/mouth/mouth0.png',
         1: 'assets/images/players/nature/mouth/mouth1.png',
       },
-      'skin': {
-        0: 'assets/images/players/nature/skin/male_skin_idle0.png',
-        1: 'assets/images/players/nature/skin/male_skin_idle1.png',
-      },
     },
     'dytol': {
       'male': {
-        'idle': 'assets/images/players/dytol/male_body_idle.png',
-        'running0': 'assets/images/players/dytol/male_body_running0.png',
-        'running1': 'assets/images/players/dytol/male_body_running1.png',
-        'running2': 'assets/images/players/dytol/male_body_running2.png',
-        'running3': 'assets/images/players/dytol/male_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/dytol/skin/0/male_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/dytol/skin/1/male_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/dytol/male_body_idle.png',
+          'running0': 'assets/images/players/dytol/male_body_running0.png',
+          'running1': 'assets/images/players/dytol/male_body_running1.png',
+          'running2': 'assets/images/players/dytol/male_body_running2.png',
+          'running3': 'assets/images/players/dytol/male_body_running3.png',
+        }
       },
-      'female': {},
+      'female': {
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/dytol/skin/0/female_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/dytol/skin/1/female_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/dytol/female_body_idle.png',
+          'running0': 'assets/images/players/dytol/female_body_running0.png',
+          'running1': 'assets/images/players/dytol/female_body_running1.png',
+          'running2': 'assets/images/players/dytol/female_body_running2.png',
+          'running3': 'assets/images/players/dytol/female_body_running3.png',
+        }
+      },
       'hair': {
         0: 'assets/images/players/dytol/hair/hair0.png',
         1: 'assets/images/players/dytol/hair/hair1.png',
@@ -117,20 +185,42 @@ class Gameplay with ChangeNotifier {
         0: 'assets/images/players/dytol/mouth/mouth0.png',
         1: 'assets/images/players/dytol/mouth/mouth1.png',
       },
-      'skin': {
-        0: 'assets/images/players/dytol/skin/male_skin_idle0.png',
-        1: 'assets/images/players/dytol/skin/male_skin_idle1.png',
-      },
     },
     'aghars': {
       'male': {
-        'idle': 'assets/images/players/aghars/male_body_idle.png',
-        'running0': 'assets/images/players/aghars/male_body_running0.png',
-        'running1': 'assets/images/players/aghars/male_body_running1.png',
-        'running2': 'assets/images/players/aghars/male_body_running2.png',
-        'running3': 'assets/images/players/aghars/male_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/aghars/skin/0/male_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/aghars/skin/1/male_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/aghars/male_body_idle.png',
+          'running0': 'assets/images/players/aghars/male_body_running0.png',
+          'running1': 'assets/images/players/aghars/male_body_running1.png',
+          'running2': 'assets/images/players/aghars/male_body_running2.png',
+          'running3': 'assets/images/players/aghars/male_body_running3.png',
+        }
       },
-      'female': {},
+      'female': {
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/aghars/skin/0/female_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/aghars/skin/1/female_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/aghars/female_body_idle.png',
+          'running0': 'assets/images/players/aghars/female_body_running0.png',
+          'running1': 'assets/images/players/aghars/female_body_running1.png',
+          'running2': 'assets/images/players/aghars/female_body_running2.png',
+          'running3': 'assets/images/players/aghars/female_body_running3.png',
+        }
+      },
       'hair': {
         0: 'assets/images/players/aghars/hair/hair0.png',
         1: 'assets/images/players/aghars/hair/hair1.png',
@@ -143,20 +233,42 @@ class Gameplay with ChangeNotifier {
         0: 'assets/images/players/aghars/mouth/mouth0.png',
         1: 'assets/images/players/aghars/mouth/mouth1.png',
       },
-      'skin': {
-        0: 'assets/images/players/aghars/skin/male_skin_idle0.png',
-        1: 'assets/images/players/aghars/skin/male_skin_idle1.png',
-      },
     },
     'dark': {
       'male': {
-        'idle': 'assets/images/players/dark/male_body_idle.png',
-        'running0': 'assets/images/players/dark/male_body_running0.png',
-        'running1': 'assets/images/players/dark/male_body_running1.png',
-        'running2': 'assets/images/players/dark/male_body_running2.png',
-        'running3': 'assets/images/players/dark/male_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/dark/skin/0/male_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/dark/skin/1/male_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/dark/male_body_idle.png',
+          'running0': 'assets/images/players/dark/male_body_running0.png',
+          'running1': 'assets/images/players/dark/male_body_running1.png',
+          'running2': 'assets/images/players/dark/male_body_running2.png',
+          'running3': 'assets/images/players/dark/male_body_running3.png',
+        }
       },
-      'female': {},
+      'female': {
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/dark/skin/0/female_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/dark/skin/1/female_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/dark/female_body_idle.png',
+          'running0': 'assets/images/players/dark/female_body_running0.png',
+          'running1': 'assets/images/players/dark/female_body_running1.png',
+          'running2': 'assets/images/players/dark/female_body_running2.png',
+          'running3': 'assets/images/players/dark/female_body_running3.png',
+        }
+      },
       'hair': {
         0: 'assets/images/players/dark/hair/hair0.png',
         1: 'assets/images/players/dark/hair/hair1.png',
@@ -169,20 +281,42 @@ class Gameplay with ChangeNotifier {
         0: 'assets/images/players/dark/mouth/mouth0.png',
         1: 'assets/images/players/dark/mouth/mouth1.png',
       },
-      'skin': {
-        0: 'assets/images/players/dark/skin/male_skin_idle0.png',
-        1: 'assets/images/players/dark/skin/male_skin_idle1.png',
-      },
     },
     'undead': {
       'male': {
-        'idle': 'assets/images/players/undead/male_body_idle.png',
-        'running0': 'assets/images/players/undead/male_body_running0.png',
-        'running1': 'assets/images/players/undead/male_body_running1.png',
-        'running2': 'assets/images/players/undead/male_body_running2.png',
-        'running3': 'assets/images/players/undead/male_body_running3.png',
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/undead/skin/0/male_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/undead/skin/1/male_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/undead/male_body_idle.png',
+          'running0': 'assets/images/players/undead/male_body_running0.png',
+          'running1': 'assets/images/players/undead/male_body_running1.png',
+          'running2': 'assets/images/players/undead/male_body_running2.png',
+          'running3': 'assets/images/players/undead/male_body_running3.png',
+        }
       },
-      'female': {},
+      'female': {
+        'skin': {
+          0: {
+            'idle': 'assets/images/players/undead/skin/0/female_skin_idle.png',
+          },
+          1: {
+            'idle': 'assets/images/players/undead/skin/1/female_skin_idle.png',
+          },
+        },
+        'body': {
+          'idle': 'assets/images/players/undead/female_body_idle.png',
+          'running0': 'assets/images/players/undead/female_body_running0.png',
+          'running1': 'assets/images/players/undead/female_body_running1.png',
+          'running2': 'assets/images/players/undead/female_body_running2.png',
+          'running3': 'assets/images/players/undead/female_body_running3.png',
+        }
+      },
       'hair': {
         0: 'assets/images/players/undead/hair/hair0.png',
         1: 'assets/images/players/undead/hair/hair1.png',
@@ -194,10 +328,6 @@ class Gameplay with ChangeNotifier {
       'mouth': {
         0: 'assets/images/players/undead/mouth/mouth0.png',
         1: 'assets/images/players/undead/mouth/mouth1.png',
-      },
-      'skin': {
-        0: 'assets/images/players/undead/skin/male_skin_idle0.png',
-        1: 'assets/images/players/undead/skin/male_skin_idle1.png',
       },
     },
   };
@@ -239,6 +369,19 @@ class Gameplay with ChangeNotifier {
     return 0;
   }
 
+  ///This function starts the main gameplay
+  void start(context) {
+    Dialogs.loadingDialog(context: context);
+    _engine = Engine();
+    _engine.initNavigatorSocket(context, (data) {
+      Navigator.pop(context);
+      _engine.closeNavigatorSocket();
+    });
+  }
+
+  //---
+  //EVERTHING DOWN THIS IS DEPRECATED
+  //---
   //System Provider
   Map _characters = {};
   int _selectedCharacter = 0;

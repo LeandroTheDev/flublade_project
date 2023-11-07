@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flublade_project/data/gameplay.dart';
-import 'package:flublade_project/data/global.dart';
+import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';

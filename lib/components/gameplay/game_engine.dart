@@ -8,7 +8,7 @@ import 'dart:convert';
 
 import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/engine_deprecated.dart';
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/server.dart';

@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/engine_deprecated.dart';
 import 'package:flublade_project/components/gameplay/player.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
@@ -216,8 +216,7 @@ class EnemyWithVision extends PositionComponent with CollisionCallbacks {
   final double enemyCollisionRadius;
   int indexChasing = -1;
 
-  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size})
-      : super(size: size);
+  EnemyWithVision(this.context, this.enemyID, this.enemyName, this.enemyVisionRadius, this.enemyCollisionRadius, {required Vector2 size}) : super(size: size);
 
   @override
   void onMount() {
