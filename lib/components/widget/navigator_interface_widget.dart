@@ -1,6 +1,4 @@
 import 'package:flame/game.dart';
-import 'package:flublade_project/components/engine_deprecated.dart';
-import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
@@ -10,28 +8,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:provider/provider.dart';
 
-class IngameInterface extends StatefulWidget {
-  const IngameInterface({super.key});
+class NavigatorInterface extends StatefulWidget {
+  const NavigatorInterface({super.key});
 
   @override
-  State<IngameInterface> createState() => _IngameInterfaceState();
+  State<NavigatorInterface> createState() => _NavigatorInterfaceState();
 }
 
-class _IngameInterfaceState extends State<IngameInterface> {
+class _NavigatorInterfaceState extends State<NavigatorInterface> {
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
     final settings = Provider.of<Settings>(context, listen: false);
-    final engine = Provider.of<GameEngine>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
     pauseDialog({
       required BuildContext context,
     }) {
-      final websocket = Provider.of<Websocket>(context, listen: false);
       final options = Provider.of<Options>(context, listen: false);
-      final gameplay = Provider.of<Gameplay>(context, listen: false);
-      final engine = Provider.of<GameEngine>(context, listen: false);
       showDialog(
           barrierColor: const Color.fromARGB(167, 0, 0, 0),
           context: context,
@@ -72,10 +66,6 @@ class _IngameInterfaceState extends State<IngameInterface> {
                         padding: const EdgeInsets.all(15.0),
                         child: ElevatedButton(
                           onPressed: () {
-                            websocket.websocketDisconnectIngame(context);
-                            gameplay.changeIsTalkable(false);
-                            gameplay.cleanEnemiesChasing();
-                            engine.changeStopIngameConnection(true);
                             Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (route) => false);
                           },
                           child: Text(Language.Translate('pausemenu_disconnectIngame', options.language) ?? 'Disconnect'),
@@ -192,7 +182,7 @@ class _IngameInterfaceState extends State<IngameInterface> {
                           listener: (area) {
                             //+x right -x left
                             //+y down -y up
-                            engine.setjoystickPosition(Vector2(area.x, area.y));
+                            gameplay.changeJoystickPosition(Vector2(area.x, area.y));
                           },
                           initialJoystickAlignment: Alignment.center,
                         ),

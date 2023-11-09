@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:flublade_project/components/gameplay/game_engine.dart';
 import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/server.dart';
 
@@ -7,7 +6,6 @@ import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/settings.dart';
 import 'package:flublade_project/pages/authenticationpage.dart';
-import 'package:flublade_project/pages/gameplay/ingame.dart';
 import 'package:flublade_project/pages/gameplay/inventory.dart';
 import 'package:flublade_project/pages/gameplay/magics.dart';
 import 'package:flublade_project/pages/mainmenu/character_creation.dart';
@@ -40,9 +38,6 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => Server(),
         ),
-        ChangeNotifierProvider(
-          create: (_) => GameEngine(),
-        ),
       ],
       child: const FluBlade(),
     ),
@@ -74,7 +69,6 @@ class FluBlade extends StatelessWidget {
         '/charactersmenu': (context) => const CharactersMenu(),
         '/charactercreation': (context) => const CharacterCreation(),
         '/characterselection': (context) => const CharacterSelection(),
-        '/ingame': (context) => const InGame(),
         '/inventory': (context) => const GameplayInventory(),
         '/magics': (context) => const Magics(),
       },

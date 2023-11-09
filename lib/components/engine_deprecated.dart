@@ -25,8 +25,8 @@ class Engine extends FlameGame with ChangeNotifier {
   Images get imagesCache => _imagesCache;
 
   void initGameController(context) {
-    _gameController = GameEngine();
-    _gameController.setContext(context);
+    // _gameController = GameEngine();
+    // _gameController.setContext(context);
     _context = context;
     _imagesCache = images;
   }

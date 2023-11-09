@@ -69,20 +69,20 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
       double xSpeed = maxSpeed;
       double ySpeed = maxSpeed;
       //X Collision Check
-      if (engine.joystickPosition[0] < 0 && collisionDirection[0]) {
+      if (gameplay.joystickPosition[0] < 0 && collisionDirection[0]) {
         xSpeed = 0.0;
       }
-      if (engine.joystickPosition[0] > 0 && collisionDirection[1]) {
+      if (gameplay.joystickPosition[0] > 0 && collisionDirection[1]) {
         xSpeed = 0.0;
       }
       //Y Collision Check
-      if (engine.joystickPosition[1] < 0 && collisionDirection[2]) {
+      if (gameplay.joystickPosition[1] < 0 && collisionDirection[2]) {
         ySpeed = 0.0;
       }
-      if (engine.joystickPosition[1] > 0 && collisionDirection[3]) {
+      if (gameplay.joystickPosition[1] > 0 && collisionDirection[3]) {
         ySpeed = 0.0;
       }
-      final moviment = Vector2(engine.joystickPosition[0] * xSpeed, engine.joystickPosition[1] * ySpeed);
+      final moviment = Vector2(gameplay.joystickPosition[0] * xSpeed, gameplay.joystickPosition[1] * ySpeed);
       position.add(moviment);
       cameraPosition.add(moviment);
     }
@@ -95,10 +95,10 @@ class Player extends SpriteAnimationComponent with HasGameRef, CollisionCallback
     if (other is WorldTile) {
       //Add Collisions
       collisionDirection = [
-        engine.joystickPosition[0] < 0,
-        engine.joystickPosition[0] > 0,
-        engine.joystickPosition[1] < 0,
-        engine.joystickPosition[1] > 0,
+        gameplay.joystickPosition[0] < 0,
+        gameplay.joystickPosition[0] > 0,
+        gameplay.joystickPosition[1] < 0,
+        gameplay.joystickPosition[1] > 0,
       ];
       lastCollision = other;
     }
@@ -166,7 +166,7 @@ class PlayerClient extends SpriteAnimationComponent with HasGameRef, CollisionCa
 class PlayerSprite extends SpriteAnimationComponent with HasGameRef {
   //Engine Declaration
   final BuildContext context;
-  late final GameEngine engine;
+  late final Gameplay gameplay;
 
   //Sprite Declarations
   late final SpriteAnimation spriteIdle;
@@ -178,7 +178,7 @@ class PlayerSprite extends SpriteAnimationComponent with HasGameRef {
   @override
   void onMount() {
     super.onMount();
-    engine = Provider.of<GameEngine>(context, listen: false);
+    gameplay = Provider.of<Gameplay>(context, listen: false);
   }
 
   @override
@@ -213,11 +213,11 @@ class PlayerSprite extends SpriteAnimationComponent with HasGameRef {
   void update(double dt) async {
     super.update(dt);
     //Check joystick moviment
-    if (!(engine.joystickPosition[0] == 0.0 && engine.joystickPosition[1] == 0.0)) {
+    if (!(gameplay.joystickPosition[0] == 0.0 && gameplay.joystickPosition[1] == 0.0)) {
       animation = spriteRun;
 
       //Run Animation
-      final actualDirection = engine.joystickPosition[0] > 0 ? 'left' : 'right';
+      final actualDirection = gameplay.joystickPosition[0] > 0 ? 'left' : 'right';
       if (actualDirection != lastDirection) {
         lastDirection = actualDirection;
         if (!isFlippedHorizontally) {

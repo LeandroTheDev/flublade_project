@@ -2,7 +2,7 @@
 
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/components/widget/character_widget.dart';
-import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/base.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/options.dart';
@@ -203,7 +203,7 @@ class _CharactersMenuState extends State<CharactersMenu> {
                         itemCount: characters.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
-                          final raceID = Gameplay.returnRaceIDbyName(characters['character$index']['race']);
+                          final raceID = Base.returnRaceIDbyName(characters['character$index']['race']);
                           final gender = characters['character$index']['body']['gender'] == 'female';
                           return FittedBox(
                             child: Stack(
@@ -283,29 +283,29 @@ class _CharactersMenuState extends State<CharactersMenu> {
                                     height: 1300,
                                     child: CharacterWidget(
                                       scale: 20,
-                                      body: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'body', gender: gender, selectedSprite: 'idle'),
-                                      skin: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'skin', gender: gender, selectedSprite: 'idle'),
+                                      body: Base.returnBodyOptionAsset(raceID: raceID, bodyOption: 'body', gender: gender, selectedSprite: 'idle'),
+                                      skin: Base.returnBodyOptionAsset(raceID: raceID, bodyOption: 'skin', gender: gender, selectedSprite: 'idle'),
                                       skinColor: Color.fromARGB(
                                         255,
                                         characters['character$index']['body']['skinColor']['red'],
                                         characters['character$index']['body']['skinColor']['green'],
                                         characters['character$index']['body']['skinColor']['blue'],
                                       ),
-                                      hair: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'hair', selectedOption: characters['character$index']['body']['hair']),
+                                      hair: Base.returnBodyOptionAsset(raceID: raceID, bodyOption: 'hair', selectedOption: characters['character$index']['body']['hair']),
                                       hairColor: Color.fromARGB(
                                         255,
                                         characters['character$index']['body']['hairColor']['red'],
                                         characters['character$index']['body']['hairColor']['green'],
                                         characters['character$index']['body']['hairColor']['blue'],
                                       ),
-                                      eyes: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'eyes', selectedOption: characters['character$index']['body']['eyes']),
+                                      eyes: Base.returnBodyOptionAsset(raceID: raceID, bodyOption: 'eyes', selectedOption: characters['character$index']['body']['eyes']),
                                       eyesColor: Color.fromARGB(
                                         255,
                                         characters['character$index']['body']['eyesColor']['red'],
                                         characters['character$index']['body']['eyesColor']['green'],
                                         characters['character$index']['body']['eyesColor']['blue'],
                                       ),
-                                      mouth: Gameplay.returnBodyOptionAsset(raceID: raceID, bodyOption: 'mouth', selectedOption: characters['character$index']['body']['mouth']),
+                                      mouth: Base.returnBodyOptionAsset(raceID: raceID, bodyOption: 'mouth', selectedOption: characters['character$index']['body']['mouth']),
                                       mouthColor: Color.fromARGB(
                                         255,
                                         characters['character$index']['body']['mouthColor']['red'],

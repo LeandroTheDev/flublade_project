@@ -2,9 +2,9 @@
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/components/widget/character_widget.dart';
 import 'package:flublade_project/components/widget/color_widget.dart';
+import 'package:flublade_project/data/base.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
-import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/pages/mainmenu/characters_menu.dart';
 
@@ -142,7 +142,7 @@ class _CharacterCreationState extends State<CharacterCreation> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 350.0, top: 770),
                           child: Image.asset(
-                            'assets/images/menu/classes/${Gameplay.classes[selectedClass]}.png',
+                            'assets/images/menu/classes/${Base.classes[selectedClass]}.png',
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -272,7 +272,7 @@ class _CharacterBodyState extends State<CharacterBody> {
       //Race Changing
       raceChange() {
         if (value) {
-          if (bodyOptions[selectedOption] == Gameplay.races.length - 1) {
+          if (bodyOptions[selectedOption] == Base.races.length - 1) {
             setState(() {
               bodyOptions[selectedOption] = 0;
             });
@@ -284,7 +284,7 @@ class _CharacterBodyState extends State<CharacterBody> {
         } else {
           if (bodyOptions[selectedOption]! < 1) {
             setState(() {
-              bodyOptions[selectedOption] = Gameplay.races.length - 1;
+              bodyOptions[selectedOption] = Base.races.length - 1;
             });
           } else {
             setState(() {
@@ -309,7 +309,7 @@ class _CharacterBodyState extends State<CharacterBody> {
       //Skin Changing
       skinChange() {
         //Skin Changing
-        if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][bodyOptions['gender'] == 0 ? 'male' : 'female'][selectedOption].length - 1) {
+        if (bodyOptions[selectedOption] == Base.bodyOptions[Base.races[bodyOptions['race']]][bodyOptions['gender'] == 0 ? 'male' : 'female'][selectedOption].length - 1) {
           setState(() {
             bodyOptions[selectedOption] = 0;
           });
@@ -337,7 +337,7 @@ class _CharacterBodyState extends State<CharacterBody> {
           return;
         }
         //Skin Changing
-        if (bodyOptions[selectedOption] == Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length - 1) {
+        if (bodyOptions[selectedOption] == Base.bodyOptions[Base.races[bodyOptions['race']]][selectedOption].length - 1) {
           setState(() {
             bodyOptions[selectedOption] = 0;
           });
@@ -365,7 +365,7 @@ class _CharacterBodyState extends State<CharacterBody> {
         //Body Changing
         if (bodyOptions[selectedOption]! < 1) {
           setState(() {
-            bodyOptions[selectedOption] = Gameplay.bodyOptions[Gameplay.races[bodyOptions['race']]][selectedOption].length - 1;
+            bodyOptions[selectedOption] = Base.bodyOptions[Base.races[bodyOptions['race']]][selectedOption].length - 1;
           });
         } else {
           setState(() {
@@ -407,13 +407,13 @@ class _CharacterBodyState extends State<CharacterBody> {
     void usernameSelect() {
       createCharacter() async {
         //Class declaration
-        String characterClass = Gameplay.classes[widget.selectedClass];
+        String characterClass = Base.classes[widget.selectedClass];
         //Loading Widget
         Dialogs.loadingDialog(context: context);
         //Creating body response
         Map bodyResponse = bodyOptions;
         bodyResponse['gender'] = bodyOptions['gender'] == 0 ? 'male' : 'female';
-        bodyResponse['race'] = Gameplay.races[bodyOptions['race']];
+        bodyResponse['race'] = Base.races[bodyOptions['race']];
         //Colors
         bodyResponse['hairColor'] = {
           'red': bodyColors['hairColor']!.red,
@@ -601,14 +601,14 @@ class _CharacterBodyState extends State<CharacterBody> {
                         padding: const EdgeInsets.only(left: 350.0, top: 770),
                         child: CharacterWidget(
                           scale: 10.5,
-                          body: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'body', gender: bodyOptions['gender'] == 1, selectedSprite: 'idle'),
-                          skin: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'skin', gender: bodyOptions['gender'] == 1, selectedOption: bodyOptions['skin'], selectedSprite: 'idle'),
+                          body: Base.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'body', gender: bodyOptions['gender'] == 1, selectedSprite: 'idle'),
+                          skin: Base.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'skin', gender: bodyOptions['gender'] == 1, selectedOption: bodyOptions['skin'], selectedSprite: 'idle'),
                           skinColor: bodyColors['skinColor']!,
-                          hair: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'hair', selectedOption: bodyOptions['hair']),
+                          hair: Base.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'hair', selectedOption: bodyOptions['hair']),
                           hairColor: bodyColors['hairColor']!,
-                          eyes: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'eyes', selectedOption: bodyOptions['eyes']),
+                          eyes: Base.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'eyes', selectedOption: bodyOptions['eyes']),
                           eyesColor: bodyColors['eyesColor']!,
-                          mouth: Gameplay.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'mouth', selectedOption: bodyOptions['mouth']),
+                          mouth: Base.returnBodyOptionAsset(raceID: bodyOptions['race'], bodyOption: 'mouth', selectedOption: bodyOptions['mouth']),
                           mouthColor: bodyColors['mouthColor']!,
                         ),
                       ),
@@ -650,7 +650,7 @@ class _CharacterBodyState extends State<CharacterBody> {
                                 Column(
                                   children: [
                                     Text(
-                                      Language.Translate('characters_race_${Gameplay.races[bodyOptions['race']]}', options.language) ?? 'Race',
+                                      Language.Translate('characters_race_${Base.races[bodyOptions['race']]}', options.language) ?? 'Race',
                                       style: const TextStyle(fontFamily: 'Explora', fontSize: 200, fontWeight: FontWeight.bold, letterSpacing: 10),
                                     ),
                                     Row(
