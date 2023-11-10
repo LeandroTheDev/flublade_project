@@ -5,12 +5,13 @@ import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/server.dart';
-import 'package:flublade_project/pages/gameplay/navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/io.dart';
 
-class Engine {
+import '../pages/gameplay/navigator.dart';
+
+class ConnectionEngine {
   ///Navigator Socket
   late final IOWebSocketChannel navigatorSocket;
 
@@ -77,13 +78,13 @@ class Engine {
   }
 
   ///Start the Gameplay
-  void start(context) {
+  void start(BuildContext context, int selectedCharacterIndex) {
     Dialogs.loadingDialog(context: context);
     initNavigatorSocket(context, (data) {
       //Check Errors
       if (!Server.errorTreatment(json.decode(data)["message"], context)) return;
 
-      //Remove Loading Dialog
+      // //Remove Loading Dialog
       Navigator.pop(context);
       //Change Page to Gameplay
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => GameplayNavigator(this)), (route) => false);

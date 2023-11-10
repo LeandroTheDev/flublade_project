@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/connection_engine.dart';
 import 'package:flublade_project/components/widget/character_widget.dart';
 import 'package:flublade_project/data/base.dart';
 import 'package:flublade_project/data/language.dart';
@@ -41,19 +41,6 @@ class _CharacterSelectionState extends State<CharacterSelection> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
-
-    selectCharacter(int index) async {
-      final engine = Provider.of<Engine>(context, listen: false);
-      engine.start(context);
-      //Initializing the Navigator Socket
-
-      //Check if connection success
-      // if (result != false) {
-      //   Navigator.of(context).pushNamedAndRemoveUntil('/ingame', (Route route) => false);
-      // } else {
-      //   Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
-      // }
-    }
 
     returnGold(index) {
       try {
@@ -213,7 +200,7 @@ class _CharacterSelectionState extends State<CharacterSelection> {
                                     width: 600,
                                     height: 170,
                                     child: ElevatedButton(
-                                      onPressed: () => selectCharacter(index),
+                                      onPressed: () => ConnectionEngine().start(context, index),
                                       style: ButtonStyle(
                                         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                           RoundedRectangleBorder(

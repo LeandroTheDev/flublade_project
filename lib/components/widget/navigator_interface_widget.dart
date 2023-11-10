@@ -1,15 +1,16 @@
 import 'package:flame/game.dart';
+import 'package:flublade_project/components/connection_engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/options.dart';
-import 'package:flublade_project/data/settings.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:provider/provider.dart';
 
 class NavigatorInterface extends StatefulWidget {
-  const NavigatorInterface({super.key});
+  final ConnectionEngine engine;
+  const NavigatorInterface(this.engine, {super.key});
 
   @override
   State<NavigatorInterface> createState() => _NavigatorInterfaceState();
@@ -19,7 +20,6 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
-    final settings = Provider.of<Settings>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
     pauseDialog({
@@ -66,6 +66,7 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
                         padding: const EdgeInsets.all(15.0),
                         child: ElevatedButton(
                           onPressed: () {
+                            widget.engine.closeNavigatorSocket();
                             Navigator.of(context).pushNamedAndRemoveUntil('/mainmenu', (route) => false);
                           },
                           child: Text(Language.Translate('pausemenu_disconnectIngame', options.language) ?? 'Disconnect'),
@@ -125,7 +126,7 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                             child: Container(
                               decoration: const BoxDecoration(color: Colors.purple),
-                              width: ((gameplay.playerXP / settings.levelCaps[gameplay.playerLevel.toString()]) * 100) * 5.74,
+                              width: 100, //((gameplay.playerXP / settings.levelCaps[gameplay.playerLevel.toString()]) * 100) * 5.74,
                               height: 90,
                             ),
                           ),

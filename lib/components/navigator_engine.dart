@@ -1,13 +1,13 @@
 import 'package:flame/game.dart';
-import 'package:flublade_project/components/engine.dart';
+import 'package:flublade_project/components/connection_engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class GameEngine extends FlameGame {
+class NavigatorEngine extends FlameGame {
   late final BuildContext context;
-  late final Engine engine;
-  GameEngine(this.context, this.engine);
+  late final ConnectionEngine engine;
+  NavigatorEngine(this.context, this.engine);
 
   //Providers
   late final Gameplay gameplay;
