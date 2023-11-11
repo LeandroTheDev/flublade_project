@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flublade_project/components/system/dialogs.dart';
+import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/server.dart';
@@ -12,6 +13,9 @@ import 'package:web_socket_channel/io.dart';
 import '../pages/gameplay/navigator.dart';
 
 class ConnectionEngine {
+  ///Gameplay Provider
+  late final Gameplay gameplay;
+
   ///Navigator Socket
   late final IOWebSocketChannel navigatorSocket;
 
@@ -27,7 +31,7 @@ class ConnectionEngine {
   ///Check if connection is lost or if the client asked for disconnection
   bool manuallyClosed = false;
 
-  ///Initialize the navigator socket
+  ///Initialize the navigator socket to estabilish connection
   ///
   ///context = buildcontext of your actual application
   ///
@@ -64,11 +68,16 @@ class ConnectionEngine {
   }
 
   ///Procceed Navigator Initilization sending a message to the server indicanting that you are ready
-  ///to receive world data
-  void startNavigatorSocket() {
-    listenNavigator = (data) {};
+  ///to receive world data, the listen function will be called every time the server returns the world data,
+  ///the function have a data parameter containing the Map from world data
+  void startNavigatorSocket(BuildContext context, Function listen) {
+    //Change the Listen Function
+    listenNavigator = listen;
+    //Create the Data to send
     userConnectionData["job"] = "receiveDatas";
-    navigatorSocket.sink.add(json.encode(userConnectionData));
+    final sendData = {"selectedCharacter": gameplay.selectedCharacter};
+    //Convert and Send to the Server
+    navigatorSocket.sink.add(json.encode({...userConnectionData, ...sendData}));
   }
 
   ///Close the Navigator Socket
@@ -79,12 +88,22 @@ class ConnectionEngine {
 
   ///Start the Gameplay
   void start(BuildContext context, int selectedCharacterIndex) {
+    gameplay = Provider.of<Gameplay>(context, listen: false);
+    //Change Selected Character ID
+    gameplay.changeCharacterId(selectedCharacterIndex);
+
+    //Loading Dialog
     Dialogs.loadingDialog(context: context);
+
+    //Start Socket
     initNavigatorSocket(context, (data) {
       //Check Errors
-      if (!Server.errorTreatment(json.decode(data)["message"], context)) return;
-
-      // //Remove Loading Dialog
+      if (!Server.errorTreatment(json.decode(data)["message"], context)) {
+        closeNavigatorSocket();
+        gameplay.resetVariables();
+        return;
+      }
+      //Remove Loading Dialog
       Navigator.pop(context);
       //Change Page to Gameplay
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => GameplayNavigator(this)), (route) => false);

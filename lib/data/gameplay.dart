@@ -7,15 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Gameplay with ChangeNotifier {
-  //Player Joystick
+  ///Actual Player Joystick Position
   Vector2 _joystickPosition = Vector2(0.0, 0.0);
   Vector2 get joystickPosition => _joystickPosition;
   void changeJoystickPosition(Vector2 position) {
     _joystickPosition = position;
   }
 
+  ///Character ID of the selected characters
+  int _characterId = 0;
+  int get characterId => _characterId;
+  void changeCharacterId(int value) {
+    _characterId = value;
+  }
 
-
+  //Utils
+  ///Reset all gamneplay variables
+  void resetVariables() {
+    _joystickPosition = Vector2(0.0, 0.0);
+    _characterId = 0;
+  }
 
   //---
   //EVERTHING DOWN THIS IS DEPRECATED

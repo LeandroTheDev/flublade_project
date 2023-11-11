@@ -12,11 +12,17 @@ class NavigatorEngine extends FlameGame {
   //Providers
   late final Gameplay gameplay;
 
+  loadWorldData(data) {
+    print(data);
+  }
+
   //Game Engine Initialization
   @override
   void onMount() {
     super.onMount();
     //Providers Declaration
     gameplay = Provider.of<Gameplay>(context, listen: false);
+    //Ask for the server to receive world datas
+    engine.startNavigatorSocket(context, loadWorldData);
   }
 }
