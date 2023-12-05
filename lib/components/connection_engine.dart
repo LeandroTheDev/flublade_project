@@ -31,7 +31,8 @@ class ConnectionEngine {
   ///Check if connection is lost or if the client asked for disconnection
   bool manuallyClosed = false;
 
-  ///Initialize the navigator socket to estabilish connection
+  ///Initialize the navigator socket to estabilish connection, 
+  ///this doesnt need to be called at any time, the "start" function already call this.
   ///
   ///context = buildcontext of your actual application
   ///

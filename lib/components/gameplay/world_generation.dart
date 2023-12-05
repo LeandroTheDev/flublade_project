@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/game.dart';
 
 //
 //  DOCS
@@ -18,32 +19,7 @@ import 'package:flame/components.dart';
 // define the properties of tile.
 
 class WorldGeneration extends SpriteComponent {
-  generateWorld(List<dynamic> worldData, gameController) {
-    double tileSpaceHeight = 0.0;
-    double tileSpaceWidth = 0.0;
-    //All Tiles Columns
-    for (int i = 0; i < worldData[0].length; i++) {
-      //All Tiles Row
-      for (int j = 0; j < worldData[0][i].length; j++) {
-        gameController.add(WorldTile(
-          worldTiles[worldData[0][i][j]]["tileSprite"].toString(),
-          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()),
-              double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
-          Vector2(tileSpaceWidth, tileSpaceHeight),
-          worldTiles[worldData[0][i][j]]["collisionType"],
-          worldTiles[worldData[0][i][j]]["isSolid"],
-        ));
-        //Add Width Spacer
-        tileSpaceWidth += 31.0;
-      }
-      //Add Height Spacer
-      tileSpaceHeight += 31.0;
-      //Reset Width Spacer
-      tileSpaceWidth = 0.0;
-    }
-  }
-
-  final worldTiles = [
+  static const worldTiles = [
     //Grass
     {
       'tileSprite': 'tilesets/overworld/grass.png',
@@ -69,6 +45,31 @@ class WorldGeneration extends SpriteComponent {
       'isSolid': true,
     },
   ];
+
+  generateWorld(List<dynamic> worldData, FlameGame gameController) {
+    double tileSpaceHeight = 0.0;
+    double tileSpaceWidth = 0.0;
+    //All Tiles Columns
+    for (int i = 0; i < worldData[0].length; i++) {
+      //All Tiles Row
+      for (int j = 0; j < worldData[0][i].length; j++) {
+        gameController.add(WorldTile(
+          worldTiles[worldData[0][i][j]]["tileSprite"].toString(),
+          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()),
+              double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
+          Vector2(tileSpaceWidth, tileSpaceHeight),
+          worldTiles[worldData[0][i][j]]["collisionType"],
+          worldTiles[worldData[0][i][j]]["isSolid"],
+        ));
+        //Add Width Spacer
+        tileSpaceWidth += 31.0;
+      }
+      //Add Height Spacer
+      tileSpaceHeight += 31.0;
+      //Reset Width Spacer
+      tileSpaceWidth = 0.0;
+    }
+  }
 }
 
 class WorldTile extends SpriteComponent {
