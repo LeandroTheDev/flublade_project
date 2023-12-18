@@ -28,12 +28,12 @@ Future Features:
 
 # Wiki
 
-On the [wiki](https://github.com/LeandroTheDev/flublade_project/wiki) you will find all the information about the game to know how to deal with enemies and understand the main mechanics, else if you are a developer see the [backend wiki](https://github.com/LeandroTheDev/flublade_backend/wiki).
+On the [wiki](https://github.com/LeandroTheDev/flublade_project/wiki) you will find all the information about the game to know how to deal with enemies and understand the main mechanics, else if you are a developer see the [backend wiki](https://github.com/LeandroTheDev/flublade_server/wiki).
 
 # FAQ
 
 How to create a server?
-> See the [flublade backend](https://github.com/LeandroTheDev/flublade_backend) for more informations
+> See the [flublade backend](https://github.com/LeandroTheDev/flublade_server) for more informations
 
 What i need to compile?
 > Do you need the [flutter](https://docs.flutter.dev/get-started/install) in your machine, in your folder open the terminal and type "flutter create flublade_project", after that extract the flublade files to the flublade_project folder, then you start [compiling](https://docs.flutter.dev/deployment/android).

@@ -19,7 +19,9 @@ class NavigatorEngine extends FlameGame {
   }
 
   //Handle all the messages from the navigator socket
-  handleNavigatorMessage() {}
+  Function handleNavigatorMessage = () {
+    print("Called");
+  };
 
   //Game Engine Initialization
   @override

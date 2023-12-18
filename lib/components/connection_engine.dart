@@ -25,20 +25,16 @@ class ConnectionEngine {
   ///User credentials to check account validation
   late final Map userConnectionData;
 
-  ///This function is called every time the navigator socket returns a value
-  late Function listenNavigator;
-
   ///Check if connection is lost or if the client asked for disconnection
   bool manuallyClosed = false;
 
-  ///Initialize the navigator socket to estabilish connection, 
+  ///Initialize the navigator socket to estabilish connection,
   ///this doesnt need to be called at any time, the "start" function already call this.
   ///
   ///context = buildcontext of your actual application
   ///
   ///success = is the function called when the server returns the handshake
   void initNavigatorSocket(BuildContext context, Function success) {
-    listenNavigator = success;
     final options = Provider.of<Options>(context, listen: false);
     //HandShake with Navigator
     try {
@@ -51,7 +47,7 @@ class ConnectionEngine {
     }
     //Start Listening
     navigatorBroadcast = navigatorSocket.stream.asBroadcastStream().listen(
-          (data) => listenNavigator(data),
+          null,
           onError: (error) => Dialogs.errorDialog(errorMsg: 'authentication_invalidlogin', context: context),
           onDone: () {
             if (!manuallyClosed) {
@@ -59,6 +55,7 @@ class ConnectionEngine {
             }
           },
         );
+    navigatorBroadcast.onData((data) => success(data));
     //Send Login Message
     userConnectionData = {
       "job": "authenticate",
@@ -72,8 +69,7 @@ class ConnectionEngine {
   ///to receive world data, the listen function will be called every time the server returns the world data,
   ///the function have a data parameter containing the Map from world data
   void startNavigatorSocket(BuildContext context, Function listen) {
-    //Change the Listen Function
-    listenNavigator = listen;
+    navigatorBroadcast.onData((data) => listen(data));
     //Create the Data to send
     userConnectionData["job"] = "receiveDatas";
     final sendData = {"selectedCharacter": gameplay.selectedCharacter};
