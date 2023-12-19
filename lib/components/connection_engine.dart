@@ -81,6 +81,7 @@ class ConnectionEngine {
   void closeNavigatorSocket() {
     manuallyClosed = true;
     navigatorSocket.sink.close();
+    navigatorBroadcast.cancel();
   }
 
   ///Start the Gameplay

@@ -319,37 +319,37 @@ class Server with ChangeNotifier {
   ///Provides any dialog message for the respective error message,
   ///if the error is not listed then no dialogs will appear,
   ///return true if no error occurs
-  static bool errorTreatment(String message, BuildContext context) {
+  static bool errorTreatment(String message, BuildContext context, {int delay = 0}) {
     switch (message) {
       case 'Invalid Login':
-        Dialogs.errorDialog(context: context, errorMsg: 'authentication_invalid_login');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.errorDialog(context: context, errorMsg: 'authentication_invalid_login'));
         return false;
       case 'Server Crashed':
-        Dialogs.alertDialog(context: context, message: 'authentication_lost_connection');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_lost_connection'));
         return false;
       case 'Too Many Attempts':
-        Dialogs.alertDialog(context: context, message: 'authentication_temporary_blocked');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_temporary_blocked'));
         return false;
       case 'Wrong Credentials':
-        Dialogs.alertDialog(context: context, message: 'authentication_login_notfound');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_login_notfound'));
         return false;
       case 'Empty':
-        Dialogs.alertDialog(context: context, message: 'characters_create_error_empty');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'characters_create_error_empty'));
         return false;
       case 'Too Big':
-        Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'characters_create_error_namelimit'));
         return false;
       case 'Too Small or Too Big Username':
-        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_username');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_register_problem_username'));
         return false;
       case 'Too Small Password or Too Big Password':
-        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_password');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_register_problem_password'));
         return false;
       case 'Username Already Exists':
-        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_existusername');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_register_problem_existusername'));
         return false;
       case 'No Connection':
-        Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection');
+        Future.delayed(Duration(milliseconds: delay), () => Dialogs.alertDialog(context: context, message: 'authentication_register_problem_connection'));
         return false;
     }
     return true;

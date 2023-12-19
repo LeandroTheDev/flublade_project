@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -20,6 +22,14 @@ import 'package:flame/game.dart';
 
 class WorldGeneration extends SpriteComponent {
   static const worldTiles = [
+    //Null
+    {
+      'tileSprite': 'tilesets/overworld/grass.png',
+      'tileHeight': 32.0,
+      'tileWidth': 32.0,
+      'collisionType': 'RectangleHitbox',
+      'isSolid': false,
+    },
     //Grass
     {
       'tileSprite': 'tilesets/overworld/grass.png',
@@ -46,28 +56,50 @@ class WorldGeneration extends SpriteComponent {
     },
   ];
 
-  generateWorld(List<dynamic> worldData, FlameGame gameController) {
-    double tileSpaceHeight = 0.0;
-    double tileSpaceWidth = 0.0;
-    //All Tiles Columns
-    for (int i = 0; i < worldData[0].length; i++) {
-      //All Tiles Row
-      for (int j = 0; j < worldData[0][i].length; j++) {
-        gameController.add(WorldTile(
-          worldTiles[worldData[0][i][j]]["tileSprite"].toString(),
-          Vector2(double.parse(worldTiles[worldData[0][i][j]]["tileWidth"].toString()),
-              double.parse(worldTiles[worldData[0][i][j]]["tileHeight"].toString())),
-          Vector2(tileSpaceWidth, tileSpaceHeight),
-          worldTiles[worldData[0][i][j]]["collisionType"],
-          worldTiles[worldData[0][i][j]]["isSolid"],
-        ));
-        //Add Width Spacer
-        tileSpaceWidth += 31.0;
+  ///Receives the world data and the gameController to add the tiles in the world
+  List generateWorld(List<dynamic> worldData, FlameGame gameController, Vector2 playerPosition) {
+    List tilesRendered = [];
+    final chunkSquareRoot = sqrt(worldData.length);
+    //Swipe all chunks
+    double startX = 0;
+    double startY = 0;
+    for (int chunkIndex = 0; chunkIndex < chunkSquareRoot * chunkSquareRoot; chunkIndex++) {
+      tilesRendered.add([]);
+      //Pickup the actual chunk by index
+      final actualChunk = worldData[chunkIndex];
+      //Check if chunk is not null, null when chunk doesnt exist
+      if (actualChunk == null) continue;
+      //Actual tiles for the specific chunk
+      final List actualTiles = jsonDecode(actualChunk["tiles"]);
+      //Swiping the Y from the chunk
+      for (int y = 0; y < actualTiles.length; y++) {
+        //Swiping the X from the chunk
+        for (int x = 0; x < actualTiles[y].length; x++) {
+          //Create the component
+          final component = WorldTile(
+            worldTiles[actualTiles[y][x]]["tileSprite"].toString(),
+            Vector2(double.parse(worldTiles[actualTiles[y][x]]["tileWidth"].toString()), double.parse(worldTiles[actualTiles[y][x]]["tileHeight"].toString())),
+            Vector2(startX, startY),
+            worldTiles[actualTiles[y][x]]["collisionType"],
+            worldTiles[actualTiles[y][x]]["isSolid"],
+          );
+          //Adding to the world
+          gameController.add(component);
+          //Adding to the tiles rendered
+          tilesRendered[chunkIndex].add(component);
+          startX += 32;
+        }
+        startY += 32;
+        startX = 0;
       }
-      //Add Height Spacer
-      tileSpaceHeight += 31.0;
-      //Reset Width Spacer
-      tileSpaceWidth = 0.0;
+    }
+    return worldTiles;
+  }
+
+  ///Removes all Components in the list from the render
+  void removeAllComponents(List components, FlameGame gameController) {
+    for (int i = 0; i < components.length; i++) {
+      gameController.remove(components[i]);
     }
   }
 }

@@ -67,7 +67,7 @@ class Dialogs {
   ///Use this only for fatal errors
   ///
   ///Receives errorMsg as parameter, this will be the text to be show in center of error dialog
-  static errorDialog({
+  static void errorDialog({
     required String errorMsg,
     required BuildContext context,
   }) {
