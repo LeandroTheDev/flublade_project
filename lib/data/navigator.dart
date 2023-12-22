@@ -13,4 +13,11 @@ class NavigatorData extends ChangeNotifier {
   void changePlayerPosition(Vector2 position) {
     player.position = position;
   }
+
+  ///Actual Player Joystick Position
+  Vector2 _joystickPosition = Vector2(0.0, 0.0);
+  Vector2 get joystickPosition => _joystickPosition;
+  void changeJoystickPosition(Vector2 position) {
+    _joystickPosition = position;
+  }
 }

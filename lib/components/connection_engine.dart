@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flublade_project/components/system/dialogs.dart';
 import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/navigator.dart';
 import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/options.dart';
 import 'package:flublade_project/data/server.dart';
@@ -15,6 +16,9 @@ import '../pages/gameplay/navigator.dart';
 class ConnectionEngine {
   ///Gameplay Provider
   late final Gameplay gameplay;
+  late final NavigatorData navigator;
+
+  late final Timer playerPositionTimer;
 
   ///Navigator Socket
   late final IOWebSocketChannel navigatorSocket;
@@ -58,11 +62,13 @@ class ConnectionEngine {
     navigatorBroadcast.onData((data) => success(data));
     //Send Login Message
     userConnectionData = {
-      "job": "authenticate",
       "id": options.id,
       "token": options.token,
     };
-    navigatorSocket.sink.add(json.encode(userConnectionData));
+    navigatorSocket.sink.add(json.encode({
+      ...userConnectionData,
+      ...{"job": "authenticate"}
+    }));
   }
 
   ///Procceed Navigator Initilization sending a message to the server indicanting that you are ready
@@ -71,8 +77,7 @@ class ConnectionEngine {
   void startNavigatorSocket(BuildContext context, Function listen) {
     navigatorBroadcast.onData((data) => listen(data));
     //Create the Data to send
-    userConnectionData["job"] = "receiveDatas";
-    final sendData = {"selectedCharacter": gameplay.selectedCharacter};
+    final sendData = {"selectedCharacter": gameplay.selectedCharacter, "job": "receiveDatas"};
     //Convert and Send to the Server
     navigatorSocket.sink.add(json.encode({...userConnectionData, ...sendData}));
   }
@@ -80,6 +85,7 @@ class ConnectionEngine {
   ///Close the Navigator Socket
   void closeNavigatorSocket() {
     manuallyClosed = true;
+    playerPositionTimer.cancel();
     navigatorSocket.sink.close();
     navigatorBroadcast.cancel();
   }
@@ -87,6 +93,7 @@ class ConnectionEngine {
   ///Start the Gameplay
   void start(BuildContext context, int selectedCharacterIndex) {
     gameplay = Provider.of<Gameplay>(context, listen: false);
+    navigator = Provider.of<NavigatorData>(context, listen: false);
     //Change Selected Character ID
     gameplay.changeCharacterId(selectedCharacterIndex);
 
@@ -105,6 +112,17 @@ class ConnectionEngine {
       Navigator.pop(context);
       //Change Page to Gameplay
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => GameplayNavigator(this)), (route) => false);
+      //Start the timer for sending player positioning
+      playerPositionTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        //Send the direction to the server
+        navigatorSocket.sink.add(json.encode({
+          ...userConnectionData,
+          ...{
+            "job": "updatePlayerPosition",
+            "direction": [navigator.joystickPosition[0], navigator.joystickPosition[1]],
+          }
+        }));
+      });
     });
   }
 }

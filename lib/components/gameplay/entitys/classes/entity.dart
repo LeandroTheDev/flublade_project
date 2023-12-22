@@ -6,21 +6,19 @@ import 'package:flame/components.dart';
 ///entitySize: Vector2 the size of the entity
 ///entityCollisionRadius: double the radius for circle collision
 ///entityCollisionMultiply: double the multiply for collision
-class Entity extends SpriteAnimationComponent with CollisionCallbacks {
+class Entity extends PositionComponent with CollisionCallbacks {
   //Entity Parameters
   final String entityCollisionType;
   Vector2 entityPosition;
   Vector2 entitySize;
   double entityCollisionRadius;
   double entityCollisionMultiply;
-  Function onFinishMount;
   Entity({
     required this.entityPosition,
     required this.entitySize,
     this.entityCollisionType = "rectangle",
     this.entityCollisionRadius = 16.0,
     this.entityCollisionMultiply = 1,
-    required this.onFinishMount,
     priority = 100,
   }) : super(
           position: entityPosition,

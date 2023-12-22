@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flublade_project/components/connection_engine.dart';
 import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/language.dart';
+import 'package:flublade_project/data/navigator.dart';
 import 'package:flublade_project/data/options.dart';
 
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
+    final navigator = Provider.of<NavigatorData>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
     pauseDialog({
@@ -183,7 +185,7 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
                           listener: (area) {
                             //+x right -x left
                             //+y down -y up
-                            gameplay.changeJoystickPosition(Vector2(area.x, area.y));
+                            navigator.changeJoystickPosition(Vector2(area.x, area.y));
                           },
                           initialJoystickAlignment: Alignment.center,
                         ),

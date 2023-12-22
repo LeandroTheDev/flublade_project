@@ -23,11 +23,22 @@ class NavigatorEngine extends FlameGame {
   List worldTiles = [];
 
   ///Load all world tiles
-  void loadAllWorldTiles(data) {
+  void loadAllWorldTiles(List<dynamic> data) {
     //Remove old worlds from the render
     WorldGeneration().removeAllComponents(worldTiles, world);
     //Add new worlds to the render
     worldTiles = WorldGeneration().generateWorld(data, world, Vector2(0, 0));
+  }
+
+  void updateEntity(Map data) {
+    //Entity Position Update
+    // final entitys = data["entitys"];
+    //Player Position Update
+    final List<String> positionValues = data["playerPosition"].split(',');
+    final double x = double.parse(positionValues[0]);
+    final double y = double.parse(positionValues[1]);
+    final position = Vector2(x, y);
+    navigator.player.position = position;
   }
 
   ///Handle the socket messages provides by the server
@@ -46,6 +57,9 @@ class NavigatorEngine extends FlameGame {
     switch (response["message"]) {
       case "All Chunks Update":
         loadAllWorldTiles(response["chunks"]);
+        break;
+      case "Entity Update":
+        updateEntity(response);
         break;
     }
   }
@@ -72,4 +86,14 @@ class NavigatorEngine extends FlameGame {
     //Ask for the server to receive world datas
     engine.startNavigatorSocket(context, (data) => navigatorMessageHandler(data));
   }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    joystickMovimentDetector();
+  }
+
+  //Handles
+  ///Handle the joystick for player moviment
+  void joystickMovimentDetector() {}
 }

@@ -11,8 +11,7 @@ class PlayerEntity extends Entity with HasGameRef {
     required super.entityPosition,
     required super.entitySize,
     required this.playerBody,
-    onFinishMount,
-  }) : super(onFinishMount: onFinishMount ?? () {});
+  });
 
   //Player Sprites
   late SpriteAnimation spriteIdle;
@@ -31,7 +30,7 @@ class PlayerEntity extends Entity with HasGameRef {
           stepTime: 0.1,
         ),
       );
-      animation = spriteIdle;
+      // animation = spriteIdle;
     });
     //Idle Sprite
     return super.onLoad();

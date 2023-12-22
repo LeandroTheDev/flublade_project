@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 
 //
 //  DOCS
@@ -115,7 +114,6 @@ class WorldGeneration extends SpriteComponent {
       // print("Chunk render startX: $startX, startY: $startY"); //DEBUG
       //Increase the chunk position
       chunkPosition++;
-      tilesRendered.add([]);
       //Pickup the actual chunk by index
       final actualChunk = worldData[chunkIndex];
       //Check if chunk is not null, null when chunk doesnt exist
@@ -143,7 +141,7 @@ class WorldGeneration extends SpriteComponent {
           //Adding to the world
           gameController.add(component);
           //Adding to the tiles rendered
-          tilesRendered[chunkIndex].add(component);
+          tilesRendered.add(component);
           startX += 32;
         }
         //Reseting the X to render the lower tiles
