@@ -323,13 +323,19 @@ class Base {
   ///
   ///bodyOption = the specific option do you want for the body: (body, skin, hair, eyes...)
   ///
-  ///gender = gender is only necessary for body and skin, false for male, true for female
+  ///gender = gender is only necessary for body and skin, false for male, true for female or use the strings
   ///
   ///selectedOption = only necessary if you selecting a body option that uses int numbers like (hair, eyes, mouth, skin)
   ///
   ///selectedSprite = only for body option thats have multiples sprites (body, skin)
-  static returnBodyOptionAsset({required int raceID, String bodyOption = "body", bool gender = false, int selectedOption = 0, selectedSprite = 'idle'}) {
-    final characterGender = !gender ? 'male' : 'female';
+  static returnBodyOptionAsset({required int raceID, String bodyOption = "body", dynamic gender = false, int selectedOption = 0, selectedSprite = 'idle'}) {
+    late final String characterGender;
+    //Gender Translation
+    if (gender == "male" || gender == "female") {
+      characterGender = gender;
+    } else {
+      characterGender = !gender ? 'male' : 'female';
+    }
     switch (bodyOption) {
       case 'body':
         return Base.bodyOptions[Base.races[raceID]][characterGender][bodyOption][selectedSprite];
@@ -352,5 +358,16 @@ class Base {
       }
     }
     return 0;
+  }
+
+  ///Convert the string sprite location to the engine type,
+  ///without the assets/images/ string
+  static String convertBodyOptionAssetToEngine(String location) {
+    const enginePrefixString = "assets/images/";
+    if (location.startsWith(enginePrefixString)) {
+      return location.substring(enginePrefixString.length);
+    } else {
+      return location;
+    }
   }
 }

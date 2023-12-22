@@ -38,7 +38,7 @@ dependencies:
   web_socket_channel: ^2.4.0
   package_info_plus: ^4.2.0
   #Engine
-  flame: ^1.10.0
+  flame: ^1.13.1
   flutter_joystick: ^0.0.3
 
   # The following adds the Cupertino Icons font to your application.

@@ -2,6 +2,7 @@
 import 'package:flublade_project/components/connection_engine.dart';
 import 'package:flublade_project/components/widget/character_widget.dart';
 import 'package:flublade_project/data/base.dart';
+import 'package:flublade_project/data/gameplay.dart';
 import 'package:flublade_project/data/language.dart';
 import 'package:flublade_project/data/server.dart';
 import 'package:flublade_project/data/options.dart';
@@ -41,6 +42,7 @@ class _CharacterSelectionState extends State<CharacterSelection> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final options = Provider.of<Options>(context);
+    final gameplay = Provider.of<Gameplay>(context);
 
     returnGold(index) {
       try {
@@ -200,7 +202,10 @@ class _CharacterSelectionState extends State<CharacterSelection> {
                                     width: 600,
                                     height: 170,
                                     child: ElevatedButton(
-                                      onPressed: () => ConnectionEngine().start(context, index),
+                                      onPressed: () => {
+                                        gameplay.changeCharacterBody(characters['character$index']),
+                                        ConnectionEngine().start(context, index),
+                                      },
                                       style: ButtonStyle(
                                         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                           RoundedRectangleBorder(

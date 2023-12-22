@@ -21,6 +21,13 @@ class Gameplay with ChangeNotifier {
     _characterId = value;
   }
 
+  ///Selected character attributes storing all character customization
+  Map _characterBody = {};
+  Map get characterBody => _characterBody;
+  void changeCharacterBody(Map value) {
+    _characterBody = value;
+  }
+
   //Utils
   ///Reset all gamneplay variables
   void resetVariables() {

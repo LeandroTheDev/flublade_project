@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
 
 //
 //  DOCS
@@ -87,7 +86,7 @@ class WorldGeneration extends SpriteComponent {
   }
 
   ///Receives the world data and the gameController to add the tiles in the world
-  List generateWorld(List<dynamic> worldData, FlameGame gameController, Vector2 playerPosition) {
+  List generateWorld(List<dynamic> worldData, World gameController, Vector2 playerPosition) {
     List tilesRendered = [];
     final chunkSquareRoot = sqrt(worldData.length);
     // print("Chunk Square Root: $chunkSquareRoot, chunk quantity: ${worldData.length}"); //DEBUG
@@ -159,7 +158,7 @@ class WorldGeneration extends SpriteComponent {
   }
 
   ///Removes all Components in the list from the render
-  void removeAllComponents(List components, FlameGame gameController) {
+  void removeAllComponents(List components, World gameController) {
     for (int i = 0; i < components.length; i++) {
       gameController.remove(components[i]);
     }

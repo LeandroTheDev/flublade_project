@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flame/game.dart';
 import 'package:flublade_project/components/connection_engine.dart';
+import 'package:flublade_project/components/gameplay/entitys/player.dart';
 import 'package:flublade_project/components/gameplay/world_generation.dart';
 import 'package:flublade_project/data/gameplay.dart';
+import 'package:flublade_project/data/navigator.dart';
 import 'package:flublade_project/data/server.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,7 @@ class NavigatorEngine extends FlameGame {
 
   //Providers
   late final Gameplay gameplay;
+  late final NavigatorData navigator;
 
   ///World Tiles, stores all the tiles in actual area
   List worldTiles = [];
@@ -22,9 +25,9 @@ class NavigatorEngine extends FlameGame {
   ///Load all world tiles
   void loadAllWorldTiles(data) {
     //Remove old worlds from the render
-    WorldGeneration().removeAllComponents(worldTiles, this);
+    WorldGeneration().removeAllComponents(worldTiles, world);
     //Add new worlds to the render
-    worldTiles = WorldGeneration().generateWorld(data, this, Vector2(0, 0));
+    worldTiles = WorldGeneration().generateWorld(data, world, Vector2(0, 0));
   }
 
   ///Handle the socket messages provides by the server
@@ -53,6 +56,19 @@ class NavigatorEngine extends FlameGame {
     super.onMount();
     //Providers Declaration
     gameplay = Provider.of<Gameplay>(context, listen: false);
+    navigator = Provider.of<NavigatorData>(context, listen: false);
+    //Creating you
+    final player = PlayerEntity(
+      entityPosition: Vector2(0, 0),
+      entitySize: Vector2(38, 62),
+      playerBody: gameplay.characterBody,
+    );
+    //Adding to render
+    world.add(player);
+    camera.follow(player);
+    //Adding to provider for global changes
+    navigator.changePlayer(player);
+
     //Ask for the server to receive world datas
     engine.startNavigatorSocket(context, (data) => navigatorMessageHandler(data));
   }

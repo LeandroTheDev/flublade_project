@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:flublade_project/data/navigator.dart';
 import 'package:flublade_project/data/savedatas.dart';
 import 'package:flublade_project/data/server.dart';
 
@@ -37,6 +38,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => Server(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NavigatorData(),
         ),
       ],
       child: const FluBlade(),
