@@ -55,6 +55,8 @@ class WorldGeneration extends SpriteComponent {
     },
   ];
 
+  List<SpriteComponent> worldComponents = [];
+
   ///Return number to multiply the start position of chunk render
   ///need the double of square root to me stringify
   int calculateChunkNegative(String chunkSquareRoot) {
@@ -84,19 +86,41 @@ class WorldGeneration extends SpriteComponent {
     return 0;
   }
 
+  ///Receives a coordinates and return the closest multiple of 480
+  double calculateStartCoordinate(int coordinate) {
+    //Calculate the quotient of 480
+    int quotient = (coordinate / 480).round();
+
+    //Multiply the quotient by the 480 to obtain the proximity number
+    int closestMultiple = quotient * 480;
+
+    //Check if is negative
+    if (coordinate < 0) {
+      //We need to check if the player is in new chunk
+      if (coordinate < closestMultiple) {
+        //Increase a chunk
+        closestMultiple -= 480;
+      }
+    }
+
+    return closestMultiple.toDouble();
+  }
+
   ///Receives the world data and the gameController to add the tiles in the world
-  List generateWorld(List<dynamic> worldData, World gameController, Vector2 playerPosition) {
-    List tilesRendered = [];
+  void generateWorld(List<dynamic> worldData, World gameController, Vector2 playerPosition) {
+    // print(worldData);
+    List<SpriteComponent> tilesRendered = [];
     final chunkSquareRoot = sqrt(worldData.length);
     // print("Chunk Square Root: $chunkSquareRoot, chunk quantity: ${worldData.length}"); //DEBUG
     int chunkPosition = 1;
-    //Chunk Render Calculation Variables // Less 2 to exclude internal radius
+    //Chunk Render Calculation Variables
     final chunkNegativeCalculation = (480 * calculateChunkNegative(chunkSquareRoot.toString()));
-    double startX = playerPosition[0] - chunkNegativeCalculation;
-    double startY = playerPosition[1] - chunkNegativeCalculation;
+    double startX = calculateStartCoordinate((playerPosition[0] - chunkNegativeCalculation).round());
+    double startY = calculateStartCoordinate((playerPosition[1] - chunkNegativeCalculation).round());
     double actualStartX = startX;
     double actualStartY = startY;
     // print("Starting Render Position: $startX, $startY"); //DEBUG
+    // print("Player Position: $playerPosition"); //DEBUG
     //Swipe all chunks
     for (int chunkIndex = 0; chunkIndex < chunkSquareRoot * chunkSquareRoot; chunkIndex++) {
       // print("Rendering the chunk: $chunkIndex"); //DEBUG
@@ -105,7 +129,7 @@ class WorldGeneration extends SpriteComponent {
         //Reseting the position
         chunkPosition = 1;
         //Reseting the base X because we finished the X chunks now we are going lower
-        startX = playerPosition[0] - chunkNegativeCalculation;
+        startX = calculateStartCoordinate((playerPosition[0] - chunkNegativeCalculation).round());
         actualStartX = startX;
         //Incresing the base Y because the X is finished and we need to go lower in the coordinates
         actualStartY += 480;
@@ -127,9 +151,9 @@ class WorldGeneration extends SpriteComponent {
       final List actualTiles = jsonDecode(actualChunk["tiles"]);
       //Swiping the Y from the chunk
       for (int y = 0; y < actualTiles.length; y++) {
-        // print("X: ${startX}, Y: ${startY}");
         //Swiping the X from the chunk
         for (int x = 0; x < actualTiles[y].length; x++) {
+          // print("X: ${startX}, Y: ${startY}, tile: ${actualTiles[y][x]}");
           //Create the component
           final component = WorldTile(
             worldTiles[actualTiles[y][x]]["tileSprite"].toString(),
@@ -152,14 +176,15 @@ class WorldGeneration extends SpriteComponent {
       actualStartX += 480;
       startY = actualStartY;
     }
-    return tilesRendered;
+    worldComponents = tilesRendered;
   }
 
   ///Removes all Components in the list from the render
-  void removeAllComponents(List components, World gameController) {
-    for (int i = 0; i < components.length; i++) {
-      gameController.remove(components[i]);
+  Future<bool> removeAllComponents(World gameController) async {
+    for (int i = 0; i < worldComponents.length; i++) {
+      gameController.remove(worldComponents[i]);
     }
+    return true;
   }
 }
 

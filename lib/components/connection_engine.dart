@@ -23,7 +23,7 @@ class ConnectionEngine {
   ///Navigator Socket
   late final IOWebSocketChannel navigatorSocket;
 
-  ///Navigator Broadcast to listen the listenNavigator
+  ///Navigator Broadcast to listen the socket
   late final StreamSubscription navigatorBroadcast;
 
   ///User credentials to check account validation

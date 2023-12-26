@@ -20,14 +20,14 @@ class NavigatorEngine extends FlameGame {
   late final NavigatorData navigator;
 
   ///World Tiles, stores all the tiles in actual area
-  List worldTiles = [];
+  WorldGeneration worldGeneration = WorldGeneration();
 
   ///Load all world tiles
   void loadAllWorldTiles(List<dynamic> data) {
     //Remove old worlds from the render
-    WorldGeneration().removeAllComponents(worldTiles, world);
+    worldGeneration.removeAllComponents(world);
     //Add new worlds to the render
-    worldTiles = WorldGeneration().generateWorld(data, world, Vector2(0, 0));
+    worldGeneration.generateWorld(data, world, navigator.player.position);
   }
 
   void updateEntity(Map data) {
