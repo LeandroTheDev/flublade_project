@@ -125,4 +125,10 @@ class ConnectionEngine {
       });
     });
   }
+
+  //Helpers
+  void sendMessageToNavigatorSocket(Map message) {
+    //Send the direction to the server
+    navigatorSocket.sink.add(json.encode({...userConnectionData, ...message}));
+  }
 }

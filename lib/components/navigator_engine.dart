@@ -20,7 +20,7 @@ class NavigatorEngine extends FlameGame {
   late final NavigatorData navigator;
 
   ///World Tiles, stores all the tiles in actual area
-  WorldGeneration worldGeneration = WorldGeneration();
+  late WorldGeneration worldGeneration;
 
   ///Load all world tiles
   void loadAllWorldTiles(List<dynamic> data) {
@@ -30,6 +30,7 @@ class NavigatorEngine extends FlameGame {
     worldGeneration.generateWorld(data, world, navigator.player.position);
   }
 
+  ///Update all entity provided from the data
   void updateEntity(Map data) {
     //Entity Position Update
     // final entitys = data["entitys"];
@@ -83,6 +84,9 @@ class NavigatorEngine extends FlameGame {
     //Adding to provider for global changes
     navigator.changePlayer(player);
 
+    //Initialize the world generation
+    worldGeneration = WorldGeneration(this);
+
     //Ask for the server to receive world datas
     engine.startNavigatorSocket(context, (data) => navigatorMessageHandler(data));
   }
@@ -96,4 +100,10 @@ class NavigatorEngine extends FlameGame {
   //Handles
   ///Handle the joystick for player moviment
   void joystickMovimentDetector() {}
+  //Utils
+  void askForChunkUpdate() {
+    engine.sendMessageToNavigatorSocket({
+      "job": "updatePlayerChunk",
+    });
+  }
 }

@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flublade_project/components/navigator_engine.dart';
 
 //
 //  DOCS
@@ -20,6 +21,9 @@ import 'package:flame/components.dart';
 // define the properties of tile.
 
 class WorldGeneration extends SpriteComponent {
+  final NavigatorEngine engine;
+  WorldGeneration(this.engine);
+
   static const worldTiles = [
     //Null
     {
@@ -56,6 +60,10 @@ class WorldGeneration extends SpriteComponent {
   ];
 
   List<SpriteComponent> worldComponents = [];
+
+  ///Check if asked a update for the server for not spamming
+  bool alreadyAskedForUpdate = false;
+  bool firstLoad = false;
 
   ///Return number to multiply the start position of chunk render
   ///need the double of square root to me stringify
@@ -94,12 +102,33 @@ class WorldGeneration extends SpriteComponent {
     //Multiply the quotient by the 480 to obtain the proximity number
     int closestMultiple = quotient * 480;
 
+    //If coordinate is bugged, ask for correction
+    if (coordinate == closestMultiple && !alreadyAskedForUpdate) {
+      alreadyAskedForUpdate = true;
+
+      //First load need to ignore the chunk update is unecessary
+      if (!firstLoad) {
+        firstLoad = true;
+      }
+      //We ask for chunk updates
+      else {
+        engine.askForChunkUpdate();
+        Future.delayed(const Duration(milliseconds: 100), () => alreadyAskedForUpdate = false);
+      }
+    }
+
     //Check if is negative
     if (coordinate < 0) {
       //We need to check if the player is in new chunk
       if (coordinate < closestMultiple) {
         //Increase a chunk
         closestMultiple -= 480;
+      }
+    } else {
+      //We need to check if the player is in new chunk
+      if (coordinate < closestMultiple) {
+        //Increase a chunk
+        closestMultiple += 480;
       }
     }
 
