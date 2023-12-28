@@ -2,23 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flublade_project/components/navigator_engine.dart';
-
-//
-//  DOCS
-//
-// WorldGeneration
-// ---------------
-// tileSpaceWidth/Height -- is the space between tiles the default is 32
-//
-// worldTiles -- variable that stores the tiles information (size, sprite path)
-
-// WorldTile
-// ---------
-// Desc: WorldTile is the component that will render on the screen the respective tile, have some paramaters that will
-// define the properties of tile.
 
 class WorldGeneration extends SpriteComponent {
   final NavigatorEngine engine;
@@ -30,32 +15,24 @@ class WorldGeneration extends SpriteComponent {
       'tileSprite': 'tilesets/overworld/grass.png',
       'tileHeight': 32.0,
       'tileWidth': 32.0,
-      'collisionType': 'RectangleHitbox',
-      'isSolid': false,
     },
     //Grass
     {
       'tileSprite': 'tilesets/overworld/grass.png',
       'tileHeight': 32.0,
       'tileWidth': 32.0,
-      'collisionType': 'none',
-      'isSolid': false,
     },
     //Stone
     {
       'tileSprite': 'tilesets/overworld/stone.png',
       'tileHeight': 32.0,
       'tileWidth': 32.0,
-      'collisionType': 'RectangleHitbox',
-      'isSolid': true,
     },
     //Stone Down
     {
       'tileSprite': 'tilesets/overworld/stone_down.png',
       'tileHeight': 32.0,
       'tileWidth': 32.0,
-      'collisionType': 'RectangleHitbox',
-      'isSolid': true,
     },
   ];
 
@@ -68,7 +45,7 @@ class WorldGeneration extends SpriteComponent {
   ///Return number to multiply the start position of chunk render
   ///need the double of square root to me stringify
   int calculateChunkNegative(String chunkSquareRoot) {
-    //Will be better if i make a calculation to plus 2 add +1 but i will make this in future
+    //Will be better if i make a calculation to plus 2 add +1? yes obviously
     switch (chunkSquareRoot) {
       case "3.0":
         return 1;
@@ -117,19 +94,10 @@ class WorldGeneration extends SpriteComponent {
       }
     }
 
-    //Check if is negative
-    if (coordinate < 0) {
-      //We need to check if the player is in new chunk
-      if (coordinate < closestMultiple) {
-        //Increase a chunk
-        closestMultiple -= 480;
-      }
-    } else {
-      //We need to check if the player is in new chunk
-      if (coordinate < closestMultiple) {
-        //Increase a chunk
-        closestMultiple += 480;
-      }
+    //We need to check if the player is in new chunk
+    if (coordinate < closestMultiple) {
+      //Increase a chunk
+      closestMultiple -= 480;
     }
 
     return closestMultiple.toDouble();
@@ -188,8 +156,6 @@ class WorldGeneration extends SpriteComponent {
             worldTiles[actualTiles[y][x]]["tileSprite"].toString(),
             Vector2(double.parse(worldTiles[actualTiles[y][x]]["tileWidth"].toString()), double.parse(worldTiles[actualTiles[y][x]]["tileHeight"].toString())),
             Vector2(startX, startY),
-            worldTiles[actualTiles[y][x]]["collisionType"],
-            worldTiles[actualTiles[y][x]]["isSolid"],
           );
           //Adding to the world
           gameController.add(component);
@@ -203,6 +169,7 @@ class WorldGeneration extends SpriteComponent {
         startY += 32;
       }
       actualStartX += 480;
+      startX = actualStartX;
       startY = actualStartY;
     }
     worldComponents = tilesRendered;
@@ -223,38 +190,23 @@ class WorldTile extends SpriteComponent {
   final Vector2 tileSize;
   final Vector2 tilePosition;
 
-  late String tileCollision;
   late bool tileIsSolid;
 
   WorldTile(
-    //Request
-    this.tileSprite,
-    this.tileSize,
-    this.tilePosition, [
-    collision = 'RectangleHitbox',
-    isSolid = true,
-  ]
+      //Request
+      this.tileSprite,
+      this.tileSize,
+      this.tilePosition
       //Setting
-      ) : super(
+      )
+      : super(
           size: tileSize,
           position: tilePosition,
-        ) {
-    tileCollision = collision;
-    tileIsSolid = isSolid;
-  }
+        );
 
   @override
   Future<void> onLoad() async {
     //Load Sprite
     sprite = await Sprite.load(tileSprite);
-
-    //Hitbox
-    switch (tileCollision) {
-      case "none":
-        break;
-      case "RectangleHitbox":
-        add(RectangleHitbox(size: Vector2(32.0, 32.0), anchor: Anchor.center, position: size / 2, collisionType: CollisionType.passive));
-        break;
-    }
   }
 }
