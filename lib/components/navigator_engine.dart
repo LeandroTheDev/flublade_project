@@ -91,15 +91,6 @@ class NavigatorEngine extends FlameGame {
     engine.startNavigatorSocket(context, (data) => navigatorMessageHandler(data));
   }
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-    joystickMovimentDetector();
-  }
-
-  //Handles
-  ///Handle the joystick for player moviment
-  void joystickMovimentDetector() {}
   //Utils
   void askForChunkUpdate() {
     engine.sendMessageToNavigatorSocket({

@@ -25,19 +25,6 @@ void main() async {
   await windowManager.ensureInitialized();
   await SaveDatas.init();
 
-  // //Change window size
-  // WindowOptions windowOptions = const WindowOptions(
-  //   size: Size(200, 200),
-  //   center: true,
-  //   // backgroundColor: Colors.transparent,
-  //   skipTaskbar: false,
-  //   // titleBarStyle: TitleBarStyle.hidden,
-  // );
-  // windowManager.waitUntilReadyToShow(windowOptions, () async {
-  //   await windowManager.show();
-  //   await windowManager.focus();
-  // });
-
   runApp(
     MultiProvider(
       //Providers Call

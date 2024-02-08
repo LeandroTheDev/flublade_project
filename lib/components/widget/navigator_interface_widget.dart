@@ -18,6 +18,7 @@ class NavigatorInterface extends StatefulWidget {
 }
 
 class _NavigatorInterfaceState extends State<NavigatorInterface> {
+  bool isMoving = false;
   @override
   Widget build(BuildContext context) {
     final gameplay = Provider.of<Gameplay>(context);
@@ -186,6 +187,18 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
                             //+x right -x left
                             //+y down -y up
                             navigator.changeJoystickPosition(Vector2(area.x, area.y));
+                            //Check if player is moving and stopped moving
+                            if (isMoving && area.x == 0 && area.y == 0) {
+                              isMoving = false;
+                              //Update Animation
+                              navigator.player.bodySprite.changeToIdle();
+                            }
+                            //Check if player is NOT moving and started moving
+                            else if (!isMoving && area.x != 0 && area.y != 0) {
+                              isMoving = true;
+                              //Update Animation
+                              navigator.player.bodySprite.changeToRunning();
+                            }
                           },
                           initialJoystickAlignment: Alignment.center,
                         ),

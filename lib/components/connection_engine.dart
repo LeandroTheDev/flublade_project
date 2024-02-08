@@ -33,7 +33,7 @@ class ConnectionEngine {
   bool manuallyClosed = false;
 
   ///Initialize the navigator socket to estabilish connection,
-  ///this doesnt need to be called at any time, the "start" function already call this.
+  ///this doens't need to be called at any time, the "start" function already call this.
   ///
   ///context = buildcontext of your actual application
   ///
