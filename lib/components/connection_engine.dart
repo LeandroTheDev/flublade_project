@@ -14,6 +14,9 @@ import 'package:web_socket_channel/io.dart';
 import '../pages/gameplay/navigator.dart';
 
 class ConnectionEngine {
+  //The Context
+  late BuildContext context;
+
   ///Gameplay Provider
   late final Gameplay gameplay;
   late final NavigatorData navigator;
@@ -38,7 +41,7 @@ class ConnectionEngine {
   ///context = buildcontext of your actual application
   ///
   ///success = is the function called when the server returns the handshake
-  void initNavigatorSocket(BuildContext context, Function success) {
+  void initNavigatorSocket(Function success) {
     final options = Provider.of<Options>(context, listen: false);
     //HandShake with Navigator
     try {
@@ -74,7 +77,8 @@ class ConnectionEngine {
   ///Procceed Navigator Initilization sending a message to the server indicanting that you are ready
   ///to receive world data, the listen function will be called every time the server returns the world data,
   ///the function have a data parameter containing the Map from world data
-  void startNavigatorSocket(BuildContext context, Function listen) {
+  void startNavigatorSocket(BuildContext newContext, Function listen) {
+    context = newContext;
     navigatorBroadcast.onData((data) => listen(data));
     //Create the Data to send
     final sendData = {"selectedCharacter": gameplay.selectedCharacter, "job": "receiveDatas"};
@@ -91,7 +95,8 @@ class ConnectionEngine {
   }
 
   ///Start the Gameplay
-  void start(BuildContext context, int selectedCharacterIndex) {
+  void start(BuildContext newContext, int selectedCharacterIndex) {
+    context = newContext;
     gameplay = Provider.of<Gameplay>(context, listen: false);
     navigator = Provider.of<NavigatorData>(context, listen: false);
     //Change Selected Character ID
@@ -101,7 +106,7 @@ class ConnectionEngine {
     Dialogs.loadingDialog(context: context);
 
     //Start Socket
-    initNavigatorSocket(context, (data) {
+    initNavigatorSocket((data) {
       //Check Errors
       if (!Server.errorTreatment(json.decode(data)["message"], context)) {
         closeNavigatorSocket();
@@ -126,9 +131,11 @@ class ConnectionEngine {
     });
   }
 
+  ///This need to be called after the primary widget been loaded
+  void updateNavigatorContext(BuildContext context) => context = context;
+
   //Helpers
-  void sendMessageToNavigatorSocket(Map message) {
-    //Send the direction to the server
-    navigatorSocket.sink.add(json.encode({...userConnectionData, ...message}));
-  }
+
+  //Send the direction to the server
+  void sendMessageToNavigatorSocket(Map message) => navigatorSocket.sink.add(json.encode({...userConnectionData, ...message}));
 }

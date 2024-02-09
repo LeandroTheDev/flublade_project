@@ -79,16 +79,16 @@ class Base {
         }
       },
       'hair': {
-        0: 'assets/images/players/human/hair/0/hair.png',
-        1: 'assets/images/players/human/hair/1/hair.png',
+        0: ['assets/images/players/human/hair/0/hair_idle0.png'],
+        1: ['assets/images/players/human/hair/1/hair_idle0.png'],
       },
       'eyes': {
-        0: 'assets/images/players/human/eyes/0/eyes.png',
-        1: 'assets/images/players/human/eyes/1/eyes.png',
+        0: ['assets/images/players/human/eyes/0/eyes_idle0.png'],
+        1: ['assets/images/players/human/eyes/1/eyes_idle0.png'],
       },
       'mouth': {
-        0: 'assets/images/players/human/mouth/0/mouth.png',
-        1: 'assets/images/players/human/mouth/1/mouth.png',
+        0: ['assets/images/players/human/mouth/0/mouth_idle0.png'],
+        1: ['assets/images/players/human/mouth/1/mouth_idle0.png'],
       },
     },
     'nature': {

@@ -25,6 +25,8 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
     final navigator = Provider.of<NavigatorData>(context, listen: false);
     final screenSize = MediaQuery.of(context).size;
 
+    widget.engine.updateNavigatorContext(context);
+
     pauseDialog({
       required BuildContext context,
     }) {
@@ -192,12 +194,14 @@ class _NavigatorInterfaceState extends State<NavigatorInterface> {
                               isMoving = false;
                               //Update Animation
                               navigator.player.bodySprite.changeToIdle();
+                              navigator.player.bodyParts.changeToIdle();
                             }
                             //Check if player is NOT moving and started moving
                             else if (!isMoving && area.x != 0 && area.y != 0) {
                               isMoving = true;
                               //Update Animation
                               navigator.player.bodySprite.changeToRunning();
+                              navigator.player.bodyParts.changeToRunning();
                             }
                           },
                           initialJoystickAlignment: Alignment.center,

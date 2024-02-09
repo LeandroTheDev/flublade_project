@@ -46,29 +46,17 @@ class WorldGeneration extends SpriteComponent {
   ///need the double of square root to me stringify
   int calculateChunkNegative(String chunkSquareRoot) {
     //Will be better if i make a calculation to plus 2 add +1? yes obviously
-    switch (chunkSquareRoot) {
-      case "3.0":
-        return 1;
-      case "5.0":
-        return 2;
-      case "7.0":
-        return 3;
-      case "9.0":
-        return 4;
-      case "11.0":
-        return 5;
-      case "13.0":
-        return 6;
-      case "15.0":
-        return 7;
-      case "17.0":
-        return 8;
-      case "19.0":
-        return 9;
-      case "21.0":
-        return 10;
+    int chunkNegative = 1;
+    int calculation = 3;
+    while (true) {
+      //The chunkSquareRoot is a string of a double so we need to make this awful thing
+      if ("$calculation.0" == chunkSquareRoot) {
+        return chunkNegative;
+      } else {
+        calculation += 2;
+        chunkNegative += 1;
+      }
     }
-    return 0;
   }
 
   ///Receives a coordinates and return the closest multiple of 480
@@ -105,17 +93,16 @@ class WorldGeneration extends SpriteComponent {
 
   ///Receives the world data and the gameController to add the tiles in the world
   void generateWorld(List<dynamic> worldData, World gameController, Vector2 playerPosition) {
-    // print(worldData);
     List<SpriteComponent> tilesRendered = [];
     final chunkSquareRoot = sqrt(worldData.length);
     // print("Chunk Square Root: $chunkSquareRoot, chunk quantity: ${worldData.length}"); //DEBUG
     int chunkPosition = 1;
     //Chunk Render Calculation Variables
-    final chunkNegativeCalculation = (480 * calculateChunkNegative(chunkSquareRoot.toString()));
-    double startX = calculateStartCoordinate((playerPosition[0] - chunkNegativeCalculation).round());
-    double startY = calculateStartCoordinate((playerPosition[1] - chunkNegativeCalculation).round());
-    double actualStartX = startX;
-    double actualStartY = startY;
+    final chunkNegativeCalculation = (480 * calculateChunkNegative(chunkSquareRoot.toString())); //Calculates the negative side of the chunk
+    double startX = calculateStartCoordinate((playerPosition[0] - chunkNegativeCalculation).round()); //Calculates the First X chunk coordinate to start rendering
+    double startY = calculateStartCoordinate((playerPosition[1] - chunkNegativeCalculation).round()); //Calculates the First Y chunk coordinate to start rendering
+    double actualStartX = startX; //Actual chunk that is rendering
+    double actualStartY = startY; //Actual chunk that is rendering
     // print("Starting Render Position: $startX, $startY"); //DEBUG
     // print("Player Position: $playerPosition"); //DEBUG
     //Swipe all chunks
@@ -150,7 +137,7 @@ class WorldGeneration extends SpriteComponent {
       for (int y = 0; y < actualTiles.length; y++) {
         //Swiping the X from the chunk
         for (int x = 0; x < actualTiles[y].length; x++) {
-          // print("X: ${startX}, Y: ${startY}, tile: ${actualTiles[y][x]}");
+          // print("X: ${startX}, Y: ${startY}, tile: ${actualTiles[y][x]}"); //DEBUG
           //Create the component
           final component = WorldTile(
             worldTiles[actualTiles[y][x]]["tileSprite"].toString(),

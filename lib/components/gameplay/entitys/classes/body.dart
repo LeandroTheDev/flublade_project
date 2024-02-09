@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
+/// The brute body of the entity,
+///
 /// The First sprite in the list will be considered as idle,
 /// you can also add the idle quantity in sprite
 class BodySprite extends SpriteAnimationComponent with HasGameRef {
@@ -14,7 +16,7 @@ class BodySprite extends SpriteAnimationComponent with HasGameRef {
     required this.sprites,
     required Vector2 bodySize,
     this.color = Colors.black,
-  }) : super(size: bodySize, position: Vector2(-(bodySize[0] / 2), -(bodySize[1] / 2)));
+  }) : super(size: bodySize, position: Vector2(-(bodySize[0] / 2), -(bodySize[1] / 2)), priority: 100);
   SpriteAnimation? spriteIdle;
   SpriteAnimation? spriteRunning;
 
